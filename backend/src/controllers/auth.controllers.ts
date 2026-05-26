@@ -4,7 +4,8 @@ import ApiResponse from "../utils/ApiResponse.js";
 import {prisma} from '../prisma.js'
 import bcrypt from 'bcrypt'
 import { generateAccessAndRefreshTokens } from "../utils/generateToken.js";
-
+import crypto from 'crypto'
+import { sendVerificationEmail } from "../services/mail.service.js";
 
 export const registerUser=asyncHandler(async(req,res)=>{
 
@@ -12,6 +13,14 @@ export const registerUser=asyncHandler(async(req,res)=>{
 
   if(!name || !email || !password){
     throw new ApiError(400,"All fields are required")
+  }
+
+  const isValidEmail=(email:string)=>{
+    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)
+  }
+
+  if(!isValidEmail(email)){
+    throw new ApiError(400,"Invalid email format")
   }
 
   const existingUser=await prisma.user.findUnique({
@@ -24,9 +33,14 @@ export const registerUser=asyncHandler(async(req,res)=>{
 
   const hashedPassword=await bcrypt.hash(password,10)
 
+  const verificationToken=crypto.randomBytes(32).toString("hex")
+  const verificationExp=new Date(Date.now()+15*60*1000)
+
   const user=await prisma.user.create({
     data:{
-      name,email,password:hashedPassword
+      name,email,password:hashedPassword,emailVerified:false,
+      emailVerificationToken:verificationToken,
+      emailVerificationExp:verificationExp
     },
     select:{
       id:true,
@@ -34,10 +48,13 @@ export const registerUser=asyncHandler(async(req,res)=>{
       email:true,
       avatar:true,
       role:true,
+      emailVerified:true,
       createdAt:true,
       updatedAt:true,
     }
     })
+
+    await sendVerificationEmail(email,verificationToken)
 
     res.status(201).json(new ApiResponse(201,user,"User created Successfully"))
 
@@ -66,15 +83,19 @@ export const loginUser=asyncHandler(async(req,res)=>
     throw new ApiError(401,"Invalid credentials")
   }
 
+  if(!user.emailVerified){
+    throw new ApiError(401,"Invlaid")
+  }
+
   const {accessToken,refreshToken}=generateAccessAndRefreshTokens(user.id)
 
-  // await prisma.refreshToken.create({
-  //   data:{
-  //     token:refreshToken,
-  //     userId:user.id,
-  //     expiresIn:new Date(Date.now()+7 * 24 * 60* 60* 1000)
-  //   }
-  // })
+  await prisma.refreshToken.create({
+    data:{
+      token:refreshToken,
+      userId:user.id,
+      expiresIn:new Date(Date.now()+7 * 24 * 60* 60* 1000)
+    }
+  })
 
   res.status(200).json(new ApiResponse(200,{
     user:{
