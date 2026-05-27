@@ -1,7 +1,7 @@
 import { transporter } from "../constant/mail.js";
 import env from '../constant/env.js'
 
-export const sendVerificationEmail=async(email:string,token:string)=>{
+export const verificationEmailService=async(email:string,token:string)=>{
 
   const verificationLink=`${env.CLIENT_URL}/verify-email?token=${token}`
 
