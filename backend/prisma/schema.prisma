@@ -24,6 +24,9 @@ model User {
   emailVerificationToken     String?
   emailVerificationExp       DateTime?  
 
+  passwordResetToken    String?
+  passwordResetExp      DateTime?
+
   refreshTokens RefreshToken[]
   accounts     Account[]
   transactions Transaction[]
