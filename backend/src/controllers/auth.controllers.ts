@@ -430,7 +430,7 @@ export const resetPassword=asyncHandler(async(req,res)=>{
   }
 
   if(newPassword!==confirmNewPassword){
-    throw new ApiError(402,"both password should be equal")
+    throw new ApiError(400,"both password should be equal")
   }
 
   const checkNewPassword=await bcrypt.compare(newPassword,user.password)
@@ -443,12 +443,22 @@ export const resetPassword=asyncHandler(async(req,res)=>{
 
    await prisma.user.update({
     where:{
-      email:user.email
+      id:user.id
     },
     data:{
-      password:hashedNewPassword
+      password:hashedNewPassword,
+      passwordResetExp:null,
+      passwordResetToken:null
     }
   })
+
+  await prisma.refreshToken.deleteMany({
+    where:{
+      userId:user.id
+    }
+  })
+
+  return res.status(200).json(new ApiResponse(200,null,"Password reset successfully"))
 })
 
 //getting user profile 
@@ -457,7 +467,6 @@ export const getUserProfile=asyncHandler(async(req,res)=>{
   if(!req.user){
     throw new ApiError(401,"Unauthorised")
   }
-
 
   return res.status(200).json(new ApiResponse(200,req.user,"User profile fetched "))
 

@@ -1,6 +1,6 @@
 import { Router } from "express";
 import { verifyJWT } from "../middlewares/auth.middleware.js";
-import { createAccount, deleteAccount, getAccount, updateAccount } from "../controllers/accout.controllers.js";
+import { createAccount, deleteAccount, getAccount, updateAccount } from "../controllers/account.controllers.js";
 
 const accountRouter=Router()
 
