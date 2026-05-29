@@ -25,6 +25,9 @@ export const createAccount=asyncHandler(async(req,res)=>{
       userId
     }
   })
+  if(!account){
+    throw new ApiError(400,"Some error occurred during creating account")
+  }
 
   return res.status(201).json(new ApiResponse(201,account,"Account created successfully"))
 })
