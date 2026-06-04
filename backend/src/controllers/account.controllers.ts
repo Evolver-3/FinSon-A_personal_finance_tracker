@@ -41,7 +41,7 @@ export const getAccount=asyncHandler(async(req,res)=>{
 
   const accounts=await prisma.account.findMany({
     where:{
-      id:userId
+      userId
     },
     select:{
       id:true,
@@ -56,7 +56,7 @@ export const getAccount=asyncHandler(async(req,res)=>{
     }
   })
 
-  return res.status(201).json(new ApiResponse(200,accounts,"Account fetched successfully"))
+  return res.status(200).json(new ApiResponse(200,accounts,"Account fetched successfully"))
 
 })
 
@@ -64,12 +64,12 @@ export const updateAccount=asyncHandler(async(req,res)=>{
   const userId=req.user?.id
 
   if(!userId){
-    throw new ApiError(400,"Unauthorized")
+    throw new ApiError(401,"Unauthorized")
   }
   const {accountId}=req.params
 
   if(!accountId || Array.isArray(accountId)){
-    throw new ApiError(401,"account doesn't exist")
+    throw new ApiError(400,"account doesn't exist")
   }
   const {name,type,balance}=req.body
 
@@ -131,7 +131,7 @@ export const deleteAccount=asyncHandler(async(req,res)=>{
   })
 
   if(!existingAccount){
-    throw new ApiError(400,"account not found")
+    throw new ApiError(404,"account not found")
   }
 
   await prisma.account.delete({

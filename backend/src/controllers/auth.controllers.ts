@@ -8,6 +8,7 @@ import crypto from 'crypto'
 import { verificationEmailService } from "../services/mail.service.js";
 import jwt from 'jsonwebtoken'
 import env from '../constant/env.js'
+import { passwordResetEmail } from "../services/resetPassword.service.js";
 
 
 //register controller
@@ -90,9 +91,9 @@ export const loginUser=asyncHandler(async(req,res)=>
     throw new ApiError(401,"Invalid credentials")
   }
 
-  if(!user.emailVerified){
-    throw new ApiError(401,"Invalid")
-  }
+  // if(!user.emailVerified){
+  //   throw new ApiError(401,"Invalid")
+  // } 
 
   const {accessToken,refreshToken}=generateAccessAndRefreshTokens(user.id)
 
@@ -110,7 +111,8 @@ export const loginUser=asyncHandler(async(req,res)=>
       name:user.name,
       email:user.email,
       avatar:user.avatar,
-      role:user.role
+      role:user.role,
+      emailVerified:user.emailVerified
     },
     accessToken,
     refreshToken
@@ -396,7 +398,7 @@ export const forgotPassword=asyncHandler(async(req,res)=>{
     }
   })
 
-  await verificationEmailService(user.email,resetToken)
+  await passwordResetEmail(user.email,resetToken)
 
   return res.status(200).json(new ApiResponse(200,null,"Verification link sended on email successfully"))
 })

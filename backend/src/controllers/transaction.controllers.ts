@@ -14,7 +14,7 @@ export const createTransaction=asyncHandler(async(req,res)=>{
 
   const {title,amount,type,note,date,accountId,categoryId}=req.body
 
-  if(!title || !amount ||!type || !accountId||!accountId || !categoryId){
+  if(!title || !amount ||!type || !accountId|| !categoryId){
     throw new ApiError(400,"all fields are required")
   }
 
