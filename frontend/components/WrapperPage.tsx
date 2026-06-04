@@ -8,7 +8,7 @@ type wrapperProps={
 const Wrapper = ({children}:wrapperProps) => {
   return (
 <SafeAreaView className="flex-1 bg-slate-50 dark:bg-neutral-950 ">
-    <View className='flex-1 bg-neutral-950 dark:bg-rose-100'>
+    <View className='flex-1 bg-neutral-950 dark:bg-neutral-950'>
       {children}
     </View>
   </SafeAreaView>
