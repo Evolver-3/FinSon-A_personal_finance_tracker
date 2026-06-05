@@ -23,7 +23,7 @@ const Authbody = ({children,errorMessage,headingText}:authBodyProps) => {
     
                 <View className='w-fit ml-auto absolute right-0 -top-5'>
                   {errorMessage && (
-                  <Text className='text-md text-red-400 bg-red-200 rounded-xl px-3 border border-red-200'>{errorMessage}</Text>
+                  <Text className='text-xs text-red-400 bg-neutral-600 rounded-xl px-3 py-2'>{errorMessage}</Text>
                 )}
                 </View>
 
