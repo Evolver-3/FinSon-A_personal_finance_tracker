@@ -7,14 +7,17 @@ import Authbody from '@/components/Authbody'
 
 const signInPage = () => {
 
-  const {login,loading}=useAuth()
+  const {login}=useAuth()
   const [email,setEmail]=useState<string >("")
   const [password,setPassword]=useState<string>("")
   const [errorMessage,setErrorMessage]=useState<string>("")
+  const [loading,setLoading]=useState(false)
+
 
   const handleSubmit=async()=>{
 
     setErrorMessage("")
+    setLoading(true)
 
     if(!email.trim() || !password.trim()){
       setErrorMessage("Empty fields")
@@ -27,6 +30,7 @@ const signInPage = () => {
       setTimeout(() => {
         router.replace("/(tabs)")
       }, 500);
+      setLoading(true)
     }else{
       setErrorMessage("Wrong credentials")
     }
@@ -70,7 +74,9 @@ const signInPage = () => {
           </Link>
         </Pressable>
 
-        <ButtonNeed text={"Sign in"} onPress={handleSubmit}/>
+        <ButtonNeed
+        disabled={loading}
+        text={"Sign in"} onPress={handleSubmit}/>
             
          <View className='flex-row  '>
             <Text className='text-neutral-100 text-sm'>
@@ -104,11 +110,11 @@ type dataProps={
 
 export const TextData=({tag,value,placeholder,onChangeText,secureTextEntry}:dataProps)=>{
   return(
-    <View className=''>
-      <View className='flex gap-y-2'>
-        <Text className='text-md font-semibold text-neutral-300 text-dm '>{tag}</Text>
+
+      <View className='flex gap-y-4'>
+        <Text className='text-lg font-semibold text-neutral-400 text-dm '>{tag}</Text>
         <TextInput
-        className='rounded-xl bg-neutral-900 p-3 placeholder:text-xs text-neutral-200'
+        className='rounded-xl bg-neutral-900 p-5 text-md text-neutral-200 border border-neutral-700 '
         placeholderTextColor={"#6D6664"}
         autoCapitalize='none'
         value={value ?? ""}
@@ -116,21 +122,23 @@ export const TextData=({tag,value,placeholder,onChangeText,secureTextEntry}:data
         onChangeText={onChangeText}
         secureTextEntry={secureTextEntry}/>
       </View>
-    </View>
+
   )
 }
 
 type buttonNeedProps={
   onPress:()=>void
   text:string
+  disabled:boolean
 }
 
-export const ButtonNeed=({onPress,text}:buttonNeedProps)=>{
+export const ButtonNeed=({onPress,text,disabled}:buttonNeedProps)=>{
   return(
     <Pressable
       onPress={onPress}
-      className='items-center justify-center'>
-        <Text className='text-center mt-4 py-3 rounded-xl w-4/5  bg-neutral-900  text-white text-md border border-neutral-600'>
+      disabled={disabled}
+      className='items-center justify-center mt-10'>
+        <Text className='text-center  py-3 rounded-xl w-4/5  bg-neutral-900  text-white text-md border border-neutral-600'>
           {text}
         </Text>
     </Pressable>

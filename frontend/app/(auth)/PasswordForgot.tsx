@@ -46,6 +46,7 @@ const PasswordForgot = () => {
         secureTextEntry={false}
         />
         <ButtonNeed
+        disabled={loading}
         onPress={handleRecoveryEmail}
         text={"Get recovery mail"}/>
       </View>

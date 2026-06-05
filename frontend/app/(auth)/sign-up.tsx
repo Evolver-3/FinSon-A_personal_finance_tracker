@@ -7,16 +7,18 @@ import Authbody from '@/components/Authbody'
 import { ButtonNeed, TextData } from './sign-in'
 
 const signUpPage = () => {
-  const {error,register,loading}=useAuth()
+  const {register}=useAuth()
   
   const [email,setEmail]=useState<string >("")
   const [password,setPassword]=useState<string>("")
   const [username,setUsername]=useState<string>("")
   const [errorMessage,setErrorMessage]=useState<string>("")
+  const [loading,setLoading]=useState(false)
 
   const handleSubmit=async()=>{
     
     setErrorMessage("")
+    setLoading(true)
 
     if(!email.trim() || !password.trim() || !username.trim()){
       setErrorMessage("fields are empty")
@@ -29,7 +31,11 @@ const signUpPage = () => {
       setTimeout(() => {
         router.replace("/(auth)/sign-in")
       }, 500);
+    }else{
+      setErrorMessage("Something went wrong")
     }
+      setLoading(false)
+    
   }
 
   useEffect(()=>{
@@ -71,7 +77,9 @@ const signUpPage = () => {
             secureTextEntry={true}
             />
             
-            <ButtonNeed text={"Sign in"} onPress={handleSubmit}/>
+            <ButtonNeed
+            disabled={loading}
+            text={"Sign in"} onPress={handleSubmit}/>
 
             <View className='flex-row'>
               <Text className='text-neutral-100 text-sm'>Don't have an account? </Text>
