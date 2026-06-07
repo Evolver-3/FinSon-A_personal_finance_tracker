@@ -1,3 +1,5 @@
+import React from "react"
+
 declare global{
 
   interface registrationProps{
@@ -142,6 +144,12 @@ declare global{
     updatedAt?:string
 
 
+  }
+
+  type AuthContextType={
+    user:User|null
+    loading:boolean 
+    setUser:React.Dispatch<React.SetStateAction<User|null>>
   }
 }
 
