@@ -1,5 +1,6 @@
-import { registerUser,loginUser, verifyEmail, resendEmail, refreshToken, logout, logoutAllDevice, passwordReset, forgotPassword, resetPassword, getProfile} from "@/services/authServices";
+import { registerUser,loginUser, verifyEmail, resendEmail, refreshToken, logout, logoutAllDevice, passwordReset, forgotPassword, resetPassword} from "@/services/authServices";
 import { useState } from "react";
+import {saveTokens, clearTokens} from '../services/tokenStorage'
 
 export const useAuth=()=>{
   const [error,setError]=useState<string|null>(null)
@@ -34,13 +35,16 @@ export const useAuth=()=>{
       run(()=>registerUser(data)),
 
     login:(data:loginProps)=>
-      run(()=>loginUser(data)),
+      run(async()=>{
+        const res=await loginUser(data)
+        
+        await saveTokens(res.data.accessToken,res.data.refreshToken)
+        
+        return res
+      }),
 
     verifyEmailToken:(token:string)=>
       run(()=>verifyEmail(token)),
-
-    resendEmailToken:(token:string)=>
-      run(()=>resendEmail(token)),
 
     resendVerificationEmail: (email: string) =>
       run(() => resendEmail(email)),
@@ -49,7 +53,11 @@ export const useAuth=()=>{
       run(() => refreshToken(token)),
 
     logoutUser: (token: string) =>
-      run(() => logout(token)),
+      run(async()=>{
+        const res=await logout(token)
+        await clearTokens()
+        return res
+      }),
 
     logoutEverywhere: () =>
       run(() => logoutAllDevice()),
@@ -61,9 +69,6 @@ export const useAuth=()=>{
       run(() => forgotPassword(email)),
 
     resetUserPassword: (token: string, data: resetPasswordProps) =>
-      run(() => resetPassword(token, data)),
-
-    fetchProfile: () =>
-      run(()=>getProfile())
+      run(() => resetPassword(token, data))
   }
 }

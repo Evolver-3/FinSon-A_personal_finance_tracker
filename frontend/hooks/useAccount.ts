@@ -1,4 +1,4 @@
-import { createAccount, getAccount, updateAccount, deleteAccount } from "@/services/accountServices";
+import { createAccount, getAccount, updateAccount, deleteAccount } from '@/services/accountServices'
 import { useEffect, useState } from "react";
 
 export const useAccount=()=>{
