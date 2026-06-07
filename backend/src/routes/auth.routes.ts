@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { registerUser,loginUser,verifyEmail,resendVerificationEmail, changePassword, logoutUser, AllLogout, refreshAccessToken, getUserProfile, forgotPassword, resetPassword} from "../controllers/auth.controllers.js";
+import { registerUser,loginUser,verifyEmail,resendVerificationEmail, changePassword, logoutUser, AllLogout, refreshAccessToken, forgotPassword, resetPassword} from "../controllers/auth.controllers.js";
 import { verifyJWT } from "../middlewares/auth.middleware.js";
 
 const authRouter=Router()
@@ -38,8 +38,6 @@ authRouter.route("/forgot-password").post(forgotPassword)
 
 authRouter.route("/reset-password").post(resetPassword)
 
-//user profile
 
-authRouter.route("/profile").get(verifyJWT,getUserProfile)
 
 export default authRouter

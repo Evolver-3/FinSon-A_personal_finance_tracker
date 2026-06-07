@@ -4,6 +4,18 @@ import ApiResponse from "../utils/ApiResponse.js";
 import { prisma } from "../prisma.js";
 import { uploadToCloudinary } from "../services/cloudinary.service.js";
 
+//getting user profile 
+export const getUserProfile=asyncHandler(async(req,res)=>{ 
+
+  if(!req.user){
+    throw new ApiError(401,"Unauthorised")
+  }
+  console.log(req?.user)
+
+  return res.status(200).json(new ApiResponse(200,req.user,"User profile fetched "))
+
+})
+
 export const updateProfile=asyncHandler(async(req,res)=>{
 
   if(!req.user){

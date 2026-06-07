@@ -463,13 +463,3 @@ export const resetPassword=asyncHandler(async(req,res)=>{
   return res.status(200).json(new ApiResponse(200,null,"Password reset successfully"))
 })
 
-//getting user profile 
-export const getUserProfile=asyncHandler(async(req,res)=>{ 
-
-  if(!req.user){
-    throw new ApiError(401,"Unauthorised")
-  }
-
-  return res.status(200).json(new ApiResponse(200,req.user,"User profile fetched "))
-
-})
