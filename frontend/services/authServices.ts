@@ -53,9 +53,6 @@ export const resetPassword=async(token:string,data:resetPasswordProps)=>{
   return res.data
 }
 
-export const getProfile=async()=>{
-  const res=await api.get("/auth/profile")
-  return res.data
-}
+
 
 

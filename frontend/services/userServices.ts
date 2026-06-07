@@ -1,13 +1,25 @@
 import {api} from './api'
 
-export const profileUpdate=async(name:string)=>{
-  const res=await api.patch("/user/profile-update",{name})
+
+export const getProfile=async()=>{
+  const res=await api.get("/user/profile")
+  console.log("getProfile",res.data)
+  return res.data
+
+}
+
+export const profileUpdate=async(data:{name:string})=>{
+  const res=await api.patch("/user/profile-update",data)
  
   return res.data
 }
 
-export const avatar=async(avatar:string)=>{
-  const res=await api.patch("/user/avatar",{avatar})
+export const changeAvatar=async(data:FormData)=>{
+  const res=await api.patch("/user/avatar",data,{
+    headers:{
+      "Content-Type":"multipart/form-data"
+    }
+  })
 
   return res.data
 }
