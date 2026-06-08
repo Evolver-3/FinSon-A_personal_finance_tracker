@@ -1,6 +1,21 @@
-import { Stack } from "expo-router";
-import '@/global.css'
-export default function RootLayout(){
+import { Redirect, Stack } from "expo-router"
+import { ActivityIndicator, View } from "react-native"
+import { useAuthContext } from "@/context/AuthContext"
 
-  return <Stack screenOptions={{headerShown:false}}/>
+export default function AuthLayout() {
+  const { user, loading } = useAuthContext()
+
+  if (loading) {
+    return (
+      <View className="flex-1 items-center justify-center">
+        <ActivityIndicator />
+      </View>
+    )
+  }
+
+  if (user) {
+    return <Redirect href="/(tabs)/home" />
+  }
+
+  return <Stack screenOptions={{ headerShown: false }} />
 }

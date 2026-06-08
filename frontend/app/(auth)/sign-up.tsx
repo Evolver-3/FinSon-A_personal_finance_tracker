@@ -28,14 +28,12 @@ const signUpPage = () => {
     const success=await register({email,name:username,password})
 
     if(success){
-      setTimeout(() => {
-        router.replace("/(auth)/sign-in")
-      }, 500);
+     router.replace("/(auth)/sign-in")
+      setLoading(false)
     }else{
       setErrorMessage("Something went wrong")
     }
-      setLoading(false)
-    
+       
   }
 
   useEffect(()=>{
@@ -45,7 +43,7 @@ const signUpPage = () => {
         }, 2000);
         return ()=>clearTimeout(timer)
       }
-    })
+    },[errorMessage])
 
   return (
     <Wrapper>
@@ -78,16 +76,19 @@ const signUpPage = () => {
             />
             
             <ButtonNeed
+            loading={loading}
             disabled={loading}
             text={"Sign in"} onPress={handleSubmit}/>
 
             <View className='flex-row'>
               <Text className='text-neutral-100 text-sm'>Don't have an account? </Text>
-            <Pressable>
-              <Link href={"/(auth)/sign-in"}>
+            
+              <Link href={"/(auth)/sign-in"} asChild>
+              <Pressable>
                 <Text className='text-blue-500 text-sm'>Sign In</Text>
+                </Pressable>
               </Link>
-            </Pressable>
+            
             </View>
             
            </View>

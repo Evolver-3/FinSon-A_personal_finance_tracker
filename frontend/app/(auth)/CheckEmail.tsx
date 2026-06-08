@@ -50,12 +50,13 @@ const CheckEmail = () => {
           </Text>
 
           <ButtonNeed
+          loading={loading}
           disabled={loading}
           onPress={handleResend}
           text={"Resend email"}/>
 
           <Link href="/(auth)/sign-in">
-          Back to sign in
+          <Text>Back to sign in</Text>
           </Link>
         </View>
 

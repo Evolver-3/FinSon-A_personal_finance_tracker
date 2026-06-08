@@ -1,9 +1,10 @@
-import { View, Text, KeyboardAvoidingView, Platform, ScrollView,TextInput, Pressable } from 'react-native'
+import { View, Text ,TextInput, Pressable, ActivityIndicator } from 'react-native'
 import React, { useEffect, useState } from 'react'
 import Wrapper from '@/components/WrapperPage'
 import { Link, router } from 'expo-router'
 import { useAuth } from '@/hooks/useAuth'
 import Authbody from '@/components/Authbody'
+import { useAuthContext } from '@/context/AuthContext'
 
 const signInPage = () => {
 
@@ -13,26 +14,38 @@ const signInPage = () => {
   const [errorMessage,setErrorMessage]=useState<string>("")
   const [loading,setLoading]=useState(false)
 
+  const {loadUser}=useAuthContext()
+
 
   const handleSubmit=async()=>{
 
-    setErrorMessage("")
-    setLoading(true)
-
+    try{
+      setErrorMessage("")
+  
     if(!email.trim() || !password.trim()){
       setErrorMessage("Empty fields")
       return
     }
 
+    setLoading(true)
+
     const success=await login({email,password})
 
     if(success){
-      setTimeout(() => {
-        router.replace("/(tabs)")
-      }, 500);
-      setLoading(true)
+      await loadUser()
+      console.log("navigating to home")
+        router.replace("/(tabs)/home") 
     }else{
       setErrorMessage("Wrong credentials")
+    }
+    
+    }catch(err:any){
+      setErrorMessage(
+      err?.response?.data?.message ||
+      "Something went wrong")
+
+    }finally{
+      setLoading(false)
     }
   }
   
@@ -43,7 +56,7 @@ const signInPage = () => {
       }, 2000);
       return ()=>clearTimeout(timer)
     }
-  })
+  },[errorMessage])
 
   return (
     <Wrapper>
@@ -62,7 +75,7 @@ const signInPage = () => {
         <TextData
         tag='Enter your password'
         value={password}
-        placeholder='sduw48rw'
+        placeholder='password'
         onChangeText={setPassword}
         secureTextEntry={true}/>
 
@@ -75,17 +88,20 @@ const signInPage = () => {
         </Pressable>
 
         <ButtonNeed
+        loading={loading}
         disabled={loading}
         text={"Sign in"} onPress={handleSubmit}/>
             
          <View className='flex-row  '>
             <Text className='text-neutral-100 text-sm'>
               Don't have an account? </Text> 
-             <Pressable>
-               <Link href={"/(auth)/sign-up"}>
+             
+               <Link href={"/(auth)/sign-up"} asChild>
+               <Pressable>
                   <Text className='text-blue-500 text-sm'> Sign Up</Text>
+                  </Pressable>
                 </Link>
-              </Pressable>
+              
           </View>
 
       </View>
@@ -130,16 +146,17 @@ type buttonNeedProps={
   onPress:()=>void
   text:string
   disabled:boolean
+  loading:boolean
 }
 
-export const ButtonNeed=({onPress,text,disabled}:buttonNeedProps)=>{
+export const ButtonNeed=({onPress,text,disabled,loading}:buttonNeedProps)=>{
   return(
     <Pressable
       onPress={onPress}
       disabled={disabled}
-      className='items-center justify-center mt-10'>
+      className='items-center justify-center mt-10 cursor-pointer'>
         <Text className='text-center  py-3 rounded-xl w-4/5  bg-neutral-900  text-white text-md border border-neutral-600'>
-          {text}
+          {loading?<ActivityIndicator/> :text}
         </Text>
     </Pressable>
   )
