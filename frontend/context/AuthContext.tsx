@@ -21,11 +21,14 @@ export const AuthProvider=({children}:{children:React.ReactNode})=>{
         }
 
         const res=await getProfile()
+    
         setUser(res.data)
 
-      }catch(error){
+      }catch(error:any){
+       if(error?.response?.status=== 401){
         setUser(null)
         await clearTokens()
+       }
       }finally{
         setLoading(false)
       }
