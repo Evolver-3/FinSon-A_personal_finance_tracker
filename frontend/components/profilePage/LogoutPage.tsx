@@ -1,0 +1,48 @@
+import { View, Text, Pressable } from 'react-native'
+import React from 'react'
+import { useAuth } from '@/hooks/useAuth'
+import { LogOut } from 'lucide-react-native'
+import { clearTokens, getAccessToken } from '@/services/tokenStorage'
+import { router } from 'expo-router'
+import { useAuthContext } from '@/context/AuthContext'
+
+const LogoutPage = () => {
+
+  const { logoutUser}=useAuth()
+  const {setUser}=useAuthContext()
+
+  const handleLogout=async()=>{
+    try{
+      const token=await getAccessToken()
+
+      if(token){
+        await logoutUser(token)
+      }
+      setUser(null)
+      router.replace("/(auth)/sign-in")
+    }catch(error){
+      await clearTokens()
+      setUser(null)
+      router.replace("/(auth)/sign-in")
+
+    }
+
+  }
+  return (
+    <View className='mt-10 border border-red-700 rounded-md w-full py-2 items-center'>
+      <Pressable
+      onPress={handleLogout}>
+        <View className='flex-row items-center gap-x-2'>
+          <LogOut
+          size={20}
+          color={"#D63131"}/>
+          <Text className='text-white'>Log Out</Text>
+        </View>
+
+
+      </Pressable>
+    </View>
+  )
+}
+
+export default LogoutPage

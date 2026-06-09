@@ -1,5 +1,5 @@
 import { View, Text, Image, Pressable, ActivityIndicator } from 'react-native'
-import React,{useState} from 'react'
+import React,{useState,useEffect} from 'react'
 import { useUser } from '@/hooks/useUser'
 import { ImageUp, UserRound } from 'lucide-react-native'
 import * as ImagePicker from 'expo-image-picker'
@@ -7,10 +7,14 @@ import Authbody from '../Authbody'
 
 const AvatarUpload = () => {
 
-  const {addingAvatar,user}=useUser()
+  const {addingAvatar,user,fetchUserProfile}=useUser()
 
   const [errorMessage,setErrorMessage]=useState<string>("")
   const [loading,setLoading]=useState(false)
+
+  useEffect(()=>{
+    fetchUserProfile()
+  },[])
 
  const pickAvatar = async () => {
   try {
@@ -20,20 +24,22 @@ const AvatarUpload = () => {
     //permission to access files in ios apps
     const permission=await ImagePicker.requestMediaLibraryPermissionsAsync()
 
-    if(!permission){
+    if(!permission.granted){
       setErrorMessage("Permission to access media library is required")
       return
     }
-
 
     const result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ["images"],
       quality: 0.8,
     })
 
+    console.log("result:", result)
+    
     if (result.canceled) return
 
     const asset = result.assets[0]
+    console.log("asset:", asset.uri,asset.fileName, asset.mimeType)
 
     const formData = new FormData()
 
@@ -43,12 +49,10 @@ const AvatarUpload = () => {
       type: asset.mimeType || "image/jpeg",
     } as any)
 
-    console.log("avatar",user?.avatar)
-    console.log("formData:", JSON.stringify(formData))
-    
-    console.log("asset:", asset.uri, asset.fileName, asset.mimeType)
+    console.log("updating avatar.....")
 
     await addingAvatar(formData)
+    console.log("update done:", user?.avatar)
 
   } catch (error: any) {
     setErrorMessage(
@@ -67,12 +71,11 @@ const AvatarUpload = () => {
 }
 
   return (
-    <Authbody errorMessage={errorMessage}
-    headingText={"Your Profile"}>
-      <View className='bg-neutral-700 rounded-full flex-1 '
+
+      <View className='bg-neutral-700 rounded-full flex-1 relative'
     style={{width:100,height:100}}>
       {user?.avatar ? (
-        <Image source={{uri:user.avatar}}
+        <Image source={{uri:user?.avatar as any}}
         style={{
           width:100,
           height:100,
@@ -85,15 +88,14 @@ const AvatarUpload = () => {
       <Pressable className='absolute bottom-0 right-0 bg-neutral-500 p-1 rounded-xl'
       onPress={pickAvatar}
       disabled={loading}>
-       {loading ? (<ActivityIndicator size="small" />):(
+       
          <ImageUp
         size={15} color={"#ffffff"}/>
-       )}
+      
       </Pressable>
       
       
     </View>
-    </Authbody>
   )
 }
 
