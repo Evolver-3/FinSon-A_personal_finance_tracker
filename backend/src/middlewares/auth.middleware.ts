@@ -13,7 +13,17 @@ export const verifyJWT=asyncHandler(async(req,res,next)=>{
       throw new ApiError(401,"Invalid accessToken")
     }
 
-    const decodedToken=jwt.verify(token,env.ACCESS_TOKEN_SECRET) as AccessTokenPayload
+    let decodedToken:AccessTokenPayload
+    try{
+      
+      decodedToken=jwt.verify(token,env.ACCESS_TOKEN_SECRET) as AccessTokenPayload
+    }catch(jwtError:any){
+      if(jwtError.name==="TokenExpiredError"){
+        throw new ApiError(401,"Access Token expired")
+      }
+      throw new ApiError(401,"Invalid access token")
+
+    }
 
     const user=await prisma.user.findUnique({
       where:{

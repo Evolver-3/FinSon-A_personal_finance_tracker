@@ -52,9 +52,9 @@ export const uploadAvatar=asyncHandler(async(req,res)=>{
   const userId=req.user?.id
 
   if(!userId){
-    throw new ApiError(401,"Unauthoirized")
+    throw new ApiError(401,"Unauthorized")
   }
-  const avatar=req.file
+  const avatar=req?.file
 
   if(!avatar){
     throw new ApiError(400,"Avatar is required")
@@ -65,6 +65,8 @@ export const uploadAvatar=asyncHandler(async(req,res)=>{
   if(!uploadAvatar){
     throw new ApiError(500,"failed to upload image on cloudinary")
   }
+
+  console.log(uploadAvatar)
 
   const user=await prisma.user.update({
     where:{id:userId},
