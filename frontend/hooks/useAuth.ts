@@ -2,6 +2,7 @@ import { registerUser,loginUser, verifyEmail, resendEmail, refreshToken, logout,
 import { useState } from "react";
 import {saveTokens, clearTokens} from '../services/tokenStorage'
 
+
 export const useAuth=()=>{
   const [error,setError]=useState<string|null>(null)
   const [loading,setLoading]=useState(false)
@@ -18,6 +19,7 @@ export const useAuth=()=>{
 
     }catch(err:any){
       const message=err?.response?.data?.message || err?.message || "Something went wrong"
+      console.log("full error:", JSON.stringify(err?.response?.data))
 
       setError(message)
       throw err
@@ -39,7 +41,7 @@ export const useAuth=()=>{
         const res=await loginUser(data)
         
         await saveTokens(res.data.accessToken,res.data.refreshToken)
-        
+
         return res
       }),
 

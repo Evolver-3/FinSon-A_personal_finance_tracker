@@ -1,8 +1,10 @@
+import { useAuthContext } from "@/context/AuthContext";
 import { profileUpdate, changeAvatar,getProfile} from "@/services/userServices"
 import { useState } from "react";
 
 export const useUser=()=>{
-  const [user,setUser]=useState<User | null>(null)
+  const {user,setUser,loadUser}=useAuthContext()
+
   const [loading,setLoading]=useState(false)
   const [error,setError]=useState<string | null>(null)
 
@@ -11,10 +13,8 @@ export const useUser=()=>{
       setLoading(true)
       setError(null)
       
-      const res=await getProfile()
-      setUser(res.data)
+     await loadUser()
 
-      return res.data
     }catch(error:any){
       const message=error?.response?.data?.message || error?.message || "Something went wrong"
       setError(message)
@@ -51,10 +51,9 @@ export const useUser=()=>{
       setLoading(true)
       setError(null)
 
-      const res=await changeAvatar(avatar)
-      setUser(res.data)
-
-      return res.data
+      await changeAvatar(avatar)
+      await loadUser()
+      
     }catch(error:any){
       const message=error?.response?.data?.message || error?.message || "Something went wrong"
       setError(message)
@@ -67,6 +66,6 @@ export const useUser=()=>{
   }
 
   return {
-    user,loading,error,setUser,updatingProfile,addingAvatar,fetchUserProfile
+    user,loading,error,updatingProfile,addingAvatar,fetchUserProfile
   }
 }

@@ -3,7 +3,7 @@ import { createBudget, getAllBudget, getBudget, updateBudget, deleteBudget } fro
 import {useState,useEffect} from 'react'
 
 
-export const useTransaction=()=>{
+export const useBudget=()=>{
 
   const [budgets,setbudgets]=useState<Budget[]>([])
 

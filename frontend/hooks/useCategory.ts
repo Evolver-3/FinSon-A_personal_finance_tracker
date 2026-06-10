@@ -34,8 +34,7 @@ export const useCategory=()=>{
     }
   }
 
-
-    const fetchAllCategory=async()=>{
+  const fetchAllCategory=async()=>{
     try{
       setLoading(true)
       setError(null)
@@ -55,7 +54,7 @@ export const useCategory=()=>{
     }
   }
 
-    const fetchCategory=async(id:string)=>{
+  const fetchCategory=async(id:string)=>{
     try{
       setLoading(true)
       setError(null)
@@ -75,7 +74,7 @@ export const useCategory=()=>{
     }
   }
 
-    const editCategory=async(id:string,data:updateCategoryProps)=>{
+  const editCategory=async(id:string,data:updateCategoryProps)=>{
     try{
       setLoading(true)
       setError(null)
@@ -97,7 +96,7 @@ export const useCategory=()=>{
     }
   }
 
-    const removeCategory=async(id:string)=>{
+  const removeCategory=async(id:string)=>{
     try{
       setLoading(true)
       setError(null)
@@ -120,7 +119,6 @@ export const useCategory=()=>{
 
   useEffect(()=>{
     fetchAllCategory()
-
   },[])
 
   return {
