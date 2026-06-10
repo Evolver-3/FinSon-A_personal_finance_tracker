@@ -14,12 +14,15 @@ export const profileUpdate=async(data:{name:string})=>{
   return res.data
 }
 
-export const changeAvatar=async(data:FormData)=>{
-  const res=await api.patch("/user/avatar",data,{
-    headers:{
-      "Content-Type":"multipart/form-data"
-    }
+export const changeAvatar = async (data: FormData) => {
+  const res = await api.patch("/user/avatar", data, {
+    headers: {
+      "Content-Type": "multipart/form-data", // keep this
+      "Accept": "application/json",
+    },
+  
+    transformRequest: (data) => data,
   })
-
+  console.log(res.data)
   return res.data
 }

@@ -8,6 +8,7 @@ export const registerUser=async(data:registrationProps)=>{
 
 export const loginUser=async(data:loginProps)=>{
   const res=await api.post("/auth/login",data)
+  
   return res.data
 }
 

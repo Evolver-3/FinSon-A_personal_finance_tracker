@@ -15,7 +15,6 @@ export const getCategory=async(categoryId:string)=>{
   return res.data
 }
 
-
 export const updateCategory=async(categoryId:string,data:updateCategoryProps)=>{
   const res=await api.patch(`/category/${categoryId}`,data)
   return res.data

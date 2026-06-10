@@ -1,11 +1,11 @@
 import axios from 'axios'
 import { clearTokens, getAccessToken, getRefreshToken, saveTokens } from './tokenStorage'
+import { router } from 'expo-router'
 
 export const api=axios.create({
-  baseURL:"http://192.168.1.7:5000/api/v1",
+  baseURL:"http://192.168.1.5:5000/api/v1",
   headers:{
     "Content-Type":"application/json",
-    
   }
 })
 
@@ -35,20 +35,22 @@ api.interceptors.response.use(
           return Promise.reject(error)
         }
         const res=await axios.post(
-          "http://192.168.1.7:5000/api/v1/auth/refreshToken",
+          "http://192.168.1.5:5000/api/v1/auth/refreshToken",
           {refreshToken:refreshToken}
         )
 
-        const newAccessToken=res.data.data.accessToken
-        const newRefreshToken = res.data.data.refreshToken
+        const {accessToken,refreshToken:newRefreshToken}=res.data.data
 
-        await saveTokens(newAccessToken, newRefreshToken)
+        await saveTokens(accessToken, newRefreshToken)
 
-        originalRequest.headers.Authorization = `Bearer ${newAccessToken}`
+        api.defaults.headers.common.Authorization =`Bearer ${accessToken}`
+
+        originalRequest.headers = {...originalRequest.headers,Authorization: `Bearer ${accessToken}`,}
 
         return api(originalRequest)
       }catch (refreshError) {
         await clearTokens()
+        router.replace("/(auth)/sign-in")
         return Promise.reject(refreshError)
       }
     }
