@@ -29,7 +29,7 @@ const LogoutPage = () => {
 
   }
   return (
-    <View className='mt-10 border border-red-700 rounded-md w-full py-2 items-center'>
+    <View className='mt-10 border border-red-700 rounded-md  py-2 items-center'>
       <Pressable
       onPress={handleLogout}>
         <View className='flex-row items-center gap-x-2'>

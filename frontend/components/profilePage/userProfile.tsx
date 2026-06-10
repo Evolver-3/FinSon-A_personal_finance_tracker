@@ -5,7 +5,7 @@ import LogoutPage from './LogoutPage'
 
 const UserProfile = () => {
   return (
-    <View className='mt-10 items-center '>
+    <View className='mt-10 items-center flex-1'>
       <AvatarUpload/>
       <LogoutPage/>
     </View>
