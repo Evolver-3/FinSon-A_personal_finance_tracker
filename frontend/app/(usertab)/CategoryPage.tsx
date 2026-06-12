@@ -1,14 +1,16 @@
-import { View, Text ,Pressable, Modal, FlatList} from 'react-native'
+import { View, Text ,Pressable, Modal, FlatList, ViewStyle} from 'react-native'
 import React,{useState} from 'react'
 import Wrapper from '@/components/WrapperPage'
 import TopUserComp from '@/components/comps/TopUserComp'
 import { Cross, Pencil, Plus, Search } from 'lucide-react-native'
 import { useCategory } from '@/hooks/useCategory'
-import { ButtonNeed, TextData } from '../(auth)/sign-in'
+import { ButtonNeed } from '@/components/comps/ButtonNeed'
+import { TextData } from '@/components/comps/TextData'
 import RenderCategory from '@/components/category/RenderCategory'
+import { categoryColors, categorydynamicColors } from '@/data'
 
 const CategoryPage = () => {
-  const {fetchAllCategory,fetchCategory,categories,loading,creatingCategory}=useCategory()
+  const { selectedCategory,editCategory,fetchCategory,categories,loading,creatingCategory}=useCategory()
   const [visible,setVisible]=useState(false)
 
   const [name,setName]=useState("")
@@ -48,42 +50,74 @@ const CategoryPage = () => {
             </Pressable>
           </View>
           
-          <Modal
+         
+        </View>
+
+         <Modal
           visible={visible}
           transparent={true}
           animationType='slide'
-          onRequestClose={()=>setVisible(false)}>
+          onRequestClose={() => setVisible(false)}>
 
-            <Pressable className='flex-1 bg-black/50 justify-center items-center'
-            onPress={()=>setVisible(false)}>
+           <View className=" flex-1">
 
-              <Pressable
-              onPress={(e)=>e.stopPropagation()}>
-              <View className='bg-neutral-900 rounded-xl p-6 w-4/5 shadow-md flex-col gap-y-4'>
+             <Pressable className='  bg-black/50 '
+             style={{
+              flex:1
+             }}
+              onPress={()=>setVisible(false)}/>
 
-              <Text className='text-white text-md font-extralight'>
-                Create New Category
+              <View className='bg-neutral-900 rounded-t-3xl pt-10 px-7 flex-col gap-y-3'
+              style={{flex:3}}
+              onStartShouldSetResponder={() => true}
+              >
+
+              <Text className='text-white text-lg font-semibold '>
+                Add Category
               </Text>
 
-              <View>
+              
                  <TextData
                   tagexist={false}
-                  tag={''}
+                  tag={'dd'}
                   value={name}
-                  placeholder='Category name'
+                  placeholder='e.g., Food'
                   onChangeText={setName}
                   secureTextEntry={false}/>
 
-                  <View className="flex-row gap-x-3">
+                  <View className='items-center justify-center mt-3'>
+                   
+                    <View className="flex-row gap-x-3 p-1 bg-neutral-500 rounded-xl w-1/2">
                     <SelectType
                     focused={type==="INCOME"}
-                    onPress={()=>setType("INCOME")}
+                    onPress={()=>{
+                      console.log("Income chosen")
+                      setType("INCOME")}}
                     text='Income'/>
 
                     <SelectType
                     focused={type==="EXPENSE"}
-                    onPress={()=>setType("EXPENSE")}
+                    onPress={()=>{
+                      console.log("Expense chosen")
+                      setType("EXPENSE")}}
                     text='Expense'/>
+                  </View>
+                  </View>
+
+                  <View className=' flex-row gap-x-3'>
+                    {categorydynamicColors.map((col,id)=>(
+                    <View key={id}
+                    className=''>
+                      <SelectColors
+                      style={{
+                        backgroundColor:col.btncolor
+                      }}
+                      focused={color===col.btncolor}
+                      onPress={()=>setColor(col.btncolor)}
+                    />
+                    </View>
+
+                    ))}
                   </View>
 
                  
@@ -95,16 +129,16 @@ const CategoryPage = () => {
                   />
 
               </View>
-              </View>
-              </Pressable>
-
-            </Pressable>
-
+            
+           </View>
           </Modal>
-        </View>
 
         <RenderCategory
-        categories={categories}/>
+        categories={categories}
+        loading={loading}
+        selectedCategory={selectedCategory}
+        editCategory={editCategory}
+        fetchCategory={fetchCategory}/>
         
 
       </View>
@@ -123,9 +157,39 @@ type SelectTypeProps={
 export const SelectType=({text,onPress,focused}:SelectTypeProps)=>{
   return (
     <Pressable
-    className={`flex-1 px-2 py-1 rounded-lg items-center ${focused ? "bg-green-500":"bg-neutral-500"}`}
+    style={{
+      flex:1,
+      paddingHorizontal:8,
+      paddingVertical:4,
+      borderRadius:8,
+      alignItems:'center',
+      backgroundColor:focused?"#262626":"transparent"
+    }}
     onPress={onPress}>
-      <Text>{text}</Text>
+      <Text 
+      style={{
+        fontSize:14,
+        fontWeight:"200",
+        textAlign:"center",
+        color:focused?"#60a5fa":"#000000"
+      }}>{text}</Text>
+    </Pressable>
+  )
+}
+
+type SelectColorProps={
+  onPress:()=>void
+  focused:boolean
+  style:ViewStyle
+
+}
+
+export const SelectColors=({onPress,focused,style}:SelectColorProps)=>{
+  return (
+    <Pressable
+    className={` p-3 rounded-full items-center border ${focused?"border border-white":"border-0"}`}
+    style={style}
+    onPress={onPress}>
     </Pressable>
   )
 }
