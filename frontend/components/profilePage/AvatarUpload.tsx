@@ -59,12 +59,7 @@ const AvatarUpload = () => {
       error?.response?.data?.message ||
       error?.message ||
       "Failed to upload avatar")
-
-      console.log("Full error:", JSON.stringify(error?.response?.data))
-
-      console.log("Status:", error?.response?.status)
-      console.log("Headers sent:", error?.config?.headers)
-    
+  
   } finally {
     setErrorLoading(false)
   }
@@ -74,11 +69,11 @@ const AvatarUpload = () => {
 
     <View className='flex-col gap-y-5'>
       <View 
-        className='bg-neutral-700 rounded-full relative'
+        className='bg-neutral-700 rounded-full relative items-center justify-center'
         style={{width:100,height:100}}>
 
         {user?.avatar ? (
-        loading?<ActivityIndicator/>:(
+        loading?(<ActivityIndicator />):(
           <Image source={{uri:user?.avatar as any}}
         style={{
           width:100,
