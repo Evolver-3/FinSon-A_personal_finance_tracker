@@ -1,0 +1,190 @@
+import { View, Text ,Modal, Pressable,ScrollView, ViewStyle} from 'react-native'
+import { TextData } from '../comps/TextData'
+import { ButtonNeed } from '../comps/ButtonNeed'
+import React from 'react'
+import { categorydynamicColors, CategoryIcons } from '@/data'
+
+type createCateProps={
+  visible:boolean 
+  setVisible:React.Dispatch<React.SetStateAction<boolean>>
+  name:string 
+  setName:React.Dispatch<React.SetStateAction<string>>
+  type:string
+  setType:React.Dispatch<React.SetStateAction<"INCOME"|"EXPENSE">>
+  color:string 
+  setColor:React.Dispatch<React.SetStateAction<string>>
+  handleSubmit:()=>void
+  loading:boolean
+  icon:IconFn|null
+  setIcon:React.Dispatch<React.SetStateAction<IconFn| null>>
+}
+const CreateCategory = ({visible,setVisible,name,setName,type,setType,color,setColor,handleSubmit,loading,icon,setIcon}:createCateProps) => {
+  return (
+   <Modal
+    visible={visible}
+    transparent={true}
+    animationType='slide'
+    onRequestClose={() => setVisible(false)}>
+   
+      <View className=" flex-1">
+   
+        <Pressable className='  bg-black/50 '
+        style={{
+          flex:2
+        }}
+        onPress={()=>setVisible(false)}/>
+   
+          <View className='bg-neutral-900 rounded-t-3xl pt-10 px-7 flex-col gap-y-3'
+          style={{flex:2}}
+          onStartShouldSetResponder={() => true}>
+            <Text className='text-white text-lg font-semibold '>
+              Add Category
+            </Text>
+            
+            <TextData
+              tagexist={false}
+              tag={'dd'}
+              value={name}
+              placeholder='e.g., Food'
+              onChangeText={setName}
+              secureTextEntry={false}/>
+              <View className='items-center justify-center mt-3 '>
+                <View className="flex-row gap-x-3 p-1 py-1 bg-neutral-500 rounded-xl">
+                <SelectType
+                  focused={type==="INCOME"}
+                  onPress={()=>setType("INCOME")}
+                  text='Income'/>
+   
+                <SelectType
+                  focused={type==="EXPENSE"}
+                  onPress={()=>
+                  setType("EXPENSE")}
+                  text='Expense'/>
+                </View>
+              </View>
+   
+              <View className=' flex-row gap-x-3 mt-3'>
+                <Text className='text-md font-semibold text-white'>Choose Color</Text>
+                <ScrollView
+                showsVerticalScrollIndicator={false}
+                horizontal
+                contentContainerClassName='items-center'
+                className='flex-row'
+                contentContainerStyle={{alignItems:"center",
+                  gap:10}}>
+                  {categorydynamicColors.map((col,id)=>(
+                  <View key={id}
+                  className=''>
+                    <SelectColors
+                    style={{
+                    backgroundColor:col.btncolor
+                    }}
+                    focused={color===col.btncolor}
+                    onPress={()=>setColor(col.btncolor)}
+                    />
+                  </View>
+                ))}
+                </ScrollView>
+              </View>
+
+              <View className='flex flex-row'>
+                {CategoryIcons.map((tag)=>(
+                  <SelecttIcon
+                  key={tag.id}
+                  icon={tag.symbol}
+                  focused={icon===tag.symbol}
+                  onPress={()=>{
+                    console.log("icon selected")
+                    setIcon(()=>tag.symbol)}}
+                />
+                ))}
+              </View>
+              
+              <ButtonNeed
+              onPress={handleSubmit}
+              text={'Create new'}
+              loading={loading}
+              disabled={loading}
+              />
+   
+          </View>
+               
+        </View>
+           </Modal>
+  )
+}
+
+export default CreateCategory
+
+
+type SelectTypeProps={
+  text:string 
+  onPress:()=>void
+  focused:boolean
+
+}
+export const SelectType=({text,onPress,focused}:SelectTypeProps)=>{
+  return (
+    <Pressable
+    style={{
+      flex:1,
+      paddingHorizontal:8,
+      paddingVertical:8,
+      borderRadius:8,
+      alignItems:'center',
+      backgroundColor:focused?"#262626":"transparent"
+    }}
+    onPress={onPress}>
+      <Text 
+      style={{
+        fontSize:14,
+        fontWeight:"400",
+        textAlign:"center",
+        color:focused?"#60a5fa":"#000000"
+      }}>{text}</Text>
+    </Pressable>
+  )
+}
+
+type SelectColorProps={
+  onPress:()=>void
+  focused:boolean
+  style:ViewStyle  
+
+}
+
+export const SelectColors=({onPress,focused,style}:SelectColorProps)=>{
+  return (
+    <Pressable
+    className={` p-3 rounded-full items-center border ${focused?"border border-white":"border-0"}`}
+    style={style}
+    onPress={onPress}>
+    </Pressable>
+  )
+}
+
+type TabIconProps={
+  icon: IconFn | null
+  onPress:()=>void
+  focused:boolean
+}
+
+
+const SelecttIcon=({icon,onPress,focused,}:TabIconProps)=>{
+  return (
+    <Pressable 
+    style={{
+      alignItems:'center',
+      justifyContent:"center",
+      padding:4,
+      borderRadius:8,
+      borderWidth:focused?1:0,
+      borderColor:focused?"#60a5fa":"transparent",
+      backgroundColor:focused?"#1e293b":'transparent'
+    }}
+    onPress={onPress}
+    >
+    {icon?icon(focused):null}
+    </Pressable>
+  )
+}
