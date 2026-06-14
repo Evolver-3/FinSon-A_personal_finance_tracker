@@ -47,6 +47,7 @@ export const getAllCategory=asyncHandler(async (req,res)=>{
       userId
     },
     select:{
+      id:true,
       name:true,
       color:true,
       icon:true,
@@ -84,6 +85,14 @@ export const getCategoryById=asyncHandler(async (req,res)=>{
     where:{
       id:categoryId,
       userId
+    }, select:{
+      id:true,
+      name:true,
+      color:true,
+      icon:true,
+      type:true,
+      createdAt:true,
+      updatedAt:true
     }
   })
 
