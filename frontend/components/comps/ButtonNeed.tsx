@@ -12,8 +12,20 @@ export const ButtonNeed=({onPress,text,disabled,loading}:buttonNeedProps)=>{
     <Pressable
       onPress={onPress}
       disabled={disabled}
-      className='items-center justify-center mt-10 cursor-pointer'>
-        <Text className='text-center  py-3 rounded-xl w-4/5  bg-neutral-900  text-white text-md border border-neutral-600'>
+      style={{
+        backgroundColor:`rgba(0,0,0,0.5)`,
+        borderWidth:0,
+
+      }}>
+        <Text 
+        style={{
+          textAlign:"center",
+          paddingHorizontal:6,
+          paddingVertical:20,
+          borderRadius:300,
+          color:"#ffffff",
+          backgroundColor:"#36C9D1",
+        }}>
           {loading?<ActivityIndicator/> :text}
         </Text>
     </Pressable>

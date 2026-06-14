@@ -2,6 +2,7 @@ import { View, Text, FlatList,Pressable, ActivityIndicator, Modal} from 'react-n
 import { Pencil } from 'lucide-react-native'
 import React,{useState} from 'react'
 import UpdateCategory from './UpdateCategory'
+import { getIconByName } from './CreateCategory'
 
 type RenderCategoryProps={
   categories:Category[]
@@ -9,9 +10,10 @@ type RenderCategoryProps={
   selectedCategory:Category |null
   editCategory:(id:string,data:updateCategoryProps)=>Promise<void>
   fetchCategory:(id:string)=>Promise<Category>
+  removeCategory:(id:string)=>Promise<void>
 }
 
-const RenderCategory = ({categories,loading,editCategory,fetchCategory}:RenderCategoryProps) => {
+const RenderCategory = ({categories,loading,editCategory,fetchCategory,removeCategory}:RenderCategoryProps) => {
 
   const [openEdit,setOpenEdit]=useState(false)
   const [selectedCategory,setSelectedCategory]=useState<Category|null>(null)
@@ -38,7 +40,7 @@ const RenderCategory = ({categories,loading,editCategory,fetchCategory}:RenderCa
                   <View className='flex-grow flex-row gap-x-4'>
                     <View
                     className='p-2 rounded-full shadow-sm'>
-                      {item.icon}
+                      {getIconByName(item.icon,false)}
                     </View>
     
                     <View>
@@ -52,6 +54,7 @@ const RenderCategory = ({categories,loading,editCategory,fetchCategory}:RenderCa
     
                   <Pressable
                   onPress={()=>{
+                    console.log('pencil pressed', item.id)
                     setOpenEdit(true)
                     setSelectedCategory(item)}}>
                     <Pencil
@@ -69,7 +72,9 @@ const RenderCategory = ({categories,loading,editCategory,fetchCategory}:RenderCa
                   openEdit={openEdit}
                   setOpenEdit={setOpenEdit}
                   selectedCategory={selectedCategory}
-                  editCategory={editCategory}/>
+                  editCategory={editCategory}
+                  removeCategory={removeCategory}
+                  loading={loading}/>
               
             </View>
   )

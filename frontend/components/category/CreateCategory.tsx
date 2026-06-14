@@ -15,12 +15,13 @@ type createCateProps={
   setColor:React.Dispatch<React.SetStateAction<string>>
   handleSubmit:()=>void
   loading:boolean
-  icon:IconFn|null
-  setIcon:React.Dispatch<React.SetStateAction<IconFn| null>>
+  icon:string|null
+  setIcon:React.Dispatch<React.SetStateAction<string| null>>
 }
 const CreateCategory = ({visible,setVisible,name,setName,type,setType,color,setColor,handleSubmit,loading,icon,setIcon}:createCateProps) => {
   return (
-   <Modal
+
+    <Modal
     visible={visible}
     transparent={true}
     animationType='slide'
@@ -28,9 +29,10 @@ const CreateCategory = ({visible,setVisible,name,setName,type,setType,color,setC
    
       <View className=" flex-1">
    
-        <Pressable className='  bg-black/50 '
+        <Pressable
         style={{
-          flex:2
+          flex:2,
+          backgroundColor: 'rgba(0,0,0,0.5)'
         }}
         onPress={()=>setVisible(false)}/>
    
@@ -87,15 +89,15 @@ const CreateCategory = ({visible,setVisible,name,setName,type,setType,color,setC
                 </ScrollView>
               </View>
 
-              <View className='flex flex-row'>
+              <View className='flex-row items-center justify-center '>
                 {CategoryIcons.map((tag)=>(
-                  <SelecttIcon
+                  <SelectIcon
                   key={tag.id}
-                  icon={tag.symbol}
-                  focused={icon===tag.symbol}
-                  onPress={()=>{
-                    console.log("icon selected")
-                    setIcon(()=>tag.symbol)}}
+                  name={tag.name}
+                  icon={tag?.name}
+                  focused={icon===tag.name}
+                  onPress={()=>
+                    setIcon(tag.name)}
                 />
                 ))}
               </View>
@@ -110,7 +112,7 @@ const CreateCategory = ({visible,setVisible,name,setName,type,setType,color,setC
           </View>
                
         </View>
-           </Modal>
+    </Modal>
   )
 }
 
@@ -123,6 +125,7 @@ type SelectTypeProps={
   focused:boolean
 
 }
+
 export const SelectType=({text,onPress,focused}:SelectTypeProps)=>{
   return (
     <Pressable
@@ -164,13 +167,14 @@ export const SelectColors=({onPress,focused,style}:SelectColorProps)=>{
 }
 
 type TabIconProps={
-  icon: IconFn | null
+  icon: string | null
   onPress:()=>void
   focused:boolean
+  name:string
 }
 
 
-const SelecttIcon=({icon,onPress,focused,}:TabIconProps)=>{
+export const SelectIcon=({icon,onPress,focused,name}:TabIconProps)=>{
   return (
     <Pressable 
     style={{
@@ -184,7 +188,15 @@ const SelecttIcon=({icon,onPress,focused,}:TabIconProps)=>{
     }}
     onPress={onPress}
     >
-    {icon?icon(focused):null}
+    {getIconByName(name,focused)}
     </Pressable>
   )
+}
+
+export const getIconByName=(name:string | null, focused:boolean)=>{
+  if(!name) return null 
+
+  const found=CategoryIcons.find(c=>c.name===name)
+
+  return found?found.symbol(focused):null
 }

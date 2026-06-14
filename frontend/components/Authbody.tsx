@@ -3,7 +3,7 @@ import React, { ReactNode } from 'react'
 
 type authBodyProps={
   children: ReactNode
-  errorMessage:string
+  errorMessage:string | null
   headingText:string
 }
 const Authbody = ({children,errorMessage,headingText}:authBodyProps) => {
