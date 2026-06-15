@@ -4,7 +4,6 @@ import { ButtonNeed } from '../comps/ButtonNeed'
 import React ,{ useState ,useEffect} from 'react'
 import { SelectType,SelectIcon,SelectColors } from './CreateCategory'
 import { categorydynamicColors,CategoryIcons } from '@/data'
-import { useCategory } from '@/hooks/useCategory'
 
 type updateProps={
   openEdit:boolean
@@ -18,15 +17,16 @@ type updateProps={
 const UpdateCategory = ({openEdit,setOpenEdit,selectedCategory,editCategory,removeCategory,loading}:updateProps) => {
 
     const [name,setName]=useState("")
-    const [color,setColor]=useState("#6366f1")
+    const [color,setColor]=useState<CategoryColor>(categorydynamicColors[0])
     const [icon,setIcon]=useState<string | null>(null)
     const [type,setType]=useState<"INCOME" | "EXPENSE">("EXPENSE")
-    const [pageLoading,setPageLoading]=useState(false)
+    const [editPageLoading,setEditPageLoading]=useState(false)
+    const [removePageLoading,setRemovePageLoading]=useState(false)
 
     const handleEditCategory=async()=>{
       try{
   
-        setPageLoading(true)
+        setEditPageLoading(true)
         if(!selectedCategory?.id)return
 
         console.log("Category clicked:",selectedCategory)
@@ -36,7 +36,7 @@ const UpdateCategory = ({openEdit,setOpenEdit,selectedCategory,editCategory,remo
       }catch(error){
         console.log(error)
       }finally{
-        setPageLoading(false)
+        setEditPageLoading(false)
 
       }
     }
@@ -44,18 +44,16 @@ const UpdateCategory = ({openEdit,setOpenEdit,selectedCategory,editCategory,remo
     useEffect(()=>{
       if(selectedCategory){
         setName(selectedCategory.name ?? "")
-        setColor(selectedCategory.color ?? "#6366f1")
+        setColor(selectedCategory.color ?? categorydynamicColors[0])
         setIcon(selectedCategory.icon?? null)
         setType(selectedCategory.type ?? "EXPENSE")
-        console.log("odkhfgein")
-        console.log(selectedCategory.id)
-
+      
       }
-    },[selectedCategory])
+    },[selectedCategory]) 
 
     const handleDeleteCategory=async()=>{
     try{
-      setPageLoading(true)
+      setRemovePageLoading(true)
 
       if(!selectedCategory?.id)return 
 
@@ -64,7 +62,7 @@ const UpdateCategory = ({openEdit,setOpenEdit,selectedCategory,editCategory,remo
     }catch(error){
       console.log(error)
     }finally{
-      setPageLoading(false)
+      setRemovePageLoading(false)
 
     }
     }
@@ -85,7 +83,7 @@ const UpdateCategory = ({openEdit,setOpenEdit,selectedCategory,editCategory,remo
               }}
               onPress={()=>setOpenEdit(false)}/>
          
-                <View className='bg-neutral-900 rounded-t-3xl pt-10 px-7 flex-col gap-y-3'
+                <View className='bg-neutral-900 rounded-t-3xl pt-10 px-7 flex-col gap-y-8'
                 style={{flex:2}}
                 onStartShouldSetResponder={() => true}>
                   <Text className='text-white text-lg font-semibold '>
@@ -131,8 +129,8 @@ const UpdateCategory = ({openEdit,setOpenEdit,selectedCategory,editCategory,remo
                           style={{
                           backgroundColor:col.btncolor
                           }}
-                          focused={color===col.btncolor}
-                          onPress={()=>setColor(col.btncolor)}
+                          focused={color.btncolor===col.btncolor}
+                          onPress={()=>setColor(col)}
                           />
                         </View>
                       ))}
@@ -152,19 +150,25 @@ const UpdateCategory = ({openEdit,setOpenEdit,selectedCategory,editCategory,remo
                       ))}
                     </View>
                     
-                      <ButtonNeed
+                   <View className='flex-col gap-y-10 '>
+                       <ButtonNeed
+                    style={{}}
                     onPress={handleEditCategory}
                     text={'Edit'}
-                    loading={pageLoading}
-                    disabled={pageLoading}
+                    loading={editPageLoading}
+                    disabled={editPageLoading}
                     />
                     
                     <ButtonNeed
+                    style={{
+                      
+                    }}
                     onPress={handleDeleteCategory}
                     text={'Remove'}
-                    loading={pageLoading}
-                    disabled={pageLoading}
+                    loading={removePageLoading}
+                    disabled={removePageLoading}
                     />
+                   </View>
                 </View>
                  
                      

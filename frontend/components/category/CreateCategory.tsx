@@ -11,14 +11,15 @@ type createCateProps={
   setName:React.Dispatch<React.SetStateAction<string>>
   type:string
   setType:React.Dispatch<React.SetStateAction<"INCOME"|"EXPENSE">>
-  color:string 
-  setColor:React.Dispatch<React.SetStateAction<string>>
+  color:CategoryColor
+  setColor:React.Dispatch<React.SetStateAction<CategoryColor>>
   handleSubmit:()=>void
   loading:boolean
   icon:string|null
   setIcon:React.Dispatch<React.SetStateAction<string| null>>
 }
 const CreateCategory = ({visible,setVisible,name,setName,type,setType,color,setColor,handleSubmit,loading,icon,setIcon}:createCateProps) => {
+
   return (
 
     <Modal
@@ -36,7 +37,7 @@ const CreateCategory = ({visible,setVisible,name,setName,type,setType,color,setC
         }}
         onPress={()=>setVisible(false)}/>
    
-          <View className='bg-neutral-900 rounded-t-3xl pt-10 px-7 flex-col gap-y-3'
+          <View className='bg-neutral-900 rounded-t-3xl pt-10 px-7 flex-col gap-y-8 '
           style={{flex:2}}
           onStartShouldSetResponder={() => true}>
             <Text className='text-white text-lg font-semibold '>
@@ -50,7 +51,7 @@ const CreateCategory = ({visible,setVisible,name,setName,type,setType,color,setC
               placeholder='e.g., Food'
               onChangeText={setName}
               secureTextEntry={false}/>
-              <View className='items-center justify-center mt-3 '>
+              <View className='items-center justify-center '>
                 <View className="flex-row gap-x-3 p-1 py-1 bg-neutral-500 rounded-xl">
                 <SelectType
                   focused={type==="INCOME"}
@@ -65,7 +66,7 @@ const CreateCategory = ({visible,setVisible,name,setName,type,setType,color,setC
                 </View>
               </View>
    
-              <View className=' flex-row gap-x-3 mt-3'>
+              <View className=' flex-row gap-x-3'>
                 <Text className='text-md font-semibold text-white'>Choose Color</Text>
                 <ScrollView
                 showsVerticalScrollIndicator={false}
@@ -81,15 +82,15 @@ const CreateCategory = ({visible,setVisible,name,setName,type,setType,color,setC
                     style={{
                     backgroundColor:col.btncolor
                     }}
-                    focused={color===col.btncolor}
-                    onPress={()=>setColor(col.btncolor)}
+                    focused={color.btncolor===col.btncolor}
+                    onPress={()=>setColor(col)}
                     />
                   </View>
                 ))}
                 </ScrollView>
               </View>
 
-              <View className='flex-row items-center justify-center '>
+              <View className='flex-row items-center justify-between '>
                 {CategoryIcons.map((tag)=>(
                   <SelectIcon
                   key={tag.id}
@@ -101,15 +102,17 @@ const CreateCategory = ({visible,setVisible,name,setName,type,setType,color,setC
                 />
                 ))}
               </View>
-              
-              <ButtonNeed
+
+               <ButtonNeed
+               style={{}}
               onPress={handleSubmit}
               text={'Create new'}
               loading={loading}
               disabled={loading}
               />
-   
           </View>
+
+         
                
         </View>
     </Modal>
@@ -180,7 +183,7 @@ export const SelectIcon=({icon,onPress,focused,name}:TabIconProps)=>{
     style={{
       alignItems:'center',
       justifyContent:"center",
-      padding:4,
+      padding:7,
       borderRadius:8,
       borderWidth:focused?1:0,
       borderColor:focused?"#60a5fa":"transparent",
