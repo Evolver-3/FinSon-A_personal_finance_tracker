@@ -27,26 +27,30 @@ declare global{
   interface createAccountProps{
     name:string 
     type:"CASH" | "BANK" | "CARD" | "WALLET" 
-    balance?:number
+    balance?:string
+    icon?:string | null
+    color?:CategoryColor
   }
 
   interface updateAccountProps{
     name?:string 
     type?:"CASH" | "BANK" | "CARD" | "WALLET" 
     balance?:number
+    icon?:string | null
+    color?:CategoryColor
   }
 
   interface createCategoryProps{
     name:string
-    color?:string
-    icon?:string
+    color?:CategoryColor
+    icon?:string | null
     type:"INCOME" | "EXPENSE"
   }
 
   interface updateCategoryProps{
     name?:string
-    color?:string
-    icon?:string
+    color?:CategoryColor
+    icon?:string | null
     type?:"INCOME" | "EXPENSE"
   }
 
@@ -109,7 +113,11 @@ declare global{
   type Category={
     id:string
     name:string 
-    color:string | null
+    color:{
+      btncolor:string 
+      colors:string 
+      darkColor:string
+    }
     icon:string | null
     type:"INCOME" | "EXPENSE"
     createdAt?:string 
@@ -150,7 +158,19 @@ declare global{
     user:User|null
     loading:boolean 
     setUser:React.Dispatch<React.SetStateAction<User|null>>
+    loadUser:()=>Promise<void>
   }
+
+  //type of icon state
+  type IconFn=(focused:boolean)=>React.JSX.Element
+
+
+  
+type CategoryColor = {
+  btncolor: string
+  colors: string
+  darkColor: string
+}
 }
 
 export {}
