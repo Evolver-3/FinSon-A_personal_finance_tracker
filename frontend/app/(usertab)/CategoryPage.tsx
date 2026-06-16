@@ -7,6 +7,7 @@ import { useCategory } from '@/hooks/useCategory'
 import CreateCategory from '@/components/category/CreateCategory'
 import RenderCategory from '@/components/category/RenderCategory'
 import { categorydynamicColors } from '@/data'
+import HeaderList from '@/components/comps/Flat/HeaderList'
 
 const CategoryPage = () => {
   const { selectedCategory,editCategory,fetchCategory,categories,loading,creatingCategory,removeCategory}=useCategory()
@@ -56,28 +57,14 @@ const CategoryPage = () => {
         data={categories}
         keyExtractor={(item)=>item.id}
         contentContainerStyle={{paddingHorizontal:4,paddingTop:6, gap:10}}
+
         ListHeaderComponent={
-        <View className='flex-1 px-4 gap-y-4 pt-4'>
-        <TopUserComp
-        headingText={"Category"}/>
- 
-        <View className='flex-row items-center gap-x-2'>
-
-          <View className='flex-row border border-neutral-500 rounded-lg w-8/10 p-2 gap-x-4 flex-grow'>
-          <Search size={20} color={"#ffffff"}/>
-          <Text className='text-sm text-white font-extralight'>Search Categories...</Text>
-
-          </View>
-            <Pressable
-            className='rounded-lg p-2 bg-neutral-600 border border-neutral-600'
-            onPress={()=>setVisible(true)}>
-              <Plus
-              color={"#ffffff"}
-              size={20}/>
-            </Pressable>
-          </View>
-        </View>
+        <HeaderList
+        headingText={"Add New Categories"}
+        onPress={()=>setVisible(true)}
+        inlineText={"Search categories..."}/>
         }
+        
         ListEmptyComponent={
           <View className='px-4'>
             <Text style={{color:"#ffffff"}}>Add Category</Text>

@@ -2,8 +2,8 @@ import { View, Text ,Modal, Pressable,ScrollView, ViewStyle, ActivityIndicator} 
 import { TextData } from '../comps/TextData'
 import { ButtonNeed } from '../comps/ButtonNeed'
 import React ,{ useState ,useEffect} from 'react'
-import { SelectType,SelectIcon,SelectColors } from './CreateCategory'
 import { categorydynamicColors,CategoryIcons } from '@/data'
+import ModalComp, { SelectColors, SelectIcon, SelectType } from '../comps/Mode/ModalComp'
 
 type updateProps={
   openEdit:boolean
@@ -68,53 +68,35 @@ const UpdateCategory = ({openEdit,setOpenEdit,selectedCategory,editCategory,remo
     }
 
   return (
-       <Modal
-          visible={openEdit}
-          transparent={true}
-          animationType='slide'
-          onRequestClose={() => setOpenEdit(false)}>
-         
-            <View className=" flex-1">
-         
-              <Pressable
-              style={{
-                flex:1,
-                backgroundColor: 'rgba(0,0,0,0.5)'
-              }}
-              onPress={()=>setOpenEdit(false)}/>
-         
-                <View className='bg-neutral-900 rounded-t-3xl pt-10 px-7 flex-col gap-y-8'
-                style={{flex:2}}
-                onStartShouldSetResponder={() => true}>
-                  <Text className='text-white text-lg font-semibold '>
-                    Edit Category
-                  </Text>
-                  
-                  <TextData
-                    tagexist={false}
-                    tag={'dd'}
-                    value={name}
-                    placeholder='e.g., Food'
-                    onChangeText={setName}
-                    secureTextEntry={false}/>
+    <ModalComp
+    visible={openEdit}
+    onRequestClose={()=>setOpenEdit(false)}
+    textblock={"Update Category"}
+    >
+      <TextData
+        tagexist={false}
+        tag={'dd'}
+        value={name}
+        placeholder='e.g., Food'
+        onChangeText={setName}
+        secureTextEntry={false}/>
 
-                    <View className='items-center justify-center mt-3 '>
-                      <View className="flex-row gap-x-3 p-1 py-1 bg-neutral-500 rounded-xl">
-                      <SelectType
-                        focused={type==="INCOME"}
-                        onPress={()=>setType("INCOME")}
-                        text='Income'/>
+      <View className='items-center justify-center mt-3 '>
+        <View className="flex-row gap-x-3 p-1 py-1 bg-neutral-500 rounded-xl">
+          <SelectType
+            focused={type==="INCOME"}
+            onPress={()=>setType("INCOME")}
+            text='Income'/>
          
-                      <SelectType
-                        focused={type==="EXPENSE"}
-                        onPress={()=>
-                        setType("EXPENSE")}
-                        text='Expense'/>
-                      </View>
-                    </View>
+          <SelectType
+            focused={type==="EXPENSE"}
+            onPress={()=>setType("EXPENSE")}
+            text='Expense'/>
+        </View>
+      </View>
          
-                    <View className=' flex-row gap-x-3 mt-3'>
-                      <Text className='text-md font-semibold text-white'>Choose Color</Text>
+      <View className=' flex-row gap-x-3 mt-3'>
+          <Text className='text-md font-semibold text-white'>Choose Color</Text>
                       <ScrollView
                       showsVerticalScrollIndicator={false}
                       horizontal
@@ -169,11 +151,7 @@ const UpdateCategory = ({openEdit,setOpenEdit,selectedCategory,editCategory,remo
                     disabled={removePageLoading}
                     />
                    </View>
-                </View>
-                 
-                     
-              </View>
-          </Modal>
+    </ModalComp>
   )
 }
 

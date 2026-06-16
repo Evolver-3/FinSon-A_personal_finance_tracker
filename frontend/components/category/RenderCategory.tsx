@@ -2,7 +2,7 @@ import { View, Text, FlatList,Pressable, ActivityIndicator, Modal} from 'react-n
 import { Pencil } from 'lucide-react-native'
 import React,{useState} from 'react'
 import UpdateCategory from './UpdateCategory'
-import { getIconByName } from './CreateCategory'
+import { getIconByName } from '../comps/Mode/ModalComp'
 
 type RenderCategoryProps={
   item:Category
@@ -21,7 +21,7 @@ const RenderCategory = ({loading,editCategory,removeCategory,item}:RenderCategor
   return (
     <View className='px-4'>
       <View
-          className='flex-row items-center rounded-xl p-4 '
+        className='flex-row items-center rounded-xl p-4 '
           style={{
           backgroundColor:item.color.darkColor
           }}>
