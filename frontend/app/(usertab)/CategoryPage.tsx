@@ -8,11 +8,6 @@ import CreateCategory from '@/components/category/CreateCategory'
 import RenderCategory from '@/components/category/RenderCategory'
 import { categorydynamicColors } from '@/data'
 
-const Size=28
-const GAP=10
-const CLOSED_WIDTH=Size 
-
-const OPEN_WIDTH=250
 const CategoryPage = () => {
   const { selectedCategory,editCategory,fetchCategory,categories,loading,creatingCategory,removeCategory}=useCategory()
   const [visible,setVisible]=useState(false)
