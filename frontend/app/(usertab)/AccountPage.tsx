@@ -7,6 +7,7 @@ import CreateAccount from '@/components/account/CreateAccount'
 import { Plus } from 'lucide-react-native'
 import AccountItem from '@/components/account/AccountItem'
 import { categorydynamicColors } from '@/data'
+import HeaderList from '@/components/comps/Flat/HeaderList'
 
 const AccountPage = () => {
   const {loading,error,createAccount,accounts,editAccount,removeAccount}=useAccount()
@@ -64,36 +65,18 @@ const AccountPage = () => {
       <FlatList
       data={accounts}
       keyExtractor={(item)=>item.id}
-      contentContainerStyle={{paddingHorizontal:8,paddingTop:4,gap:10}}
-      ListHeaderComponent={
-        <View style={{gap:16,marginBottom:8}}>
-          <View style={{
-            flexDirection:"row",
-            borderWidth:1,
-            borderColor:"#737373",
-            borderRadius:8,
-            padding:8,
-            gap:16,
-            flexGrow:1
-          }}>
-            <Text style={{fontSize:14,color:"#ffffff",fontWeight:'200'}}>Search Account..</Text>
-          </View>
+      contentContainerStyle={{paddingHorizontal:4,paddingTop:6,gap:10}}
 
-          <Pressable
-          style={{
-            borderRadius:8,
-            padding:8,
-            backgroundColor:"#525252"
-          }}
-          onPress={()=>setOpenCreate(true)}>
-            <Plus color="#ffffff" size={20}/>
-          </Pressable>
-        </View>
+      ListHeaderComponent={
+        <HeaderList
+        headingText={"Add New Accounts"}
+        onPress={()=>setOpenCreate(true)}
+        inlineText={"Search Accounts ..."}/>
       }
 
       ListEmptyComponent={
-        <View>
-          <Text style={{color:"#ffffff"}}>Add Accoun/t</Text>
+        <View className='px-4'>
+          <Text style={{color:"#ffffff"}}>Add Account</Text>
         </View>
       }
       renderItem={({item})=>(
