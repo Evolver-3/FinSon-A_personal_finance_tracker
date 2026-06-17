@@ -8,8 +8,11 @@ type ModalCompProps={
   onRequestClose:()=>void 
   textblock:string 
   children:React.ReactNode
+  pressableFlex?:number 
+  viewFlex?:number
+
 }
-const ModalComp = ({visible,onRequestClose,textblock,children}:ModalCompProps) => {
+const ModalComp = ({visible,onRequestClose,textblock,children,pressableFlex,viewFlex}:ModalCompProps) => {
   return (
      <Modal
         visible={visible}
@@ -21,12 +24,12 @@ const ModalComp = ({visible,onRequestClose,textblock,children}:ModalCompProps) =
        
             <Pressable
             style={{
-              flex:2,
-              backgroundColor: 'rgba(0,0,0,0.5)'
+              backgroundColor: 'rgba(0,0,0,0.5)',
+              flex:pressableFlex,
             }}
             onPress={onRequestClose}/>
-              <View className='bg-neutral-900 rounded-t-3xl pt-10 px-7 flex-col gap-y-8 '
-              style={{flex:2}}
+              <View className='bg-neutral-900 rounded-t-3xl pt-4 px-7 flex-col gap-y-4 '
+              style={{flex:viewFlex}}
               onStartShouldSetResponder={() => true}>
                 <Text className='text-white text-lg font-semibold '>
                  {textblock}
