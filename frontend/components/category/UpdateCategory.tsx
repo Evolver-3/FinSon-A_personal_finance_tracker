@@ -95,7 +95,7 @@ const UpdateCategory = ({openEdit,setOpenEdit,selectedCategory,editCategory,remo
         </View>
       </View>
          
-      <View className=' flex-row gap-x-3 mt-3'>
+      <View className=' flex-row gap-x-3 mt-1'>
           <Text className='text-md font-semibold text-white'>Choose Color</Text>
                       <ScrollView
                       showsVerticalScrollIndicator={false}
@@ -119,7 +119,7 @@ const UpdateCategory = ({openEdit,setOpenEdit,selectedCategory,editCategory,remo
                       </ScrollView>
                     </View>
       
-                    <View className='flex-row items-center justify-center '>
+                    <View className='flex-row items-center justify-between '>
                       {CategoryIcons.map((tag)=>(
                         <SelectIcon
                         key={tag.id}
@@ -132,7 +132,7 @@ const UpdateCategory = ({openEdit,setOpenEdit,selectedCategory,editCategory,remo
                       ))}
                     </View>
                     
-                   <View className='flex-col gap-y-10 '>
+                   <View className='flex-col gap-y-4 mt-3 '>
                        <ButtonNeed
                     style={{}}
                     onPress={handleEditCategory}
@@ -143,7 +143,6 @@ const UpdateCategory = ({openEdit,setOpenEdit,selectedCategory,editCategory,remo
                     
                     <ButtonNeed
                     style={{
-                      
                     }}
                     onPress={handleDeleteCategory}
                     text={'Remove'}
