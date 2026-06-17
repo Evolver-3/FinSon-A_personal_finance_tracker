@@ -4,24 +4,25 @@ import Wrapper from '@/components/WrapperPage'
 import { Link, router } from 'expo-router'
 import { useAuth } from '@/hooks/useAuth'
 import Authbody from '@/components/Authbody'
-import { ButtonNeed, TextData } from './sign-in'
+import { ButtonNeed } from '@/components/comps/ButtonNeed'
+import { TextData } from '@/components/comps/TextData'
 
 const signUpPage = () => {
-  const {register}=useAuth()
+  const {register,error}=useAuth()
   
   const [email,setEmail]=useState<string >("")
   const [password,setPassword]=useState<string>("")
   const [username,setUsername]=useState<string>("")
-  const [errorMessage,setErrorMessage]=useState<string>("")
+  const [localErrorMessage,setLocalErrorMessage]=useState<string>("")
   const [loading,setLoading]=useState(false)
 
   const handleSubmit=async()=>{
     
-    setErrorMessage("")
+    setLocalErrorMessage("")
     setLoading(true)
 
     if(!email.trim() || !password.trim() || !username.trim()){
-      setErrorMessage("fields are empty")
+      setLocalErrorMessage("fields are empty")
       return
     }
 
@@ -31,27 +32,29 @@ const signUpPage = () => {
      router.replace("/(auth)/sign-in")
       setLoading(false)
     }else{
-      setErrorMessage("Something went wrong")
+      setLocalErrorMessage("Something went wrong")
     }
        
   }
 
   useEffect(()=>{
-      if(errorMessage){
+      if(localErrorMessage){
         const timer=setTimeout(() => {
-          setErrorMessage("")
+          setLocalErrorMessage("")
         }, 2000);
         return ()=>clearTimeout(timer)
       }
-    },[errorMessage])
+    },[localErrorMessage])
 
+    const errorMessage=localErrorMessage || error
   return (
-    <Wrapper>
+    <Wrapper loading={loading}>
       <Authbody errorMessage={errorMessage}
       headingText={"Create a new account"}>
         <View className=' gap-y-4'>
             
             <TextData
+            tagexist
             tag='Your email address'
             value={email}
             placeholder='arunlal@gmail.com'
@@ -60,6 +63,7 @@ const signUpPage = () => {
             />
 
             <TextData
+            tagexist
             tag='Your Username'
             value={username}
             placeholder='arun lal'
@@ -68,6 +72,7 @@ const signUpPage = () => {
             />
 
             <TextData
+            tagexist
             tag='Enter your password'
             value={password}
             placeholder='Password'
@@ -76,6 +81,7 @@ const signUpPage = () => {
             />
             
             <ButtonNeed
+            style={{}}
             loading={loading}
             disabled={loading}
             text={"Sign in"} onPress={handleSubmit}/>
