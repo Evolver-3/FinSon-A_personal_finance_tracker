@@ -19,7 +19,7 @@ const AccountPage = () => {
   const [color,setColor]=useState<CategoryColor>(categorydynamicColors[0])
   const [icon,setIcon]=useState<string | null>(null)
   const [type,setType]=useState <"CASH" | "BANK" | "CARD" | "WALLET">("CASH")
-  const [balance,setBalance]=useState("")
+  const [balance,setBalance]=useState("") 
 
   const [pageLoad,setPageLoad]=useState(false)
 
@@ -43,7 +43,7 @@ const AccountPage = () => {
 
   console.log(accounts)
   return (
-    <Wrapper>
+    <Wrapper loading={loading}>
       
       <CreateAccount
       openCreate={openCreate}

@@ -4,10 +4,10 @@ import Wrapper from '@/components/WrapperPage'
 
 const Add = () => {
   return (
-   <Wrapper>
-     <View>
-      <Text className='text-white'>Add</Text>
-    </View>
+   <Wrapper loading={false}>
+     <View className='flex-1 px-4 gap-y-4 pt-4 flex-col'>
+      
+     </View>
    </Wrapper>
   )
 }

@@ -38,7 +38,8 @@ const CategoryPage = () => {
   }
   console.log(categories)
   return (
-    <Wrapper>
+    <Wrapper
+    loading={loading}>
        <CreateCategory
         visible={visible}
         setVisible={setVisible}

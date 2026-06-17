@@ -1,13 +1,40 @@
-import { View, Text } from 'react-native'
-import React from 'react'
+import { View, Text,Image} from 'react-native'
+import React,{useEffect} from 'react'
+import { useUser } from '@/hooks/useUser'
+import { useAccount } from '@/hooks/useAccount'
+import { useAuthContext } from '@/context/AuthContext'
 import Wrapper from '@/components/WrapperPage'
-import UserInfo from '@/components/Homepage/UserInfo'
-
+import TopUserComp from '@/components/comps/TopUserComp'
 const index = () => {
-  return (
 
-    <Wrapper>
-      <UserInfo/>
+   const {fetchAccount,accounts,loading}=useAccount()
+    const {user}=useAuthContext()
+    useEffect(()=>{
+  
+      fetchAccount()
+    },[])
+  
+    const totalBalance=accounts.reduce((total,account)=>{
+      return total+Number(account.balance)
+    },0)
+  return (
+    <Wrapper loading={loading}>
+       <View className='flex-1 px-4 gap-y-4 pt-4'>
+      <TopUserComp
+      headingText={""}/>
+      
+      <View className='boxBlock'>
+        <Text className='text-white text-xs'>TOTAL BALANCE</Text>
+        <Text className='text-white text-3xl'>{totalBalance? totalBalance :0}</Text>
+        
+
+      </View>
+
+      <View className='boxBlock'>
+       
+
+      </View>
+    </View>
 
     </Wrapper>
   ) 

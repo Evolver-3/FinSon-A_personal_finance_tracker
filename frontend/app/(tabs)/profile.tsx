@@ -1,20 +1,16 @@
 import { View, Text } from 'react-native'
 import React from 'react'
 import Wrapper from '@/components/WrapperPage'
-import UserProfile from '@/components/profilePage/userProfile'
-
+import AvatarUpload from '@/components/profilePage/AvatarUpload'
+import LogoutPage from '@/components/profilePage/LogoutPage'
 
 const profile = () => {
   return (
-    <Wrapper>
-      <View className='flex-1 px-4 gap-y-4 pt-4 flex-col jusitify-center'>
-      
-        <View className=''>
-          <UserProfile/>
-        </View>
-
-        
-        </View>
+    <Wrapper loading={false}>
+      <View className="flex-col px-4 gap-y-4 pt-4">
+        <AvatarUpload/>
+        <LogoutPage/>
+      </View>
     </Wrapper>
   )
 }

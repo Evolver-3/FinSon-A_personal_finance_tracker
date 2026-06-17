@@ -1,11 +1,24 @@
 import { View, Text } from 'react-native'
 import React from 'react'
 import Wrapper from '@/components/WrapperPage'
+import TopUserComp from '@/components/comps/TopUserComp'
+import { useBudget } from '@/hooks/useBudget'
 
 const Budget = () => {
+
+  const {creatingNewBudget,fetchAllBudgets}=useBudget()
   return (
-    <Wrapper>
+    <Wrapper loading={false}>
       <View>
+        <TopUserComp
+        headingText={"Monthly budgets"}
+        />
+
+        <View className="">
+          
+
+
+        </View>
         
       </View>
 
