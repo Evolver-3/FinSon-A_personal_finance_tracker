@@ -72,8 +72,11 @@ const UpdateCategory = ({openEdit,setOpenEdit,selectedCategory,editCategory,remo
     visible={openEdit}
     onRequestClose={()=>setOpenEdit(false)}
     textblock={"Update Category"}
+    pressableFlex={3}
+    viewFlex={3}
     >
       <TextData
+      keyboardType="default"
         tagexist={false}
         tag={'dd'}
         value={name}
@@ -95,7 +98,7 @@ const UpdateCategory = ({openEdit,setOpenEdit,selectedCategory,editCategory,remo
         </View>
       </View>
          
-      <View className=' flex-row gap-x-3 mt-1'>
+      <View className=' flex-row gap-x-3 mt-2 items-center'>
           <Text className='text-md font-semibold text-white'>Choose Color</Text>
                       <ScrollView
                       showsVerticalScrollIndicator={false}
@@ -132,7 +135,7 @@ const UpdateCategory = ({openEdit,setOpenEdit,selectedCategory,editCategory,remo
                       ))}
                     </View>
                     
-                   <View className='flex-col gap-y-4 mt-3 '>
+                   <View className='flex-col gap-y-4 mt-3 flex-1'>
                        <ButtonNeed
                     style={{}}
                     onPress={handleEditCategory}

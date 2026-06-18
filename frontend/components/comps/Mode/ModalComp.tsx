@@ -1,6 +1,6 @@
 import { View, Text, Modal, Pressable, ScrollView, ViewStyle} from 'react-native'
 import React from 'react'
-import { CategoryIcons } from '@/data'
+import { AccountIcons, CategoryIcons } from '@/data'
 import { TextData } from '../TextData'
 
 type ModalCompProps={
@@ -120,6 +120,27 @@ export const SelectIcon=({icon,onPress,focused,name}:TabIconProps)=>{
   )
 }
 
+
+export const SelectAccountIcon=({icon,onPress,focused,name}:TabIconProps)=>{
+  return (
+    <Pressable 
+    style={{
+      alignItems:'center',
+      justifyContent:"center",
+      padding:7,
+      borderRadius:8,
+      borderWidth:focused?1:0,
+      borderColor:focused?"#60a5fa":"transparent",
+      backgroundColor:focused?"#1e293b":'transparent'
+    }}
+    onPress={onPress}
+    >
+    {getAccountIconByName(name,focused)}
+    </Pressable>
+  )
+}
+
+
 export const getIconByName=(name:string | null, focused:boolean)=>{
   if(!name) return null 
 
@@ -128,71 +149,10 @@ export const getIconByName=(name:string | null, focused:boolean)=>{
   return found?found.symbol(focused):null
 }
 
+export const getAccountIconByName=(name:string | null,focused:boolean)=>{
+  if(!name) return null 
 
+  const found=AccountIcons.find(c=>c.name===name)
 
-            // <TextData
-            //   tagexist={false}
-            //   tag={'dd'}
-            //   value={name}
-            //   placeholder='e.g., Food'
-            //   onChangeText={setName}
-            //   secureTextEntry={false}/>
-            //   <View className='items-center justify-center '>
-            //     <View className="flex-row gap-x-3 p-1 py-1 bg-neutral-500 rounded-xl">
-            //     <SelectType
-            //       focused={type==="INCOME"}
-            //       onPress={()=>setType("INCOME")}
-            //       text='Income'/>
-   
-            //     <SelectType
-            //       focused={type==="EXPENSE"}
-            //       onPress={()=>
-            //       setType("EXPENSE")}
-            //       text='Expense'/>
-            //     </View>
-            //   </View>
-   
-            //   <View className=' flex-row gap-x-3'>
-            //     <Text className='text-md font-semibold text-white'>Choose Color</Text>
-            //     <ScrollView
-            //     showsVerticalScrollIndicator={false}
-            //     horizontal
-            //     contentContainerClassName='items-center'
-            //     className='flex-row'
-            //     contentContainerStyle={{alignItems:"center",
-            //       gap:10}}>
-            //       {categorydynamicColors.map((col,id)=>(
-            //       <View key={id}
-            //       className=''>
-            //         <SelectColors
-            //         style={{
-            //         backgroundColor:col.btncolor
-            //         }}
-            //         focused={color.btncolor===col.btncolor}
-            //         onPress={()=>setColor(col)}
-            //         />
-            //       </View>
-            //     ))}
-            //     </ScrollView>
-            //   </View>
-
-            //   <View className='flex-row items-center justify-between '>
-            //     {CategoryIcons.map((tag)=>(
-            //       <SelectIcon
-            //       key={tag.id}
-            //       name={tag.name}
-            //       icon={tag?.name}
-            //       focused={icon===tag.name}
-            //       onPress={()=>
-            //         setIcon(tag.name)}
-            //     />
-            //     ))}
-            //   </View>
-
-            //    <ButtonNeed
-            //    style={{}}
-            //   onPress={handleSubmit}
-            //   text={'Create new'}
-            //   loading={loading}
-            //   disabled={loading}
-            //   />
+  return found?found.symbol(focused):null
+}

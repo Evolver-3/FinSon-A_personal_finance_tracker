@@ -53,7 +53,7 @@ const signInPage = () => {
   const errorMessage=localError || error
 
   return (
-    <Wrapper loading={loading}>
+    <Wrapper loading={false}>
     
     <Authbody errorMessage={errorMessage}
     headingText={"Signed in your account"}>
@@ -61,6 +61,7 @@ const signInPage = () => {
         
         <TextData
         tagexist
+        keyboardType="email-address"
         tag='Your email address'
         value={email}
         placeholder='arunlal@gmail.com'
@@ -69,6 +70,7 @@ const signInPage = () => {
 
         <TextData
         tagexist
+        keyboardType="visible-password"
         tag='Enter your password'
         value={password}
         placeholder='password'

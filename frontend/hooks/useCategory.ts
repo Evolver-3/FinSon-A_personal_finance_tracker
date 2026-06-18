@@ -26,6 +26,7 @@ export const useCategory=()=>{
 
       return res.data
 
+
     }catch(error:any){
       
       handleError(error)
@@ -40,7 +41,6 @@ export const useCategory=()=>{
       setError(null)
 
       const res=await getCategories()
-
       setCategories(res.data)
 
       return res.data
@@ -48,7 +48,7 @@ export const useCategory=()=>{
 
     }catch(error:any){
      
-      handleError(false)
+      handleError(error)
     }finally{
       setLoading(false)
     }
@@ -60,6 +60,10 @@ export const useCategory=()=>{
       setError(null)
 
       const res=await getCategory(id)
+
+      console.log("fetchSingle--res.data",res.data)
+
+      console.log("fetchSingle--res.data.data",res.data.data)
 
       setSelectedCategory(res.data)
 
@@ -79,6 +83,7 @@ export const useCategory=()=>{
       setLoading(true)
       setError(null)
       const res=await updateCategory(id,data)
+      console.log("edit category:",res)
 
       setCategories((prev)=>
       prev.map((category)=>(category.id === id ? res.data:category)))

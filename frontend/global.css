@@ -2,3 +2,10 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+
+@layer components {
+  .boxBlock{
+  @apply bg-black rounded-xl shadow-md p-5 border border-slate-900
+}
+}

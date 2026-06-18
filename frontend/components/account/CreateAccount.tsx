@@ -3,7 +3,7 @@ import React from 'react'
 import { TextData } from '../comps/TextData'
 import { AccountIcons, categorydynamicColors, CategoryIcons } from '@/data'
 import { ButtonNeed } from '../comps/ButtonNeed'
-import ModalComp, { SelectColors, SelectIcon, SelectType } from '../comps/Mode/ModalComp'
+import ModalComp, { SelectAccountIcon, SelectColors, SelectType } from '../comps/Mode/ModalComp'
 
 type createAccountProps={
   openCreate:boolean 
@@ -20,14 +20,20 @@ type createAccountProps={
   setIcon:React.Dispatch<React.SetStateAction<string| null>>
   balance:string
   setBalance:React.Dispatch<React.SetStateAction<string>>
+  error:string | null
 }
-const CreateAccount = ({openCreate,setOpenCreate,name,setName,type,setType,color,setColor,handleCreateAccount,loading,icon,setIcon,balance,setBalance}:createAccountProps) => {
+
+const CreateAccount = ({openCreate,setOpenCreate,name,setName,type,setType,color,setColor,handleCreateAccount,loading,icon,setIcon,balance,setBalance,error}:createAccountProps) => {
   return (
    <ModalComp
    visible={openCreate}
    onRequestClose={()=>setOpenCreate(false)}
-   textblock={'Create Account'}>
+   textblock={'Create Account'}
+   pressableFlex={3}
+    viewFlex={3}>
+
     <TextData
+    keyboardType="default"
       tagexist={false}
       tag={''}
       value={name}
@@ -36,14 +42,15 @@ const CreateAccount = ({openCreate,setOpenCreate,name,setName,type,setType,color
       secureTextEntry={false}/>
 
     <TextData
+    keyboardType="decimal-pad"
     tagexist={false}
     tag={''}
     value={balance}
-    placeholder='0'
+    placeholder='0.00'
     onChangeText={setBalance}
     secureTextEntry={false}/>
     
-    <View className='items-center justify-center '>
+    <View className='items-center justify-center mt-3'>
       <View className="flex-row gap-x-3 p-1 py-1 bg-neutral-500 rounded-xl">
 
         <SelectType
@@ -68,7 +75,7 @@ const CreateAccount = ({openCreate,setOpenCreate,name,setName,type,setType,color
                   
       </View>
        
-      <View className=' flex-row gap-x-3'>
+      <View className=' flex-row gap-x-3 mt-2 items-center'>
         <Text className='text-md font-semibold text-white'>Choose Color</Text>
         
         <ScrollView
@@ -92,7 +99,7 @@ const CreateAccount = ({openCreate,setOpenCreate,name,setName,type,setType,color
     
       <View className='flex-row items-center justify-between '>
         {AccountIcons.map((tag)=>(
-          <SelectIcon
+          <SelectAccountIcon
           key={tag.id}
           name={tag.name}
           icon={tag?.name}

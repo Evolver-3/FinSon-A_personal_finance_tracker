@@ -35,7 +35,7 @@ declare global{
   interface updateAccountProps{
     name?:string 
     type?:"CASH" | "BANK" | "CARD" | "WALLET" 
-    balance?:number
+    balance?:string
     icon?:string | null
     color?:CategoryColor
   }
@@ -105,7 +105,13 @@ declare global{
     id:string
     name:string 
     type:"CASH" | "BANK" | "CARD" | "WALLET" 
-    balance:number
+    color:{
+      btncolor:string 
+      colors:string 
+      darkColor:string
+    }
+    icon:string
+    balance:string
     createdAt?:string 
     updatedAt?:string
   }

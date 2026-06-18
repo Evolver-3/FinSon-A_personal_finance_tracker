@@ -26,9 +26,12 @@ const CreateCategory = ({visible,setVisible,name,setName,type,setType,color,setC
     <ModalComp
     visible={visible}
     onRequestClose={()=>setVisible(false)}
-    textblock={"Create Category"}>
+    textblock={"Create Category"}
+    pressableFlex={3}
+    viewFlex={2}>
       
             <TextData
+            keyboardType="default"
               tagexist={false}
               tag={''}
               value={name}

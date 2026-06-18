@@ -9,7 +9,7 @@ const Budget = () => {
   const {creatingNewBudget,fetchAllBudgets}=useBudget()
   return (
     <Wrapper loading={false}>
-      <View>
+      <View className='flex-1 px-4 gap-y-4 pt-4'>
         <TopUserComp
         headingText={"Monthly budgets"}
         />

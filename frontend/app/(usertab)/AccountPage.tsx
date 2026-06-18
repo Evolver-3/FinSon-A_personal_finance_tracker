@@ -1,25 +1,23 @@
-import { View, Text, FlatList, Pressable} from 'react-native'
+import { View, Text, FlatList} from 'react-native'
 import React, { useState } from 'react'
 import Wrapper from '@/components/WrapperPage'
-import TopUserComp from '@/components/comps/TopUserComp'
 import { useAccount } from '@/hooks/useAccount'
 import CreateAccount from '@/components/account/CreateAccount'
-import { Plus } from 'lucide-react-native'
 import AccountItem from '@/components/account/AccountItem'
 import { categorydynamicColors } from '@/data'
 import HeaderList from '@/components/comps/Flat/HeaderList'
 
 const AccountPage = () => {
-  const {loading,error,createAccount,accounts,editAccount,removeAccount}=useAccount()
+  const {loading,error,creatingAccount,accounts,editAccount,removeAccount,  selectedAccount}=useAccount()
   
   const [openCreate,setOpenCreate]=useState(false)
 
- 
   const [name,setName]=useState("")
   const [color,setColor]=useState<CategoryColor>(categorydynamicColors[0])
   const [icon,setIcon]=useState<string | null>(null)
   const [type,setType]=useState <"CASH" | "BANK" | "CARD" | "WALLET">("CASH")
   const [balance,setBalance]=useState("") 
+
 
   const [pageLoad,setPageLoad]=useState(false)
 
@@ -27,28 +25,30 @@ const AccountPage = () => {
     try{
       setPageLoad(true)
 
-      await createAccount ({name,type,color,icon,balance})
+      await creatingAccount ({name,type,color,icon,balance})
       setName("")
       setColor(categorydynamicColors[0])
       setOpenCreate(false)
+      setBalance("0")
       
-
-    }catch(error){
+    }catch(err:any){
       console.log(error)
+      console.log(err)
 
     }finally{
       setPageLoad(false)
     }
   }
 
-  console.log(accounts)
+  console.log("Ui render:",accounts)
   return (
-    <Wrapper loading={loading}>
+    <Wrapper loading={false}>
       
       <CreateAccount
+      error={error}
       openCreate={openCreate}
       setOpenCreate={setOpenCreate}
-      loading={loading}
+      loading={pageLoad}
       handleCreateAccount={handleCreateAccount}
       name={name}
       setName={setName}
@@ -81,7 +81,10 @@ const AccountPage = () => {
       }
       renderItem={({item})=>(
         <AccountItem
+        error={error}
         item={item}
+        loading={pageLoad}
+        selectedAccount={selectedAccount}
         editAccount={editAccount}
         removeAccount={removeAccount}/>
       )}

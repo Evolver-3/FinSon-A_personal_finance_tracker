@@ -7,11 +7,11 @@ import Wrapper from '@/components/WrapperPage'
 import TopUserComp from '@/components/comps/TopUserComp'
 const index = () => {
 
-   const {fetchAccount,accounts,loading}=useAccount()
+   const {fetchAllAccounts,accounts,loading}=useAccount()
     const {user}=useAuthContext()
     useEffect(()=>{
   
-      fetchAccount()
+      fetchAllAccounts()
     },[])
   
     const totalBalance=accounts.reduce((total,account)=>{

@@ -1,4 +1,4 @@
-import {View,TextInput,Text} from 'react-native'
+import {View,TextInput,Text, KeyboardTypeOptions} from 'react-native'
 type dataProps={
   tag:string
   placeholder:string 
@@ -6,10 +6,11 @@ type dataProps={
   onChangeText:(text:string)=>void
   secureTextEntry:boolean
   tagexist:boolean
+  keyboardType:KeyboardTypeOptions
   
 }
 
-export const TextData=({tagexist,tag,value,placeholder,onChangeText,secureTextEntry}:dataProps)=>{
+export const TextData=({tagexist,tag,value,placeholder,onChangeText,secureTextEntry,keyboardType}:dataProps)=>{
   return(
 
       <View className='flex gap-y-4'>
@@ -33,7 +34,8 @@ export const TextData=({tagexist,tag,value,placeholder,onChangeText,secureTextEn
         value={value ?? ""}
         placeholder={placeholder}
         onChangeText={onChangeText}
-        secureTextEntry={secureTextEntry}/>
+        secureTextEntry={secureTextEntry}
+        keyboardType={keyboardType}/>
       </View>
 
   )

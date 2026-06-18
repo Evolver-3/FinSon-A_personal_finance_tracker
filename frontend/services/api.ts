@@ -3,7 +3,7 @@ import { clearTokens, getAccessToken, getRefreshToken, saveTokens } from './toke
 import { router } from 'expo-router'
 
 export const api=axios.create({
-  baseURL:"http://192.168.1.5:5000/api/v1",
+  baseURL:"http://192.168.1.4:5000/api/v1",
   headers:{
     "Content-Type":"application/json",
   }
@@ -35,7 +35,7 @@ api.interceptors.response.use(
           return Promise.reject(error)
         }
         const res=await axios.post(
-          "http://192.168.1.5:5000/api/v1/auth/refreshToken",
+          "http://192.168.1.4:5000/api/v1/auth/refreshToken",
           {refreshToken:refreshToken}
         )
 

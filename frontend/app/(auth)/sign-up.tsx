@@ -48,13 +48,14 @@ const signUpPage = () => {
 
     const errorMessage=localErrorMessage || error
   return (
-    <Wrapper loading={loading}>
+    <Wrapper loading={false}>
       <Authbody errorMessage={errorMessage}
       headingText={"Create a new account"}>
         <View className=' gap-y-4'>
             
             <TextData
             tagexist
+            keyboardType="email-address"
             tag='Your email address'
             value={email}
             placeholder='arunlal@gmail.com'
@@ -64,6 +65,7 @@ const signUpPage = () => {
 
             <TextData
             tagexist
+            keyboardType="default"
             tag='Your Username'
             value={username}
             placeholder='arun lal'
@@ -73,6 +75,7 @@ const signUpPage = () => {
 
             <TextData
             tagexist
+            keyboardType="visible-password"
             tag='Enter your password'
             value={password}
             placeholder='Password'

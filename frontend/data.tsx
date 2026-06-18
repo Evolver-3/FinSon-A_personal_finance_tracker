@@ -1,4 +1,4 @@
-import { Home, BadgePlus, UserRound, Banknote, ChartNoAxesCombinedIcon, Utensils ,Fuel, Hamburger, ShoppingCart, GlobeCheck, CarTaxiFrontIcon} from 'lucide-react-native'
+import { Home, BadgePlus, UserRound, Banknote, ChartNoAxesCombinedIcon, Utensils ,Fuel, Hamburger, GlobeCheck, CarTaxiFrontIcon, Landmark, BanknoteIcon, Wallet, CreditCard, Toolbox, Clapperboard, Hospital} from 'lucide-react-native'
 import React from 'react'
 
 type bottomTabDataProps={
@@ -149,6 +149,82 @@ export const CategoryIcons:CategoryIconsProps[] = [
         color={focused?"#60a5fa":"#ffffff"}
       />
     )
+  },
+  {
+    id: 6,
+    name:"Toolbox",
+    symbol:(focused:boolean)=>(
+      <Toolbox
+        size={30}
+        color={focused?"#60a5fa":"#ffffff"}
+      />
+    )
+  },
+  {
+    id: 7,
+    name:"Clapperboard",
+    symbol:(focused:boolean)=>(
+      <Clapperboard
+        size={30}
+        color={focused?"#60a5fa":"#ffffff"}
+      />
+    )
+  },
+  {
+    id: 8,
+    name:"Hospital",
+    symbol:(focused:boolean)=>(
+      <Hospital
+        size={30}
+        color={focused?"#60a5fa":"#ffffff"}
+      />
+    )
+  }
+]
+
+
+
+export const AccountIcons:CategoryIconsProps[] = [
+  {
+    id: 1,
+    name:"Landmark",
+    symbol:(focused:boolean)=>(
+      <Landmark
+        size={30}
+        color={focused?"#60a5fa":"#ffffff"}
+      />
+    )},
+  {
+    id: 2,
+    name:"BankNote",
+    symbol:(focused:boolean)=>(
+      <BanknoteIcon
+        size={30}
+        color={focused?"#60a5fa":"#ffffff"}
+      />
+
+    )
     
+  },
+  {
+    id: 3,
+    name:"Wallet",
+    symbol:(focused:boolean)=>(
+      <Wallet
+        size={30}
+        color={focused?"#60a5fa":"#ffffff"}
+      />
+    )
+    
+  },
+  {
+    id: 4,
+    name:"CreditCard",
+    symbol:(focused:boolean)=>( 
+      <CreditCard
+        size={30}
+        color={focused?"#60a5fa":"#ffffff"}
+      />
+    )
   }
 ]

@@ -1,8 +1,6 @@
-import { View, Text ,Pressable, Modal, FlatList, ViewStyle, ScrollView} from 'react-native'
+import { View, Text ,Pressable, Modal, FlatList} from 'react-native'
 import React,{useState} from 'react'
 import Wrapper from '@/components/WrapperPage'
-import TopUserComp from '@/components/comps/TopUserComp'
-import { Plus, Search } from 'lucide-react-native'
 import { useCategory } from '@/hooks/useCategory'
 import CreateCategory from '@/components/category/CreateCategory'
 import RenderCategory from '@/components/category/RenderCategory'
@@ -10,7 +8,9 @@ import { categorydynamicColors } from '@/data'
 import HeaderList from '@/components/comps/Flat/HeaderList'
 
 const CategoryPage = () => {
+
   const { selectedCategory,editCategory,fetchCategory,categories,loading,creatingCategory,removeCategory}=useCategory()
+
   const [visible,setVisible]=useState(false)
 
   const [name,setName]=useState("")
@@ -39,7 +39,8 @@ const CategoryPage = () => {
   console.log(categories)
   return (
     <Wrapper
-    loading={loading}>
+    loading={false}>
+
        <CreateCategory
         visible={visible}
         setVisible={setVisible}
@@ -52,7 +53,7 @@ const CategoryPage = () => {
         icon={icon}
         setIcon={setIcon}
         handleSubmit={handleSubmit}
-        loading={loading}/>
+        loading={renderPageLoading}/>
         
         <FlatList
         data={categories}
@@ -72,7 +73,6 @@ const CategoryPage = () => {
           </View>
           
         }
-
         renderItem={({item})=>(
           <RenderCategory
           item={item}
