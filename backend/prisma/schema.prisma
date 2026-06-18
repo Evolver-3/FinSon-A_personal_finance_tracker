@@ -51,6 +51,8 @@ model Account {
   name         String
   type         AccountType
   balance      Decimal       @default(0)
+  icon         String?
+  color        Json?
 
   userId       String
   user         User          @relation(fields: [userId], references: [id], onDelete: Cascade)
@@ -64,7 +66,7 @@ model Account {
 model Category {
   id           String        @id @default(uuid())
   name         String
-  color        String?
+  color        Json?
   icon         String?
   type         TransactionType
 

@@ -11,7 +11,7 @@ export const createAccount=asyncHandler(async(req,res)=>{
     throw new ApiError(400,"unauthorized user")
   }
 
-  const {name,type,balance}=req.body
+  const {name,type,balance,icon,color}=req.body
 
   if(!name||!type){
     throw new ApiError(400,"Fields are empty")
@@ -22,6 +22,8 @@ export const createAccount=asyncHandler(async(req,res)=>{
       name,
       type,
       balance:balance??0,
+      icon,
+      color,
       userId
     }
   })
@@ -32,7 +34,7 @@ export const createAccount=asyncHandler(async(req,res)=>{
   return res.status(201).json(new ApiResponse(201,account,"Account created successfully"))
 })
 
-export const getAccount=asyncHandler(async(req,res)=>{
+export const getAllAccount=asyncHandler(async(req,res)=>{
   const userId=req.user?.id
 
    if(!userId){
@@ -48,6 +50,8 @@ export const getAccount=asyncHandler(async(req,res)=>{
       name:true,
       type:true,
       balance:true,
+      icon:true,
+      color:true,
       createdAt:true,
       updatedAt:true
     },
@@ -58,6 +62,43 @@ export const getAccount=asyncHandler(async(req,res)=>{
 
   return res.status(200).json(new ApiResponse(200,accounts,"Account fetched successfully"))
 
+})
+
+export const getAccountById=asyncHandler(async(req,res)=>{
+  const userId=req.user?.id 
+
+  if(!userId){
+    throw new ApiError(400, "Not authorized")
+  }
+
+  const {accountId}=req.params
+
+  if(!accountId  || Array.isArray(accountId)){
+    throw new ApiError(400, "account doesn't exist")
+  }
+
+  const accountExist=await prisma.account.findFirst({
+    where:{
+      id:accountId,
+      userId
+    },
+    select:{
+      id:true,
+      name:true,
+      type:true,
+      balance:true,
+      icon:true,
+      color:true,
+      createdAt:true,
+      updatedAt:true
+    }
+  })
+
+  if(!accountExist){
+    throw new ApiError(400,"account doesn't exist with given id")
+  }
+
+  return res.status(200).json(new ApiResponse(200,accountExist,"account found"))
 })
 
 export const updateAccount=asyncHandler(async(req,res)=>{
@@ -71,7 +112,7 @@ export const updateAccount=asyncHandler(async(req,res)=>{
   if(!accountId || Array.isArray(accountId)){
     throw new ApiError(400,"account doesn't exist")
   }
-  const {name,type,balance}=req.body
+  const {name,type,balance,icon,color}=req.body
 
   if(!name && !type && balance===undefined){
     throw new ApiError(400,"At least one fields is required")
@@ -95,13 +136,17 @@ export const updateAccount=asyncHandler(async(req,res)=>{
     data:{
       ...(name && {name}),
       ...(type && {type}),
-      ...(balance !== undefined && {balance})
+      ...(balance !== undefined && {balance}),
+      ...(color && {color}),
+      ...(icon && {icon})
     },
     select:{
       id:true,
       name:true,
       type:true,
       balance:true,
+      icon:true,
+      color:true,
       createdAt:true,
       updatedAt:true,
     }
