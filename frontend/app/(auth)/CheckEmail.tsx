@@ -3,8 +3,8 @@ import React,{useState} from 'react'
 import Wrapper from '@/components/WrapperPage'
 import Authbody from '@/components/Authbody'
 import { Link, useLocalSearchParams } from 'expo-router'
-import { ButtonNeed } from './sign-in'
 import { useAuth } from '@/hooks/useAuth'
+import { ButtonNeed } from '@/components/comps/ButtonNeed'
 
 const CheckEmail = () => {
   
@@ -38,7 +38,7 @@ const CheckEmail = () => {
     }
   }
   return (
-    <Wrapper>
+    <Wrapper loading={loading}>
       <Authbody headingText={""} errorMessage={errorMessage}>
         <View className='flex-1 items-center '>
           <Text>
@@ -50,6 +50,7 @@ const CheckEmail = () => {
           </Text>
 
           <ButtonNeed
+          style={{}}
           loading={loading}
           disabled={loading}
           onPress={handleResend}

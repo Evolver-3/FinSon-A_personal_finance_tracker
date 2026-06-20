@@ -1,14 +1,13 @@
 import { View, Text,Image} from 'react-native'
 import React,{useEffect} from 'react'
-import { useUser } from '@/hooks/useUser'
 import { useAccount } from '@/hooks/useAccount'
-import { useAuthContext } from '@/context/AuthContext'
+
 import Wrapper from '@/components/WrapperPage'
 import TopUserComp from '@/components/comps/TopUserComp'
 const index = () => {
 
    const {fetchAllAccounts,accounts,loading}=useAccount()
-    const {user}=useAuthContext()
+
     useEffect(()=>{
   
       fetchAllAccounts()

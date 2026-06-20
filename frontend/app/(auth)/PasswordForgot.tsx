@@ -2,9 +2,11 @@ import { View, Text } from 'react-native'
 import React,{useState} from 'react'
 import { useAuth } from '@/hooks/useAuth'
 import Authbody from '@/components/Authbody'
-import { ButtonNeed, TextData } from './sign-in'
+
 import { Link, router } from 'expo-router'
 import Wrapper from '@/components/WrapperPage'
+import { TextData } from '@/components/comps/TextData'
+import { ButtonNeed } from '@/components/comps/ButtonNeed'
 
 const PasswordForgot = () => {
    const [errorMessage,setErrorMessage]=useState<string>("")
@@ -35,7 +37,7 @@ const PasswordForgot = () => {
     }
   }
   return (
-    <Wrapper>
+    <Wrapper loading={false}>
       <Authbody errorMessage={errorMessage} headingText={"Send Password Reset email"}>
       <View>
         <TextData
@@ -44,9 +46,14 @@ const PasswordForgot = () => {
         placeholder='arunlal@gmail.com'
         onChangeText={setEmail}
         secureTextEntry={false}
+        tagexist
+        keyboardType="email-address"
+
         />
         <ButtonNeed
         disabled={loading}
+        loading={loading}
+        style={{}}
         onPress={handleRecoveryEmail}
         text={"Get recovery mail"}/>
       </View>

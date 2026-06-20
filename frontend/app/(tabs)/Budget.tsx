@@ -6,7 +6,7 @@ import { useBudget } from '@/hooks/useBudget'
 
 const Budget = () => {
 
-  const {creatingNewBudget,fetchAllBudgets}=useBudget()
+  const {creatingNewBudget,fetchAllBudgets,loading,error}=useBudget()
   return (
     <Wrapper loading={false}>
       <View className='flex-1 px-4 gap-y-4 pt-4'>

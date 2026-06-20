@@ -4,7 +4,8 @@ import { useAuth } from '@/hooks/useAuth'
 import { router, useLocalSearchParams } from 'expo-router'
 import Wrapper from '@/components/WrapperPage'
 import Authbody from '@/components/Authbody'
-import { ButtonNeed, TextData } from './sign-in'
+import { TextData } from '@/components/comps/TextData'
+import { ButtonNeed } from '@/components/comps/ButtonNeed'
 
 const PasswordReset = () => {
 
@@ -58,7 +59,7 @@ const PasswordReset = () => {
     })
   
   return (
-    <Wrapper>
+    <Wrapper loading={false}>
       <Authbody headingText={"Enter a new password"} errorMessage={errorMessage}>
         <View>
           <TextData
@@ -66,16 +67,23 @@ const PasswordReset = () => {
             value={newPassword}
             placeholder='password'
             onChangeText={setNewPassword}
-            secureTextEntry={true}/>
+            secureTextEntry={true}
+            tagexist
+            keyboardType='visible-password'/>
 
           <TextData
             tag='Confirm new password'
             value={confirmNewPassword}
             placeholder='password'
             onChangeText={setConfirmNewPassword}
-            secureTextEntry={true}/>
+            secureTextEntry={true}
+            keyboardType='visible-password'
+            tagexist
+            />
 
             <ButtonNeed
+            loading={loading}
+            style={{}}
             disabled={loading}
             onPress={handleResetPassword}
             text={'Password change'}/>
