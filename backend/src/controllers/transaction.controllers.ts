@@ -108,7 +108,9 @@ export const getAllTransaction=asyncHandler(async(req,res)=>{
         select:{
           id:true,
         name:true,
-        type:true
+        type:true,
+        icon:true,
+        color:true
         }
       },
       category:{
@@ -164,7 +166,9 @@ export const getTransactionById=asyncHandler(async(req,res)=>{
         select:{
           id:true,
           name:true,
-          type:true
+          type:true,
+          color:true,
+          icon:true
         }
       },
       category:{
