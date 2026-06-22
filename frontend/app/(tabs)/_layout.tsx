@@ -4,7 +4,6 @@ import { ActivityIndicator, View ,Text} from "react-native"
 import { bottomTabData } from "@/data"
 
 
-
 export default function TabsLayout() {
   const { user,loading } = useAuthContext()
 
@@ -20,7 +19,7 @@ export default function TabsLayout() {
     return <Redirect href="/(auth)/sign-in" />
   }
 
-
+  
   return <Tabs 
           screenOptions={{
             headerShown:false,

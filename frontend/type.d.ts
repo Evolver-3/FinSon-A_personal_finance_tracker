@@ -56,10 +56,10 @@ declare global{
 
   interface createTransactionProps{
     title:string 
-    amount:number
+    amount:string
     type:"INCOME" | "EXPENSE"
     note?:string 
-    date?:string
+    date?:Date
     accountId:string
     categoryId:string
 
@@ -67,10 +67,10 @@ declare global{
 
   interface updateTransactionProps{
     title?:string 
-    amount?:number 
+    amount?:string
     type?:"INCOME" | "EXPENSE" 
     note?:string 
-    date?:string
+    date?:Date
     accountId?:string
     categoryId?:string
   }
@@ -134,12 +134,12 @@ declare global{
   type Transaction={
     id:string
     title:string 
-    amount:number 
+    amount:string 
     type:"INCOME" | "EXPENSE"
-    note:string | null
+    note:string 
     date:string
-    account?:Account
-    category?:Category
+    account?:Account  
+    category?:Category  
     accountId?:string 
     categoryId?:string
     createdAt?:string 

@@ -1,7 +1,6 @@
-import { View, Text, Modal, Pressable, ScrollView, ViewStyle} from 'react-native'
+import { View, Text, Modal, Pressable, ScrollView, ViewStyle, RegisteredStyle} from 'react-native'
 import React from 'react'
 import { AccountIcons, CategoryIcons } from '@/data'
-import { TextData } from '../TextData'
 
 type ModalCompProps={
   visible:boolean 
@@ -28,10 +27,10 @@ const ModalComp = ({visible,onRequestClose,textblock,children,pressableFlex,view
               flex:pressableFlex,
             }}
             onPress={onRequestClose}/>
-              <View className='bg-neutral-900 rounded-t-3xl pt-4 px-7 flex-col gap-y-4 '
+              <View className='bg-neutral-300 dark:bg-neutral-800 rounded-t-3xl pt-4 px-7 flex-col gap-y-4 '
               style={{flex:viewFlex}}
               onStartShouldSetResponder={() => true}>
-                <Text className='text-white text-lg font-semibold '>
+                <Text className='biggerText text-lg font-semibold '>
                  {textblock}
                 </Text>
                 
@@ -98,10 +97,12 @@ type TabIconProps={
   onPress:()=>void
   focused:boolean
   name:string
+  style:ViewStyle
 }
 
 
-export const SelectIcon=({icon,onPress,focused,name}:TabIconProps)=>{
+
+export const SelectIcon=({icon,onPress,focused,name,style}:TabIconProps)=>{
   return (
     <Pressable 
     style={{
@@ -111,7 +112,7 @@ export const SelectIcon=({icon,onPress,focused,name}:TabIconProps)=>{
       borderRadius:8,
       borderWidth:focused?1:0,
       borderColor:focused?"#60a5fa":"transparent",
-      backgroundColor:focused?"#1e293b":'transparent'
+      backgroundColor:focused?"#1e293b":'transparent',
     }}
     onPress={onPress}
     >

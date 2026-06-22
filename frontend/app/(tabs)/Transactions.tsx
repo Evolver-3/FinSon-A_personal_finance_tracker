@@ -1,23 +1,15 @@
-import { View, Text ,Pressable, Platform, FlatList} from 'react-native'
+import { View, Text , FlatList} from 'react-native'
 import React, { useState } from 'react'
 import Wrapper from '@/components/WrapperPage'
 import { useTransaction } from '@/hooks/useTransaction'
-import { TextData } from '@/components/comps/TextData'
-import { SelectType } from '@/components/comps/Mode/ModalComp'
 import { useAccount } from '@/hooks/useAccount'
 import { useCategory } from '@/hooks/useCategory'
-import { ButtonNeed } from '@/components/comps/ButtonNeed'
-import DateTimePicker from '@react-native-community/datetimepicker'
-import { CalendarRangeIcon } from 'lucide-react-native'
-import TopUserComp from '@/components/comps/TopUserComp'
-import SelectDropdown from '@/components/transactionPage/SelectDropdown'
-import TransactionComp from '@/components/transactionPage/TransactionComp'
 import CreateTransaction from '@/components/transactionPage/CreateTransaction'
 import HeaderList from '@/components/comps/Flat/HeaderList'
 import RenderTransaction from '@/components/transactionPage/RenderTransaction'
 
 const Transactions = () => {
-  const {loading,error,transactions,creatingNewTransaction,editTransaction,removeTransaction}=useTransaction()
+  const {loading,error,transactions,creatingNewTransaction,editTransaction,removeTransaction,fetchTransaction}=useTransaction()
 
   const {accounts}=useAccount()
   const {categories}=useCategory()
@@ -25,8 +17,10 @@ const Transactions = () => {
   const [pageLoad,setPageLoad]=useState(false)
   const [pageError,setPageError]=useState<string>('')
   const [openCreate,setOpenCreate]=useState(false)
+  
   return (
-    <Wrapper loading={loading}>
+
+    <Wrapper loading={false}>
 
       <CreateTransaction
       openCreate={openCreate}
@@ -38,8 +32,8 @@ const Transactions = () => {
       setPageError={setPageError}
       creatingNewTransaction={creatingNewTransaction}
       error={error}
-
       />
+
       <FlatList
       data={transactions}
       keyExtractor={(item)=>item.id}
@@ -58,10 +52,14 @@ const Transactions = () => {
       }
       renderItem={({item})=>(
         <RenderTransaction
+        error={error}
         item={item}
+        accounts={accounts}
+        categories={categories}
         loading={pageLoad}
         editTransaction={editTransaction}
-        removeTransaction={removeTransaction}/>
+        removeTransaction={removeTransaction}
+        fetchTransaction={fetchTransaction}/>
       )}
       />
     </Wrapper>

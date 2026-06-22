@@ -18,13 +18,13 @@ const index = () => {
     },0)
   return (
     <Wrapper loading={loading}>
-       <View className='flex-1 px-4 gap-y-4 pt-4'>
+       <View className='boxInnerSize'>
       <TopUserComp
       headingText={""}/>
       
       <View className='boxBlock'>
-        <Text className='text-white text-xs'>TOTAL BALANCE</Text>
-        <Text className='text-white text-3xl'>{totalBalance? totalBalance :0}</Text>
+        <Text className='smallText text-xs'>TOTAL BALANCE</Text>
+        <Text className='biggerText text-3xl'>{totalBalance? totalBalance :0}</Text>
         
 
       </View>

@@ -14,7 +14,7 @@ const TopUserComp = ({headingText}:headingTextProps) => {
     fetchUserProfile()
    },[])
   return (
-    <View className="flex-row items-center  gap-x-6 ">
+    <View className="flex-row items-center gap-x-6 ">
 
       {user?.avatar ? (
         <Image 
@@ -25,7 +25,7 @@ const TopUserComp = ({headingText}:headingTextProps) => {
           color={"#ffffff"}/>
         )}  
            
-      <Text className='text-white text-lg '>{user?.name ?? headingText}</Text>  
+      <Text className='text-neutral-700 dark:text-white text-lg '>{user?.name ?? headingText}</Text>  
               
     </View>
   )

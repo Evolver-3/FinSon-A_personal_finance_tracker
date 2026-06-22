@@ -15,19 +15,19 @@ export const TextData=({tagexist,tag,value,placeholder,onChangeText,secureTextEn
 
       <View className='flex gap-y-4'>
         {tagexist &&(
-          <Text className='text-lg font-semibold text-neutral-400 text-dm '>{tag}</Text>
+          <Text className='text-lg font-semibold smallText '>{tag}</Text>
         )}
         <TextInput
-        className='rounded-xl bg-neutral-900 p-5 text-md text-neutral-200 border border-neutral-700 '
+        className='rounded-xl mainbg p-5 text-md smallText mainBorder'
         style={{
           shadowColor:"#000",
           shadowOffset:{
-            width:0,
-            height:4
+            width:1,
+            height:1
           },
           shadowOpacity:0.25,
           shadowRadius:5,
-          elevation:8
+          elevation:10
         }}
         placeholderTextColor={"#6D6664"}
         autoCapitalize='none'

@@ -12,6 +12,12 @@ export const useTransaction=()=>{
   const [error,setError]=useState<string|null>(null)
 
   const handleError=(error:any)=>{
+
+    console.log("=== FULL ERROR ===")
+    console.log(error)
+    console.log("error.response:", error?.response)
+    console.log("error.response?.data:", error?.response?.data)
+    
     const message=error?.response?.data?.message || error?.message || "Something went wrong"
 
     setError(message)

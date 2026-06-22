@@ -8,7 +8,7 @@ import Preferences from '@/components/profilePage/Preferences'
 const profile = () => {
   return (
     <Wrapper loading={false}>
-      <View className="flex-col px-4 gap-y-4 pt-4">
+      <View className="boxInnerSize">
         <AvatarUpload/>
         <Preferences/>
         <LogoutPage/>

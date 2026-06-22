@@ -6,13 +6,11 @@ import { SelectType } from '@/components/comps/Mode/ModalComp'
 
 const ThemeToggle = () => {
   const {colorScheme,toggleColorScheme}=useColorScheme()
-
-
-  const isDark=colorScheme==="dark"
+  
   return (
     <Pressable
     onPress={toggleColorScheme}
-    className='rounded-lg bg-red-500 flex-row '>
+    className='rounded-lg bg-white flex-row p-1 border-1 border-neutral-300 '>
 
       <SelectType
       focused={colorScheme==="light"}

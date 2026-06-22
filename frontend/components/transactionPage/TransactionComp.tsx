@@ -31,8 +31,6 @@ const TransactionComp = ({initialValues,accounts,categories,onSubmit,submitText,
     
     const [datePickerOpen,setDatePickerOpen]=useState(false)
   
-    
-
     useEffect(()=>{
       if(initialValues){
         setTitle(initialValues.title ?? "")
@@ -53,7 +51,7 @@ const TransactionComp = ({initialValues,accounts,categories,onSubmit,submitText,
     visible={openCreate}
     onRequestClose={()=>setOpenCreate(false)}
     textblock={"Create Transaction"}
-    pressableFlex={3}
+    pressableFlex={1}
     viewFlex={3}>
 
       

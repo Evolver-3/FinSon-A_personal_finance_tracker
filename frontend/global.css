@@ -6,6 +6,27 @@
 
 @layer components {
   .boxBlock{
-  @apply bg-black rounded-xl shadow-md p-5 border border-slate-900
+  @apply bg-neutral-200 dark:bg-black rounded-xl shadow-md p-5 border border-slate-100 dark:border-slate-900
+}
+.boxInnerSize{
+  @apply flex-col px-4 gap-y-4 pt-4
+}
+
+.biggerText{
+  @apply text-slate-700 dark:text-slate-200
+}
+
+.smallText{
+  @apply text-slate-900 dark:text-white
+}
+.mainbg{
+  @apply bg-slate-300 dark:bg-neutral-800
+}
+.mainborder{
+  @apply border border-neutral-400 dark:border-neutral-600
 }
 }
+
+
+ /* <Text className='dark:text-white text-slate-900 text-xs'>TOTAL BALANCE</Text>
+        <Text className='text-slate-700 dark:text-slate-200 text-3xl'> */

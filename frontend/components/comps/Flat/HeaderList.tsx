@@ -2,6 +2,7 @@ import { View, Text, Pressable} from 'react-native'
 import React from 'react'
 import TopUserComp from '../TopUserComp'
 import { Search, Plus} from 'lucide-react-native'
+import ThemeIcon from '@/components/Theme/ThemeIcon'
 
 type HeaderListProps={
   headingText:string 
@@ -16,15 +17,17 @@ const HeaderList = ({headingText,onPress,inlineText}:HeaderListProps) => {
         
         <View className='flex-row items-center gap-x-2'>
           <View
-            className='flex-row border border-neutral-500 rounded-lg w-8/10 p-2   gap-x-4 flex-grow'>
-            <Search size={20} color={"#ffffff"}/>
-              <Text className='text-sm text-white font-extralight'>{inlineText}</Text>
+            className='flex-row border border-slate-400 dark:border-neutral-500 rounded-lg w-8/10 p-2   gap-x-4 flex-grow'>
+             <ThemeIcon
+              icon={Search}
+              size={20}/>
+              <Text className='text-sm smallText font-extralight'>{inlineText}</Text>
             </View>
             <Pressable
-            className='rounded-lg p-2 bg-neutral-600 border border-neutral-600'
+            className='rounded-lg p-2 bg-white dark:bg-neutral-600 border border-slate-200 dark:border-neutral-400'
             onPress={onPress}>
-              <Plus
-              color={"#ffffff"}
+              <ThemeIcon
+              icon={Plus}
               size={20}/>
             </Pressable>
           </View>
