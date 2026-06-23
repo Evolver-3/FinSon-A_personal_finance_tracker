@@ -19,6 +19,13 @@ const CategoryPage = () => {
   const [type,setType]=useState<"INCOME" | "EXPENSE">("EXPENSE")
 
   const [renderPageLoading,setRenderPageLoading]=useState(false)
+
+  const [query,setQuery]=useState("")
+
+  const filteredData=categories.filter(item=>{
+    const searchable=item.name?? ""
+    return searchable.toLowerCase().includes(query.toLowerCase())
+  })
   const handleSubmit=async()=>{
   
    try{
@@ -56,12 +63,13 @@ const CategoryPage = () => {
         loading={renderPageLoading}/>
         
         <FlatList
-        data={categories}
+        data={filteredData}
         keyExtractor={(item)=>item.id}
         contentContainerStyle={{paddingHorizontal:4,paddingTop:6, gap:10}}
 
         ListHeaderComponent={
         <HeaderList
+        setQuery={setQuery}
         headingText={"Add New Categories"}
         onPress={()=>setVisible(true)}
         inlineText={"Search categories..."}/>

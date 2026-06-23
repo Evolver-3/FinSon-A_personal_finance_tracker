@@ -21,6 +21,13 @@ const AccountPage = () => {
 
   const [pageLoad,setPageLoad]=useState(false)
 
+  const [query,setQuery]=useState("")
+
+  const filteredData=accounts.filter(item=>{
+    const searchable=item.name??''
+    return searchable.toLocaleLowerCase().includes(query.toLowerCase())
+  })
+
   const handleCreateAccount=async()=>{
     try{
       setPageLoad(true)
@@ -63,12 +70,13 @@ const AccountPage = () => {
       />
 
       <FlatList
-      data={accounts}
+      data={filteredData}
       keyExtractor={(item)=>item.id}
       contentContainerStyle={{paddingHorizontal:4,paddingTop:6,gap:10}}
 
       ListHeaderComponent={
         <HeaderList
+        setQuery={setQuery}
         headingText={"Add New Accounts"}
         onPress={()=>setOpenCreate(true)}
         inlineText={"Search Accounts ..."}/>

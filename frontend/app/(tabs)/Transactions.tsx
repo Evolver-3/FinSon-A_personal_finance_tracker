@@ -17,6 +17,13 @@ const Transactions = () => {
   const [pageLoad,setPageLoad]=useState(false)
   const [pageError,setPageError]=useState<string>('')
   const [openCreate,setOpenCreate]=useState(false)
+
+  const [query,setQuery]=useState('')
+
+  const filteredData=transactions.filter(item=>{
+    const searchable=item.title??""
+    return searchable.toLowerCase().includes(query.toLowerCase())
+  })
   
   return (
 
@@ -35,12 +42,13 @@ const Transactions = () => {
       />
 
       <FlatList
-      data={transactions}
+      data={filteredData}
       keyExtractor={(item)=>item.id}
       contentContainerStyle={{paddingHorizontal:4,paddingTop:6,gap:10}}
       
       ListHeaderComponent={
         <HeaderList
+        setQuery={setQuery}
         headingText={'Add new Transactions'}
         onPress={()=>setOpenCreate(true)}
         inlineText={"Search transactions..."}/>
