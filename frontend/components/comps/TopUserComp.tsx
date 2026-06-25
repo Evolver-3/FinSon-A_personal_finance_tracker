@@ -25,7 +25,7 @@ const TopUserComp = ({headingText}:headingTextProps) => {
           color={"#ffffff"}/>
         )}  
            
-      <Text className='text-neutral-700 dark:text-white text-lg '>{user?.name ?? headingText}</Text>  
+      <Text className='text-neutral-700 dark:text-white text-lg '>{ headingText}</Text>  
               
     </View>
   )
