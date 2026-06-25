@@ -1,11 +1,13 @@
-import { View, Text, Pressable, Platform } from 'react-native'
+import { View, Text, Pressable, Platform, TextInput, KeyboardAvoidingView } from 'react-native'
 import React,{useState,useEffect} from 'react'
 import { TextData } from '../comps/TextData'
 import ModalComp, { SelectType } from '../comps/Mode/ModalComp'
 import { CalendarRangeIcon } from 'lucide-react-native'
-import SelectDropdown from './SelectDropdown'
+import SelectDropdown from '../comps/SelectDropdown'
 import { ButtonNeed } from '../comps/ButtonNeed'
 import DateTimePicker from '@react-native-community/datetimepicker'
+import ThemeIcon from '../Theme/ThemeIcon'
+import ErrorPopUp from '../comps/ErrorPopUp'
 
 type TransactionCompProps={
   initialValues?:Partial<createTransactionProps>
@@ -17,8 +19,11 @@ type TransactionCompProps={
   loading:boolean
   openCreate:boolean
   setOpenCreate:React.Dispatch<React.SetStateAction<boolean>>
+  pressableFlex:number 
+  viewFlex:number
+  error:string | null
 }
-const TransactionComp = ({initialValues,accounts,categories,onSubmit,submitText,loading,openCreate,setOpenCreate}:TransactionCompProps) => {
+const TransactionComp = ({initialValues,accounts,categories,onSubmit,submitText,loading,openCreate,setOpenCreate,pressableFlex,viewFlex,error}:TransactionCompProps) => {
 
   const [title,setTitle]=useState(initialValues?.title ?? "")
     const [amount,setAmount]=useState(initialValues?.amount ??"")
@@ -45,14 +50,33 @@ const TransactionComp = ({initialValues,accounts,categories,onSubmit,submitText,
 
     const handleSubmit=async()=>{
       await onSubmit({title,amount,type,note,accountId,categoryId,date})
+      setTitle("")
+      setAmount("")
+      setType("EXPENSE")
+      setNote("")
+      setAccountId("")
+      setCategoryId("")
+      if(!error){
+        setOpenCreate(false)
+      }
     }
+    
+     const formattedDate=date? date.toLocaleDateString('en-IN',{
+      day:"numeric",
+      month:"short",
+      year:"numeric"
+     }):'Select Date'
+
   return (
     <ModalComp
     visible={openCreate}
     onRequestClose={()=>setOpenCreate(false)}
     textblock={"Create Transaction"}
-    pressableFlex={1}
-    viewFlex={3}>
+    pressableFlex={pressableFlex}
+    viewFlex={viewFlex}>
+
+      {/* <ErrorPopUp
+      errorMessage={error}/> */}
 
       
        <TextData
@@ -83,7 +107,10 @@ const TransactionComp = ({initialValues,accounts,categories,onSubmit,submitText,
         secureTextEntry={false}/>
 
         <View className='items-center justify-center '>
-          <View className="flex-row gap-x-3 p-1 py-1 bg-neutral-500 rounded-xl">
+          <View className="flex-row gap-x-3 p-1 py-1 mainbg rounded-xl"
+          style={{
+            elevation:2
+          }}>
           <SelectType
           focused={type==="INCOME"}
           onPress={()=>setType("INCOME")}
@@ -96,10 +123,25 @@ const TransactionComp = ({initialValues,accounts,categories,onSubmit,submitText,
           </View>
         </View>
 
-        <View>
+        <View className="flex-row items-center justify-center gap-x-4">
+
+          <TextInput
+          value={formattedDate}
+          editable={false}
+          className="mainbg"
+          style={{
+            paddingHorizontal:20,
+            paddingVertical:6,
+            borderRadius:10,
+            textAlign:"center",
+            elevation:2
+          }}
+          />
           <Pressable
           onPress={()=>setDatePickerOpen(true)}>
-            <CalendarRangeIcon color={"#fff"}/>
+            <ThemeIcon
+            icon={CalendarRangeIcon}
+            size={20}/>
           </Pressable>
 
           {datePickerOpen &&(
@@ -119,7 +161,7 @@ const TransactionComp = ({initialValues,accounts,categories,onSubmit,submitText,
           )}
         </View>
        
-        <View>
+        <View className='flex-row items-center justify-center gap-x-3'>
          <SelectDropdown
          options={accounts.map(acc=>({
           id:acc.id,

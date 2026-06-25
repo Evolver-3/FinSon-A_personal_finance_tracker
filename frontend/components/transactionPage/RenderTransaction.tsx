@@ -1,12 +1,12 @@
-import { View, Text ,Pressable, Modal} from 'react-native'
-import React,{useState} from 'react'
+import { View, Text ,Pressable, Modal,Animated} from 'react-native'
+import React,{useState,useRef} from 'react'
 import TransactionComp from './TransactionComp'
 import { getIconByName } from '../comps/Mode/ModalComp'
 import { ButtonNeed } from '../comps/ButtonNeed'
+import Animateddrop from '../comps/AnimatedStretch/Animateddrop'
 
 type renderTransactionProps={
   item:Transaction 
-  loading:boolean  
   editTransaction:(id:string, data:updateTransactionProps)=>Promise<void>
   removeTransaction:(id:string)=>Promise<void>
   accounts:Account[]
@@ -14,44 +14,45 @@ type renderTransactionProps={
    error:string| null
    fetchTransaction:(id:string)=>Promise<void>
 }
-const RenderTransaction = ({item,loading,editTransaction,removeTransaction,accounts,categories,error}:renderTransactionProps) => {
+const RenderTransaction = ({item,editTransaction,removeTransaction,accounts,categories,error}:renderTransactionProps) => {
 
-  const [pageLoad,setPageLoad]=useState(false)
+  const [editPageLoad,setEditPageLoad]=useState(false)
+  const [deleteLoad,setDeleteLoad]=useState(false)
   const [pageError,setPageError]=useState<string| null>('')
-  const [openTransaction,setOpenTransaction]=useState(false)
   const [openEdit,setOpenEdit]=useState(false)
 
   console.log(item.account)
 
   const handleDeleteTransaction=async()=>{
-    setPageLoad(true)
+    setDeleteLoad(true)
     setPageError("")
-
     try{
       await removeTransaction(item.id)
     }catch(err:any){
-      const fullError=err || error
+
+      const fullError=err || error || "Some error occurs while deleting this transaction."
+
       setPageError(fullError)
     }finally{
-      setPageLoad(false)
+      setDeleteLoad(false)
     }
-
   }
+ 
 
   const ShowAmount=({item}:{item:Transaction})=>{
     if(item.type==="EXPENSE"){
       return(
-        <View className='bg-red-200 rounded-xl px-3 py-2'>
-          <Text className='text-red-600 text-md'>
-            -{item.amount}
+        <View className='bg-red-100 rounded-md px-3 py-1'>
+          <Text className='text-red-400 text-xs font-semibold'>
+            - {item.amount}
           </Text>
         </View>
       )
     }else{
       return (
         <View className='bg-green-200 rounded-xl px-3 py-2'>
-          <Text className="text-green-600 text-md">
-            +{item.amount}
+          <Text className="text-green-600 text-xs font-semibold">
+            + {item.amount}
           </Text>
         </View>
       )
@@ -59,14 +60,14 @@ const RenderTransaction = ({item,loading,editTransaction,removeTransaction,accou
   }
   return (
     <View className='px-4 flex-1'>
-      <Pressable 
-      onPress={()=>setOpenTransaction(true)}
-      className='flex-col gap-y-2 mt-3'>
+      
+      <Animateddrop
+        firstChild={
+      <View 
+      className=' flex-row justify-between items-center'>
 
-        <View className='rounded-lg bg-neutral-700
-         p-3 flex-row justify-between items-center'>
-
-           <View className='rounded-lg p-2'
+          <View className='flex-row gap-x-5'>
+             <View className='rounded-lg p-2'
            style={{
             backgroundColor:item.category?.color.darkColor
            }}>
@@ -74,18 +75,20 @@ const RenderTransaction = ({item,loading,editTransaction,removeTransaction,accou
            </View>
 
            <View className='flex-col gap-y-2'>
-            <Text className='text-white font-semibold'>{item.title}</Text>
+            <Text className='biggerText font-semibold'>{item.title}</Text>
             <View className='flex-row gap-3 '>
-              <Text className='text-neutral-200 text-xs'>
+              <Text className='smallText text-xs'>
                 {item.account?.name}
               </Text>
-              <Text className='text-xs text-neutral-200'>
+              <Text className='smallText text-xs '>
                 {item.date}
               </Text>
             </View>
            </View>
+          </View>
 
            <View>
+
             <Text>
               <ShowAmount
               item={item}
@@ -93,44 +96,40 @@ const RenderTransaction = ({item,loading,editTransaction,removeTransaction,accou
             </Text>
            </View>
 
-        </View>
-      </Pressable>
+      </View>}
 
-       <Pressable className=' items-center justify-center'
-       onPress={()=>setOpenTransaction(false)}>
-         <Modal
-        visible={openTransaction}
-        transparent={true}
-        animationType='slide'
-        onRequestClose={()=>setOpenTransaction(false)}>
-          <View className=' p-20 bg-red-600'>
+      secChild={
+      <View style={{paddingTop:8,gap:4}}>
+          <Text style={{color:"#a3a3a3"}}>
+            Account:{item.account?.name}
+          </Text>
+          <View className='flex-row gap-x-4'>
+            <Text className="flex-grow smallText">{item.category?.name}</Text>
 
-          <ButtonNeed
+
+            <ButtonNeed
           onPress={()=>setOpenEdit(true)}
           text={"Edit"}
-          disabled={ pageLoad}
-          loading={pageLoad}
+          disabled={editPageLoad}
+          loading={editPageLoad}
           style={{}}
           />
 
-          <ButtonNeed
+            <ButtonNeed
           onPress={handleDeleteTransaction}
-          text={"Delete"}
-          disabled={ pageLoad}
-          loading={pageLoad}
+          text={"Remove"}
+          disabled={ deleteLoad}
+          loading={deleteLoad}
           style={{}}
           />
-
-          
-
+ 
           </View>
-        
-        
-        </Modal>
-       </Pressable>
-        
+      </View>}
+      secStyle={{
+  
+      }}
+      maxExpandedHeight={400}/>
 
-      
        <TransactionComp
        initialValues={{
         title:item.title,
@@ -140,17 +139,19 @@ const RenderTransaction = ({item,loading,editTransaction,removeTransaction,accou
         date:new Date(item.date),
         accountId:item.accountId,
         categoryId:item.categoryId
-
        }}
+       error={error}
+       pressableFlex={3}
+       viewFlex={5}
          openCreate={openEdit}
          setOpenCreate={setOpenEdit}
         accounts={accounts}
         categories={categories}
         submitText={"Update"}
-        loading={pageLoad}
+        loading={editPageLoad}
         
         onSubmit={async(values)=>{
-        setPageLoad(true)
+        setEditPageLoad(true)
         setPageError('')
         try{
         await editTransaction(item.id,{...values,})
@@ -158,7 +159,8 @@ const RenderTransaction = ({item,loading,editTransaction,removeTransaction,accou
         const fullError=err||error
         setPageError(fullError)
         }finally{
-        setPageLoad(false)
+
+        setEditPageLoad(false)
         
           }}}/>
     </View>
