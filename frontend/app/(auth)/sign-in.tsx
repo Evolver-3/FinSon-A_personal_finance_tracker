@@ -80,7 +80,7 @@ const signInPage = () => {
     
     <Authbody errorMessage={localError}
     headingText={"Signed in your account"}>
-      <View className=' gap-y-4'>
+      <View className='flex-col gap-y-4 '>
         
         <TextData
         tagexist

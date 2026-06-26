@@ -1,3 +1,4 @@
+import { useTheme } from '@/hooks/useTheme'
 import {View,TextInput,Text, KeyboardTypeOptions} from 'react-native'
 type dataProps={
   tag:string
@@ -12,6 +13,7 @@ type dataProps={
 }
 
 export const TextData=({tagexist,tag,value,placeholder,onChangeText,secureTextEntry,keyboardType,errorType}:dataProps)=>{
+  const {isDark}=useTheme()
   return(
 
       <View className='flex gap-y-4'
@@ -39,7 +41,9 @@ export const TextData=({tagexist,tag,value,placeholder,onChangeText,secureTextEn
             bottom:0,
             borderRadius:14,
             borderWidth:1,
-          borderColor:errorType?"#C73434":"#8C8585",   backgroundColor:"rgba(0,0,0,0.04)"
+          borderColor:errorType?"#C73434":"#8C8585",
+          backgroundColor:isDark?"#524B52":"#241E24"
+
           }}/>
           <TextInput
         className=' mainbg p-4 text-md smallText'

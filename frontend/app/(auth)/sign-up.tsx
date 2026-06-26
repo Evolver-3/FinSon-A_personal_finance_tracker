@@ -74,7 +74,7 @@ const signUpPage = () => {
     <Wrapper loading={false}>
       <Authbody errorMessage={localErrorMessage}
       headingText={"Create a new account"}>
-        <View className=' gap-y-4'>
+        <View className='flex-col gap-y-6 '>
             
             <TextData
             tagexist
