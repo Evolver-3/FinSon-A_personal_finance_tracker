@@ -3,7 +3,7 @@ import React, { useEffect,useState } from 'react'
 import Wrapper from '@/components/WrapperPage'
 import { Link, router } from 'expo-router'
 import { useAuth } from '@/hooks/useAuth'
-import Authbody from '@/components/Authbody'
+import Authbody from '@/components/comps/Authbody'
 import { ButtonNeed } from '@/components/comps/ButtonNeed'
 import { TextData } from '@/components/comps/TextData'
 
@@ -16,23 +16,37 @@ const signUpPage = () => {
   const [localErrorMessage,setLocalErrorMessage]=useState<string>("")
   const [loading,setLoading]=useState(false)
 
+  const [submitAttempt,setSubmitAttempt]=useState(false)
+  const emailError=submitAttempt && !email.trim()
+  const passwordError=submitAttempt && !password.trim()
+  const usernameError=submitAttempt && !username.trim()
+
+
   const handleSubmit=async()=>{
     
+    setSubmitAttempt(true)
     setLocalErrorMessage("")
-    setLoading(true)
 
     if(!email.trim() || !password.trim() || !username.trim()){
       setLocalErrorMessage("fields are empty")
       return
     }
 
-    const success=await register({email,name:username,password})
+    setLoading(true)
+
+    try{
+      const success=await register({email,name:username,password})
 
     if(success){
      router.replace("/(auth)/sign-in")
+    }
+
+    }catch(err:any){
+      const message=err?.response?.data?.message || err?.message || "Failed to sign in"
+      setLocalErrorMessage(message)
+      
+    }finally{
       setLoading(false)
-    }else{
-      setLocalErrorMessage("Something went wrong")
     }
        
   }
@@ -41,44 +55,56 @@ const signUpPage = () => {
       if(localErrorMessage){
         const timer=setTimeout(() => {
           setLocalErrorMessage("")
-        }, 2000);
+        }, 3000);
         return ()=>clearTimeout(timer)
       }
     },[localErrorMessage])
 
-    const errorMessage=localErrorMessage || error
+  useEffect(()=>{
+      if(submitAttempt){
+        const timer=setTimeout(() => {
+          setSubmitAttempt(false)
+        }, 3000);
+        return ()=>clearTimeout(timer)
+      }
+    },[submitAttempt])
+
+
   return (
     <Wrapper loading={false}>
-      <Authbody errorMessage={errorMessage}
+      <Authbody errorMessage={localErrorMessage}
       headingText={"Create a new account"}>
         <View className=' gap-y-4'>
             
             <TextData
             tagexist
+            errorType={emailError}
             keyboardType="email-address"
             tag='Your email address'
             value={email}
-            placeholder='arunlal@gmail.com'
+            placeholder='your email'
             onChangeText={setEmail}
             secureTextEntry={false}
             />
 
             <TextData
             tagexist
+            errorType={usernameError}
             keyboardType="default"
             tag='Your Username'
             value={username}
-            placeholder='arun lal'
+            placeholder='username'
             onChangeText={setUsername}
             secureTextEntry={false}
             />
 
             <TextData
             tagexist
-            keyboardType="visible-password"
+            errorType={passwordError}
+            keyboardType="default"
             tag='Enter your password'
             value={password}
-            placeholder='Password'
+            placeholder='password'
             onChangeText={setPassword} 
             secureTextEntry={true}
             />
@@ -90,7 +116,7 @@ const signUpPage = () => {
             text={"Sign in"} onPress={handleSubmit}/>
 
             <View className='flex-row'>
-              <Text className='text-neutral-100 text-sm'>Don't have an account? </Text>
+              <Text className='smallText text-sm'>Don't have an account? </Text>
             
               <Link href={"/(auth)/sign-in"} asChild>
               <Pressable>
