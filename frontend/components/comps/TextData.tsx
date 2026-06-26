@@ -7,27 +7,45 @@ type dataProps={
   secureTextEntry:boolean
   tagexist:boolean
   keyboardType:KeyboardTypeOptions
+  errorType?:boolean
   
 }
 
-export const TextData=({tagexist,tag,value,placeholder,onChangeText,secureTextEntry,keyboardType}:dataProps)=>{
+export const TextData=({tagexist,tag,value,placeholder,onChangeText,secureTextEntry,keyboardType,errorType}:dataProps)=>{
   return(
 
-      <View className='flex gap-y-4'>
+      <View className='flex gap-y-4'
+      style={{
+        
+      }}>
+        <View>
         {tagexist &&(
           <Text className='text-lg font-semibold smallText '>{tag}</Text>
         )}
-        <TextInput
-        className='rounded-xl mainbg p-5 text-md smallText mainBorder'
+        </View>
+
+        <View style={{
+          position:"relative",
+          overflow:"hidden",
+          borderRadius:0,
+          padding:2
+        }}>
+          <View
+          style={{
+            position:"absolute",
+            top:0,
+            left:0,
+            right:0,
+            bottom:0,
+            borderRadius:14,
+            borderWidth:1,
+          borderColor:errorType?"#C73434":"#8C8585",   backgroundColor:"rgba(0,0,0,0.04)"
+          }}/>
+          <TextInput
+        className=' mainbg p-4 text-md smallText'
         style={{
-          shadowColor:"#000",
-          shadowOffset:{
-            width:1,
-            height:1
-          },
-          shadowOpacity:0.25,
-          shadowRadius:5,
-          elevation:10
+          borderRadius:12
+          
         }}
         placeholderTextColor={"#6D6664"}
         autoCapitalize='none'
@@ -36,6 +54,7 @@ export const TextData=({tagexist,tag,value,placeholder,onChangeText,secureTextEn
         onChangeText={onChangeText}
         secureTextEntry={secureTextEntry}
         keyboardType={keyboardType}/>
+        </View>
       </View>
 
   )
