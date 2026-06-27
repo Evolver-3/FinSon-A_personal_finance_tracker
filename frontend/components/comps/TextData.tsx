@@ -51,7 +51,7 @@ export const TextData=({tagexist,tag,value,placeholder,onChangeText,secureTextEn
           borderRadius:12
           
         }}
-        placeholderTextColor={"#6D6664"}
+        placeholderTextColor={ isDark?"#C1C4C8":"#66696B"}
         autoCapitalize='none'
         value={value ?? ""}
         placeholder={placeholder}
