@@ -11,12 +11,10 @@ type transactionCreatProps={
   setPageLoad:React.Dispatch<React.SetStateAction<boolean>>
   setPageError:React.Dispatch<React.SetStateAction<string| null>>
   creatingNewTransaction:(values:createTransactionProps)=>Promise<void> 
-  error:string | null
   pageError:string | null
 }
-const CreateTransaction = ({openCreate,setOpenCreate,accounts,categories,pageLoad,setPageLoad,setPageError,creatingNewTransaction,error,pageError}:transactionCreatProps) => {
+const CreateTransaction = ({openCreate,setOpenCreate,accounts,categories,pageLoad,setPageLoad,setPageError,creatingNewTransaction,pageError}:transactionCreatProps) => {
 
-  const fullError=pageError|| error
   return (
     <View>
       <TransactionComp
@@ -26,9 +24,9 @@ const CreateTransaction = ({openCreate,setOpenCreate,accounts,categories,pageLoa
         categories={categories}
         submitText={"Create"}
         loading={pageLoad}
-        pressableFlex={2}
+        pressableFlex={4}
         viewFlex={6}
-        error={fullError}
+        error={pageError}
         
         onSubmit={async(values)=>{
         setPageLoad(true)
@@ -38,10 +36,17 @@ const CreateTransaction = ({openCreate,setOpenCreate,accounts,categories,pageLoa
         await creatingNewTransaction({
           ...values
         })
-        setOpenCreate(false)
+
         }catch(err:any){
 
-        setPageError(err?.message || error || "Failed to create transaction")
+        const message=err?.response?.data?.message || err?.message || "Failed to create a transaction"
+        setPageError(message)
+
+        setTimeout(()=>{
+          setPageError(null)
+        },3000)
+        throw err
+
         }finally{
         setPageLoad(false)
         

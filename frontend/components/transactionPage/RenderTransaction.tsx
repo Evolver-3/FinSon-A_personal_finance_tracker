@@ -4,6 +4,7 @@ import TransactionComp from './TransactionComp'
 import { getIconByName } from '../comps/Mode/ModalComp'
 import { ButtonNeed } from '../comps/ButtonNeed'
 import Animateddrop from '../comps/AnimatedStretch/Animateddrop'
+import OptionBtn from '../comps/OptionBtn'
 
 type renderTransactionProps={
   item:Transaction 
@@ -11,10 +12,9 @@ type renderTransactionProps={
   removeTransaction:(id:string)=>Promise<void>
   accounts:Account[]
    categories:Category[]
-   error:string| null
    fetchTransaction:(id:string)=>Promise<void>
 }
-const RenderTransaction = ({item,editTransaction,removeTransaction,accounts,categories,error}:renderTransactionProps) => {
+const RenderTransaction = ({item,editTransaction,removeTransaction,accounts,categories}:renderTransactionProps) => {
 
   const [editPageLoad,setEditPageLoad]=useState(false)
   const [deleteLoad,setDeleteLoad]=useState(false)
@@ -30,9 +30,9 @@ const RenderTransaction = ({item,editTransaction,removeTransaction,accounts,cate
       await removeTransaction(item.id)
     }catch(err:any){
 
-      const fullError=err || error || "Some error occurs while deleting this transaction."
+      const message=err?.response?.data?.message || err?.message || "Failed to sign in"
 
-      setPageError(fullError)
+      setPageError(message)
     }finally{
       setDeleteLoad(false)
     }
@@ -59,7 +59,7 @@ const RenderTransaction = ({item,editTransaction,removeTransaction,accounts,cate
     }
   }
   return (
-    <View className='px-4 flex-1'>
+    <View className='px-4'>
       
       <Animateddrop
         firstChild={
@@ -107,20 +107,18 @@ const RenderTransaction = ({item,editTransaction,removeTransaction,accounts,cate
             <Text className="flex-grow smallText">{item.category?.name}</Text>
 
 
-            <ButtonNeed
+            <OptionBtn
           onPress={()=>setOpenEdit(true)}
-          text={"Edit"}
+          btnText={"Edit"}
           disabled={editPageLoad}
           loading={editPageLoad}
-          style={{}}
           />
 
-            <ButtonNeed
+            <OptionBtn
           onPress={handleDeleteTransaction}
-          text={"Remove"}
+          btnText={"Remove"}
           disabled={ deleteLoad}
           loading={deleteLoad}
-          style={{}}
           />
  
           </View>
@@ -140,9 +138,9 @@ const RenderTransaction = ({item,editTransaction,removeTransaction,accounts,cate
         accountId:item.accountId,
         categoryId:item.categoryId
        }}
-       error={error}
-       pressableFlex={3}
-       viewFlex={5}
+       error={pageError}
+       pressableFlex={2}
+       viewFlex={3}
          openCreate={openEdit}
          setOpenCreate={setOpenEdit}
         accounts={accounts}
@@ -154,10 +152,10 @@ const RenderTransaction = ({item,editTransaction,removeTransaction,accounts,cate
         setEditPageLoad(true)
         setPageError('')
         try{
-        await editTransaction(item.id,{...values,})
+        await editTransaction(item.id,{...values})
         }catch(err:any){
-        const fullError=err||error
-        setPageError(fullError)
+          const message=err?.response?.data?.message || err?.message || "Failed to sign in"
+        setPageError(message)
         }finally{
 
         setEditPageLoad(false)

@@ -10,7 +10,7 @@ import ThemeIcon from '../Theme/ThemeIcon'
 import ErrorPopUp from '../comps/ErrorPopUp'
 
 type TransactionCompProps={
-  initialValues?:Partial<createTransactionProps>
+  initialValues?:Partial<initialValuesTransactionProps>
   accounts:Account[]
   categories:Category[]
   type?:"INCOME"|"EXPENSE"
@@ -38,26 +38,31 @@ const TransactionComp = ({initialValues,accounts,categories,onSubmit,submitText,
   
     useEffect(()=>{
       if(initialValues){
-        setTitle(initialValues.title ?? "")
-        setAmount(initialValues.amount ?? "")
-        setType(initialValues.type ??"EXPENSE")
-        setNote(initialValues.note ?? "")
-        setDate(initialValues.date ?? new Date())
-        setAccountId(initialValues.accountId ?? "")
-        setCategoryId(initialValues.categoryId ?? "")
+        setTitle(initialValues?.title ?? "")
+        setAmount(initialValues?.amount ?? "")
+        setType(initialValues?.type ??"EXPENSE")
+        setNote(initialValues?.note ?? "")
+        setDate(initialValues?.date ?? new Date())
+        setAccountId(initialValues?.accountId ?? "")
+        setCategoryId(initialValues?.categoryId ?? "")
       }
-    },[initialValues])
+      
+    },[initialValues?.id])
 
     const handleSubmit=async()=>{
-      await onSubmit({title,amount,type,note,accountId,categoryId,date})
-      setTitle("")
-      setAmount("")
-      setType("EXPENSE")
-      setNote("")
-      setAccountId("")
-      setCategoryId("")
-      if(!error){
+      try{
+        await onSubmit({title,amount,type,note,accountId,categoryId,date})
+        setTitle("")
+        setAmount("")
+        setType("EXPENSE")
+        setNote("")
+        setDate(new Date())
+        setAccountId("")
+        setCategoryId("")
         setOpenCreate(false)
+
+      }catch(err:any){
+        setOpenCreate(true)
       }
     }
     
@@ -75,9 +80,9 @@ const TransactionComp = ({initialValues,accounts,categories,onSubmit,submitText,
     pressableFlex={pressableFlex}
     viewFlex={viewFlex}>
 
-      {/* <ErrorPopUp
-      errorMessage={error}/> */}
-
+      <View className="relative flex-col gap-y-4 ">
+      <ErrorPopUp
+      errorMessage={error}/>
       
        <TextData
         keyboardType="default"
@@ -104,7 +109,9 @@ const TransactionComp = ({initialValues,accounts,categories,onSubmit,submitText,
         value={note}
         placeholder='Enter note'
         onChangeText={setNote}
-        secureTextEntry={false}/>
+        secureTextEntry={false}
+        />
+
 
         <View className='items-center justify-center '>
           <View className="flex-row gap-x-3 p-1 py-1 mainbg rounded-xl"
@@ -190,9 +197,10 @@ const TransactionComp = ({initialValues,accounts,categories,onSubmit,submitText,
         loading={loading}
         style={{}}
         />
+      </View>
+
     </ModalComp>
  
-    
   )
 }
 

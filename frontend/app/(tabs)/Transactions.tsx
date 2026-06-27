@@ -9,13 +9,13 @@ import HeaderList from '@/components/comps/Flat/HeaderList'
 import RenderTransaction from '@/components/transactionPage/RenderTransaction'
 
 const Transactions = () => {
-  const {loading,error,transactions,creatingNewTransaction,editTransaction,removeTransaction,fetchTransaction}=useTransaction()
+  const {transactions,creatingNewTransaction,editTransaction,removeTransaction,fetchTransaction}=useTransaction()
 
   const {accounts}=useAccount()
   const {categories}=useCategory()
 
   const [pageLoad,setPageLoad]=useState(false)
-  const [pageError,setPageError]=useState<string>('')
+  const [pageError,setPageError]=useState<string | null>(null)
   const [openCreate,setOpenCreate]=useState(false)
 
   const [query,setQuery]=useState('')
@@ -36,9 +36,9 @@ const Transactions = () => {
       categories={categories}
       pageLoad={pageLoad}
       setPageLoad={setPageLoad}
+      pageError={pageError}
       setPageError={setPageError}
       creatingNewTransaction={creatingNewTransaction}
-      error={error}
       />
 
       <FlatList
@@ -55,16 +55,14 @@ const Transactions = () => {
       }
       ListEmptyComponent={
         <View className='px-4'>
-          <Text style={{color:"#ffffff"}}>No transaction exist</Text>
+          <Text className="smallText">No transaction exist</Text>
         </View>
       }
       renderItem={({item})=>(
         <RenderTransaction
-        error={error}
         item={item}
         accounts={accounts}
         categories={categories}
-        loading={pageLoad}
         editTransaction={editTransaction}
         removeTransaction={removeTransaction}
         fetchTransaction={fetchTransaction}/>
