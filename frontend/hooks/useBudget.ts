@@ -1,4 +1,4 @@
-import { createBudget, getAllBudget, getBudget, updateBudget, deleteBudget } from "@/services/budgetServices";
+import { createBudget, updateBudget, deleteBudget, checkSpending } from "@/services/budgetServices";
 
 import {useState,useEffect} from 'react'
 
@@ -7,17 +7,10 @@ export const useBudget=()=>{
 
   const [budgets,setbudgets]=useState<Budget[]>([])
 
-  const [singleBudget,setSingleBudget]=useState<Budget|null>(null)
-
   const [loading,setLoading]=useState(false)
   const [error,setError]=useState<string|null>(null)
 
   const handleError=(error:any)=>{
-
-    console.log("=== FULL ERROR ===")
-    console.log(error)
-    console.log("error.response:", error?.response)
-    console.log("error.response?.data:", error?.response?.data)
     const message=error?.response?.data?.message || error?.message || "Something went wrong"
 
     setError(message)
@@ -30,48 +23,11 @@ export const useBudget=()=>{
       setLoading(true)
       setError(null)
 
-      const res=await createBudget(data)
+      await createBudget(data)
 
-      setbudgets((prev)=>[res.data, ...prev])
-
-      return res.data
-
-    }catch(error:any){
-      handleError(error)
-    }finally{
-      setLoading(false)
-    }
-  }
-
-    const fetchAllBudgets=async()=>{
-    try{
-      setLoading(true)
-      setError(null)
-      const res=await getAllBudget()
-
-      setbudgets(res.data)
-
-      return res.data
-
-
-    }catch(error:any){
-      handleError(error)
-
-    }finally{
-      setLoading(false)
-    }
-  }
-
-    const fetchBudget=async(id:string)=>{
-    try{
-      setLoading(true)
-      setError(null)
-
-      const res=await getBudget(id)
-
-      setSingleBudget(res.data)
-      return res.data
-
+      const now=new Date()
+      await spendingBudget(now.getMonth()+1,now.getFullYear())
+ 
     }catch(error:any){
       handleError(error)
     }finally{
@@ -83,15 +39,10 @@ export const useBudget=()=>{
     try{
       setLoading(true)
       setError(null)
-      const res=await updateBudget(id,data)
+      await updateBudget(id,data)
 
-      setbudgets((prev)=>
-      prev.map((budget)=>(budget.id === id ? res.data:budget)))
-
-      setSingleBudget((prev)=>prev?.id===id ?res.data:prev)
-      
-      return res.data
-
+      const now=new Date()
+      await spendingBudget(now.getMonth()+1,now.getFullYear())
 
     }catch(error:any){
       
@@ -108,10 +59,8 @@ export const useBudget=()=>{
       setError(null)
       await deleteBudget(id)
 
-      setbudgets((prev)=>prev.filter((budget)=>budget.id !==id))
-
-      setSingleBudget((prev)=>prev?.id===id?null:prev)
-
+      const now=new Date()
+      await spendingBudget(now.getMonth()+1,now.getFullYear())
 
     }catch(error:any){
       
@@ -121,19 +70,38 @@ export const useBudget=()=>{
     }
   }
 
+  const spendingBudget=async(month:number,year:number)=>{
+    try{
+      setLoading(true)
+      setError(null)
+      const res=await checkSpending(month,year)
+
+      console.log("raw res:", res)
+      console.log("res.data:", res.data)
+      console.log("first item:", res.data[0])
+      setbudgets(res.data)
+      return res.data
+      
+    }catch(error:any){
+      handleError(error)
+ 
+    }finally{
+      setLoading(false)
+    }
+  }
+
   useEffect(()=>{
-    fetchAllBudgets()
+    const now=new Date()
+    spendingBudget(now.getMonth()+1,now.getFullYear())
   },[])
 
   return {
     budgets,
-    singleBudget,
     error,
     loading,
     creatingNewBudget,
-    fetchAllBudgets,
-    fetchBudget,
     editBudget,
-    removeBudget
+    removeBudget,
+    spendingBudget
   }
 }
