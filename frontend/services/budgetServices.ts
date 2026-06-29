@@ -5,16 +5,6 @@ export const createBudget=async(data:createBudgetProps)=>{
   return res.data
 }
 
-export const getAllBudget=async()=>{
-  const res=await api.get("/budget")
-  return res.data
-}
-
-export const getBudget=async(budgetId:string)=>{
-  const res=await api.get(`/budget/${budgetId}`)
-  return res.data
-}
-
 
 export const updateBudget=async(budgetId:string,data:updateBudgetProps)=>{
   const res=await api.patch(`/budget/${budgetId}`,data)
@@ -25,3 +15,8 @@ export const deleteBudget=async(budgetId:string)=>{
   const res=await api.delete(`/budget/${budgetId}`)
   return res.data
 } 
+
+export const checkSpending=async(month:number,year:number)=>{
+  const res=await api.get(`/budget?month=${month}&year=${year}`,)
+  return res.data
+}
