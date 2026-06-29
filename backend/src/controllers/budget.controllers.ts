@@ -19,12 +19,16 @@ export const createBudget=asyncHandler(async(req,res)=>{
     throw new ApiError(400,"All fields are required")
   }
 
+  console.log("Backend checkpoint for posted data:", amount,month,year,categoryId)
+
   const category=await prisma.category.findFirst({
     where:{
       id:categoryId,
       userId
     }
   })
+
+  console.log("backend checkpoint:",category)
 
   if(!category){
     throw new ApiError(400,"Category not found")
@@ -74,90 +78,6 @@ export const createBudget=asyncHandler(async(req,res)=>{
 
 })
 
-//get all budgets
-export const getBudget=asyncHandler(async(req,res)=>{
-
-  const userId=req.user?.id
-
-  if(!userId){
-    throw new ApiError(401,"authorization failed")
-  }
-
-  const budget=await prisma.budget.findMany({
-    where:{
-      userId
-    },
-    select:{
-      id:true,
-      amount:true,
-      month:true,
-      year:true,
-      category:{
-        select:{
-          id:true,
-          name:true,
-          color:true,
-          icon:true,
-          type:true,
-        }
-      },
-      createdAt:true,
-      updatedAt:true
-    },
-    orderBy:{
-      updatedAt:"desc"
-    }
-  })
-
-  return res.status(200).json(new ApiResponse(200,budget,"All Budgets"))
-
-})
-
-//get a single budgets by the budgetId
-export const getBudgetById=asyncHandler(async(req,res)=>{
-  const userId=req.user?.id
-
-  if(!userId){
-    throw new ApiError(401,"authorization failed")
-  }
-
-  const {budgetId}=req.params
-
-  if(!budgetId  || Array.isArray(budgetId)){
-    throw new ApiError(400,"Budget id is required")
-  }
-
-  const budget=await prisma.budget.findFirst({
-    where:{
-      id:budgetId,
-      userId
-    },
-    select:{
-      id:true,
-      amount:true,
-      month:true,
-      year:true,
-      category:{
-        select:{
-          id:true,
-          name:true,
-          color:true,
-          icon:true,
-          type:true,
-        }
-      },
-      createdAt:true,
-      updatedAt:true
-    },
-  })
-
-  if(!budget){
-    throw new ApiError(400,"budget not found")
-  }
-
-  return res.status(200).json(new ApiResponse(200,budget,"budget by id"))
-
-})
 
 //update a single budget by it's id
 export const updateBudgetById=asyncHandler(async(req,res)=>{
@@ -274,4 +194,51 @@ export const deleteBudgetById=asyncHandler(async(req,res)=>{
   })
 
   return res.status(200).json(new ApiResponse(200,null,"budget deleted"))
+})
+
+
+export const getBudgetValues=asyncHandler(async(req,res)=>{
+
+  const userId=req.user?.id 
+  const {month,year}=req.query
+
+  if(!userId){
+    throw new ApiError(401,"A uthorization failed")
+  }
+
+  const budgetFind=await prisma.budget.findMany({
+    where:{userId},
+    include:{
+      category:true
+    }
+  })
+
+  if(budgetFind.length===0){
+    throw new ApiError(401,"No budget exist")
+  }
+
+  const budgetsValues=await Promise.all(
+    budgetFind.map(async(budget)=>{
+      const spent=await prisma.transaction.aggregate({
+        where:{
+          userId,
+          categoryId:budget.categoryId,
+          type:"EXPENSE",
+          date:{
+            gte:new Date(Number(year), Number(month)-1, 1),
+            lte:new Date(Number(year), Number(month), 1)
+          }
+        },
+        _sum:{amount:true}
+      })
+
+      return {
+        ...budget,
+        spent:spent._sum?.amount??0,
+        remaining:Number(budget.amount)-Number(spent._sum?.amount ?? 0)
+      }
+    })
+  )
+
+  return res.status(200).json(new ApiResponse(200,budgetsValues,"Budgets fetched"))
 })
