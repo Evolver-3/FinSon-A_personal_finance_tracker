@@ -1,42 +1,73 @@
-import { View, Text, TextInput } from 'react-native'
-import React, { useState,useEffect} from 'react'
+import { View} from 'react-native'
+import React, { useState,useEffect, useCallback} from 'react'
 import { TextData } from '../comps/TextData'
-import { SelectType } from '../comps/Mode/ModalComp'
+import ModalComp from '../comps/Mode/ModalComp'
 import SelectDropdown from '../comps/SelectDropdown'
 import { ButtonNeed } from '../comps/ButtonNeed'
 import ErrorPopUp from '../comps/ErrorPopUp'
+import { monthData } from '@/data'
+import { useFocusEffect } from "@react-navigation/native";
+
+type onSubmitBudget={
+  amount:number
+  month:number 
+  year:number 
+  categoryId:string
+}
 
 type budgetModalProps={
   initialValues?:Partial<createBudgetProps>
   error:string | null
   loading:boolean
   categories:Category[]
-  onSubmit:(values:createBudgetProps)=>Promise<void>
+  onSubmit:(values:onSubmitBudget)=>Promise<void>
   submitText:string
+  openModal:boolean 
+  setOpenModal:React.Dispatch<React.SetStateAction<boolean>>
+  viewFlex:number 
+  pressableFlex:number
 }
-const BudgetModel = ({initialValues,error,loading,categories,onSubmit,submitText}:budgetModalProps) => {
 
-  const [amount,setAmount]=useState(initialValues?.amount?? "")
-  const [month,setMonth]=useState(initialValues?.month ?? "")
-  const [year,setYear]=useState(initialValues?.year ?? "")
+
+const BudgetModel = ({initialValues,error,loading,categories,onSubmit,submitText,openModal,setOpenModal,viewFlex,pressableFlex}:budgetModalProps) => {
+
+  const [amount,setAmount]=useState(initialValues?.amount?.toString()?? "")
+  const [month,setMonth]=useState(initialValues?.month?.toString() ?? "")
+  const [year,setYear]=useState(initialValues?.year?.toString() ?? "")
 
   const [categoryId,setCategoryId]=useState(initialValues?.categoryId ?? '')
-
+ 
   useEffect(()=>{
     if(initialValues){
-      setAmount(initialValues.amount ?? "")
-      setMonth(initialValues.month?? "")
-      setYear(initialValues.year?? "")
-      setCategoryId(initialValues?.categoryId ?? "")
+      setAmount(initialValues.amount?.toString() ?? "")
+      setMonth(initialValues.month?.toString() ?? "")
+      setYear(initialValues.year?.toString() ?? "")
+      setCategoryId(initialValues?.categoryId?.toString() ?? "")
     }
   },[initialValues])
 
   const handleSubmit=async()=>{
-    await onSubmit({amount,month,year,categoryId})
+    await onSubmit({amount:parseFloat(amount),month:parseInt(month),year:parseInt(year),categoryId})
+
+    setAmount("")
+    setMonth("")
+    setYear("")
+    setCategoryId("")
+
+    setOpenModal(false)
   }
 
+
   return (
-    <View className='flex-col gap-y-5 mt-10 relative'>
+
+    <ModalComp
+    visible={openModal}
+    onRequestClose={()=>setOpenModal(false)}
+    textblock={"New budget"}
+    viewFlex={viewFlex}
+    pressableFlex={pressableFlex}>
+
+       <View className='flex-col gap-y-5 mt-10 relative'>
 
       <ErrorPopUp
       errorMessage={error }/>
@@ -51,14 +82,15 @@ const BudgetModel = ({initialValues,error,loading,categories,onSubmit,submitText
       keyboardType="decimal-pad"
       />
 
-      <TextData
-      tag={''}
-      placeholder={'Select a month'}
-      value={month}
-      onChangeText={setMonth}
-      secureTextEntry={false}
-      tagexist={false}
-      keyboardType="default"
+
+      <SelectDropdown
+      options={monthData.map(mon=>({
+        id:mon.id,
+        name:mon.month
+      }))}
+      selectedId={month}
+      onSelect={setMonth}
+      placeholder='Choose Month'
       />
 
       <TextData
@@ -95,6 +127,8 @@ const BudgetModel = ({initialValues,error,loading,categories,onSubmit,submitText
 
       
     </View>
+    </ModalComp>
+   
   )
 }
 

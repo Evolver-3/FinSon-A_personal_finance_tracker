@@ -1,18 +1,27 @@
-import { View, Text } from 'react-native'
+import { View } from 'react-native'
 import React from 'react'
 import BudgetModel from './BudgetModel'
 
+type budgetValues={
+  amount:number
+  month:number
+  year:number
+  categoryId:string
+}
 type createBudgetPageProps={
-  creatingNewBudget:(values:createBudgetProps)=>Promise<void>
-  error:string | null
+  creatingNewBudget:(values:budgetValues)=>Promise<void>
   loading:boolean
   categories:Category[]
   pageLoad:boolean 
   setPageLoad:React.Dispatch<React.SetStateAction<boolean>>
   setPageError:React.Dispatch<React.SetStateAction<string>>
   pageError:string
+  openModal:boolean
+  setOpenModal:React.Dispatch<React.SetStateAction<boolean>>
+  viewFlex:number 
+  pressableFlex:number
 }
-const CreateBudget = ({creatingNewBudget,error,categories,setPageLoad,pageLoad,setPageError,pageError}:createBudgetPageProps) => {
+const CreateBudget = ({creatingNewBudget,categories,setPageLoad,pageLoad,setPageError,pageError,openModal,setOpenModal,viewFlex,pressableFlex}:createBudgetPageProps) => {
   return (
     <View>
       <BudgetModel
@@ -20,6 +29,10 @@ const CreateBudget = ({creatingNewBudget,error,categories,setPageLoad,pageLoad,s
       loading={pageLoad}
       categories={categories}
       submitText={"Add new budget"}
+      openModal={openModal}
+      setOpenModal={setOpenModal}
+      viewFlex={viewFlex}
+      pressableFlex={pressableFlex}
 
       
       onSubmit={async(values)=>{
@@ -30,10 +43,11 @@ const CreateBudget = ({creatingNewBudget,error,categories,setPageLoad,pageLoad,s
           await creatingNewBudget({
             ...values
           })
-        }catch(err:any){
-          const fullError=err|| error 
 
-          setPageError(fullError)
+        }catch(err:any){
+           const message=err?.response?.data?.message || err?.message || "Failed to Create new Budget"
+
+          setPageError(message)
         }finally{
           setPageLoad(false)
         }
