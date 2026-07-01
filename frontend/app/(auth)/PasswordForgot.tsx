@@ -1,7 +1,7 @@
 import { View, Text } from 'react-native'
 import React,{useState} from 'react'
 import { useAuth } from '@/hooks/useAuth'
-import Authbody from '@/components/Authbody'
+import Authbody from '@/components/comps/Authbody'
 
 import { Link, router } from 'expo-router'
 import Wrapper from '@/components/WrapperPage'
@@ -39,7 +39,7 @@ const PasswordForgot = () => {
   return (
     <Wrapper loading={false}>
       <Authbody errorMessage={errorMessage} headingText={"Send Password Reset email"}>
-      <View>
+      <View className='flex-col gap-y-6'>
         <TextData
         tag='Your email address'
         value={email}

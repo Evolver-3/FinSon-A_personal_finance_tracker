@@ -3,7 +3,7 @@ import React, { useState,useEffect } from 'react'
 import { useAuth } from '@/hooks/useAuth'
 import { router, useLocalSearchParams } from 'expo-router'
 import Wrapper from '@/components/WrapperPage'
-import Authbody from '@/components/Authbody'
+import Authbody from '@/components/comps/Authbody'
 import { TextData } from '@/components/comps/TextData'
 import { ButtonNeed } from '@/components/comps/ButtonNeed'
 

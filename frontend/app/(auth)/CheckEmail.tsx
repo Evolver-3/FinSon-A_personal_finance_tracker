@@ -1,7 +1,7 @@
 import { View, Text } from 'react-native'
 import React,{useState} from 'react'
 import Wrapper from '@/components/WrapperPage'
-import Authbody from '@/components/Authbody'
+import Authbody from '@/components/comps/Authbody'
 import { Link, useLocalSearchParams } from 'expo-router'
 import { useAuth } from '@/hooks/useAuth'
 import { ButtonNeed } from '@/components/comps/ButtonNeed'
