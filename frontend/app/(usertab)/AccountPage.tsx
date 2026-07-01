@@ -84,7 +84,7 @@ const AccountPage = () => {
 
       ListEmptyComponent={
         <View className='px-4'>
-          <Text style={{color:"#ffffff"}}>Add Account</Text>
+          <Text className="smallText">Add Account</Text>
         </View>
       }
       renderItem={({item})=>(

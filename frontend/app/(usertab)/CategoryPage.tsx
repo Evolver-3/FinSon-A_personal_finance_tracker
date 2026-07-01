@@ -9,7 +9,7 @@ import HeaderList from '@/components/comps/Flat/HeaderList'
 
 const CategoryPage = () => {
 
-  const { selectedCategory,editCategory,fetchCategory,categories,loading,creatingCategory,removeCategory}=useCategory()
+  const { selectedCategory,editCategory,fetchCategory,categories,loading,creatingCategory,removeCategory,error}=useCategory()
 
   const [visible,setVisible]=useState(false)
 
@@ -20,23 +20,28 @@ const CategoryPage = () => {
 
   const [renderPageLoading,setRenderPageLoading]=useState(false)
 
+  const [createError,setCreateError]=useState<string | null>(null)
+
   const [query,setQuery]=useState("")
 
   const filteredData=categories.filter(item=>{
     const searchable=item.name?? ""
     return searchable.toLowerCase().includes(query.toLowerCase())
   })
+
+
   const handleSubmit=async()=>{
   
    try{
     setRenderPageLoading(true)
+    setCreateError(null)
 
     await creatingCategory({name,type,color,icon})
     setName("")
     setColor(categorydynamicColors[0])
     setVisible(false)
-   }catch(error){
-    console.log(error)
+   }catch(err:any){
+    setCreateError(err?.response?.data?.message || err?.message || error || "Error occurred while creatin category")
 
    }finally{
     setRenderPageLoading(false)
@@ -60,7 +65,10 @@ const CategoryPage = () => {
         icon={icon}
         setIcon={setIcon}
         handleSubmit={handleSubmit}
-        loading={renderPageLoading}/>
+        loading={renderPageLoading}
+        createError={createError}
+        setCreateError={setCreateError}
+        />
         
         <FlatList
         data={filteredData}
@@ -77,13 +85,14 @@ const CategoryPage = () => {
         
         ListEmptyComponent={
           <View className='px-4'>
-            <Text style={{color:"#ffffff"}}>Add Category</Text>
+            <Text className="smallText">Add Category</Text>
           </View>
           
         }
         renderItem={({item})=>(
           <RenderCategory
           item={item}
+          error={error}
         loading={renderPageLoading}
         selectedCategory={selectedCategory}
         editCategory={editCategory}
