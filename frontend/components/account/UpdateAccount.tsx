@@ -76,7 +76,7 @@ const UpdateAccount = ({openEdit,setOpenEdit,account,editAccount,removeAccount,e
    visible={openEdit}
    onRequestClose={()=>setOpenEdit(false)}
    textblock={'Edit Account'}
-   pressableFlex={3}
+   pressableFlex={2}
     viewFlex={3}>
     <TextData
       tagexist={false}
@@ -120,6 +120,7 @@ const UpdateAccount = ({openEdit,setOpenEdit,account,editAccount,removeAccount,e
         text='Wallet'/>
                   
       </View>
+    </View>
        
       <View className=' flex-row gap-x-3 mt-1'>
         <Text className='text-md font-semibold text-white'>Choose Color</Text>
@@ -146,6 +147,7 @@ const UpdateAccount = ({openEdit,setOpenEdit,account,editAccount,removeAccount,e
       <View className='flex-row items-center justify-between '>
         {AccountIcons.map((tag)=>(
           <SelectAccountIcon
+          style={{}}
           key={tag.id}
           name={tag.name}
           icon={tag?.name}
@@ -168,7 +170,6 @@ const UpdateAccount = ({openEdit,setOpenEdit,account,editAccount,removeAccount,e
         disabled={removePageLoading}/>
       </View>
       
-    </View>  
    </ModalComp>
   )
 }

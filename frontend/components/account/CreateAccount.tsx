@@ -1,4 +1,4 @@
-import { View, Text, Pressable, Modal, ScrollView, ViewStyle, TextInput} from 'react-native'
+import { View, Text, Pressable, Modal, ScrollView, ViewStyle, TextInput, KeyboardAvoidingView, Platform} from 'react-native'
 import React from 'react'
 import { TextData } from '../comps/TextData'
 import { AccountIcons, categorydynamicColors, CategoryIcons } from '@/data'
@@ -31,6 +31,7 @@ const CreateAccount = ({openCreate,setOpenCreate,name,setName,type,setType,color
    textblock={'Create Account'}
    pressableFlex={3}
     viewFlex={3}>
+      
 
     <TextData
     keyboardType="default"
@@ -51,7 +52,7 @@ const CreateAccount = ({openCreate,setOpenCreate,name,setName,type,setType,color
     secureTextEntry={false}/>
     
     <View className='items-center justify-center mt-3'>
-      <View className="flex-row gap-x-3 p-1 py-1 bg-neutral-500 rounded-xl">
+      <View className="flex-row gap-x-3 p-1 py-1 bg-neutral-50  dark:bg-neutral-600 rounded-xl">
 
         <SelectType
         focused={type==="CARD"}
@@ -72,6 +73,9 @@ const CreateAccount = ({openCreate,setOpenCreate,name,setName,type,setType,color
         focused={type==="WALLET"}
         onPress={()=>setType("WALLET")}
         text='Wallet'/>
+
+      
+    </View>
                   
       </View>
        
@@ -100,6 +104,7 @@ const CreateAccount = ({openCreate,setOpenCreate,name,setName,type,setType,color
       <View className='flex-row items-center justify-between '>
         {AccountIcons.map((tag)=>(
           <SelectAccountIcon
+          style={{}}
           key={tag.id}
           name={tag.name}
           icon={tag?.name}
@@ -113,7 +118,7 @@ const CreateAccount = ({openCreate,setOpenCreate,name,setName,type,setType,color
         loading={loading}
         disabled={loading}/>
       
-    </View>  
+
    </ModalComp>
   )
 }
