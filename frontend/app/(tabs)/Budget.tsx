@@ -79,7 +79,7 @@ const Budget = () => {
             elevation:2
           }}>
             <Text className='biggerText font-bold text-lg'>Monthly Budget Remains</Text>
-            <Text className='smalltext'>
+            <Text className='smallText'>
               <Text className='font-semibold text-neutral-700 dark:text-neutral-200 text-[33px]'>{getRemainingPerMonth}</Text> 
               {"  "}remains of {getTotalPerMonth}</Text>
 
