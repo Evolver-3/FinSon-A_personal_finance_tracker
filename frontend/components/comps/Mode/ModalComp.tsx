@@ -142,12 +142,15 @@ export const SelectAccountIcon=({icon,onPress,focused,name}:TabIconProps)=>{
 }
 
 
-export const getIconByName=(name:string | null, focused:boolean)=>{
+export const getIconByName=(name:string | null, focused:boolean,
+  color?:string,
+  size?:number
+)=>{
   if(!name) return null 
 
   const found=CategoryIcons.find(c=>c.name===name)
 
-  return found?found.symbol(focused):null
+  return found?found.symbol(focused,color,size):null
 }
 
 export const getAccountIconByName=(name:string | null,focused:boolean)=>{
