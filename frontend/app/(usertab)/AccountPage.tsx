@@ -6,6 +6,7 @@ import CreateAccount from '@/components/account/CreateAccount'
 import AccountItem from '@/components/account/AccountItem'
 import { categorydynamicColors } from '@/data'
 import HeaderList from '@/components/comps/Flat/HeaderList'
+import FakePageAnimate from '@/components/comps/Animate/FakePageAnimate'
 
 const AccountPage = () => {
   const {loading,error,creatingAccount,accounts,editAccount,removeAccount,  selectedAccount}=useAccount()
@@ -27,6 +28,8 @@ const AccountPage = () => {
     const searchable=item.name??''
     return searchable.toLocaleLowerCase().includes(query.toLowerCase())
   })
+
+  const isInitiallyLoading=loading && accounts.length===0
 
   const handleCreateAccount=async()=>{
     try{
@@ -70,7 +73,7 @@ const AccountPage = () => {
       />
 
       <FlatList
-      data={filteredData}
+      data={isInitiallyLoading ? [] :filteredData}
       keyExtractor={(item)=>item.id}
       contentContainerStyle={{paddingHorizontal:4,paddingTop:6,gap:10}}
 
@@ -83,9 +86,19 @@ const AccountPage = () => {
       }
 
       ListEmptyComponent={
-        <View className='px-4'>
-          <Text className="smallText">Add Account</Text>
-        </View>
+        <FakeLoad 
+        loading={isInitiallyLoading}
+        hasAccounts={accounts.length>0}
+        query={query}
+        unmatchText='No matching accounts found'
+        defaultText='Add an account'
+        >
+          {[1,2,3,4,5,6,7,8,9,10].map((item)=>(
+          <View key={item}
+          className='w-full h-20 mainbg rounded-md'>
+          </View>
+        ))}
+        </FakeLoad>
       }
       renderItem={({item})=>(
         <AccountItem
@@ -102,3 +115,38 @@ const AccountPage = () => {
 }
 
 export default AccountPage
+
+
+type fakeLoadProps={
+  loading:boolean 
+  hasAccounts:boolean 
+  query:string
+  children:React.ReactNode
+  unmatchText:string 
+  defaultText:string
+}
+
+
+export const FakeLoad=({loading,hasAccounts,query,children,unmatchText,defaultText}:fakeLoadProps)=>{
+  if(loading){
+    return(
+      <FakePageAnimate>
+        {children}
+      </FakePageAnimate>
+        
+    )
+  }
+  if(hasAccounts && query.trim()){
+    return(
+      <View className="px-4">
+        <Text className="text-sm smallText">{unmatchText}</Text>
+      </View>
+    )
+  }
+
+  return(
+    <View className='px-4'>
+      <Text className="text-sm smallText">{defaultText}</Text>
+    </View>
+  )
+}
