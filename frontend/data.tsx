@@ -99,19 +99,19 @@ export const CategoryIcons:CategoryIconsProps[] = [
   {
     id: 1,
     name:"Utensils",
-    symbol:(focused:boolean)=>(
+    symbol:(focused,color,size)=>(
       <Utensils
-        size={30}
-        color={focused?"#60a5fa":"#ffffff"}
+        size={size ?? 20}
+        color={color ?? (focused ? '#60a5fa' : '#ffffff')}
       />
     )},
   {
     id: 2,
     name:"Fuel",
-    symbol:(focused:boolean)=>(
+    symbol:(focused,color,size)=>(
       <Fuel
-        size={30}
-        color={focused?"#60a5fa":"#ffffff"}
+        size={size?? 20}
+        color={color ?? (focused ? '#60a5fa' : '#ffffff')}
       />
 
     )
@@ -120,11 +120,11 @@ export const CategoryIcons:CategoryIconsProps[] = [
   {
     id: 3,
     name:"Hamburger",
-    symbol:(focused:boolean)=>(
+    symbol:(focused,color,size)=>(
       
       <Hamburger
-        size={30}
-        color={focused?"#60a5fa":"#ffffff"}
+        size={size?? 20}
+        color={color ?? (focused ? '#60a5fa' : '#ffffff')}
       />
     )
     
@@ -132,10 +132,10 @@ export const CategoryIcons:CategoryIconsProps[] = [
   {
     id: 4,
     name:"CarTaxi",
-    symbol:(focused:boolean)=>( 
+    symbol:(focused,color,size)=>( 
       <CarTaxiFrontIcon
-        size={30}
-        color={focused?"#60a5fa":"#ffffff"}
+        size={size?? 20}
+        color={color ?? (focused ? '#60a5fa' : '#ffffff')}
       />
     )
     
@@ -143,40 +143,40 @@ export const CategoryIcons:CategoryIconsProps[] = [
   {
     id: 5,
     name:"GlobeCheck",
-    symbol:(focused:boolean)=>(
+    symbol:(focused,color,size)=>(
       <GlobeCheck
-        size={30}
-        color={focused?"#60a5fa":"#ffffff"}
+        size={size?? 20}
+        color={color ?? (focused ? '#60a5fa' : '#ffffff')}
       />
     )
   },
   {
     id: 6,
     name:"Toolbox",
-    symbol:(focused:boolean)=>(
+    symbol:(focused,color,size)=>(
       <Toolbox
-        size={30}
-        color={focused?"#60a5fa":"#ffffff"}
+        size={size?? 20}
+        color={color ?? (focused ? '#60a5fa' : '#ffffff')}
       />
     )
   },
   {
     id: 7,
     name:"Clapperboard",
-    symbol:(focused:boolean)=>(
+    symbol:(focused,color,size)=>(
       <Clapperboard
-        size={30}
-        color={focused?"#60a5fa":"#ffffff"}
+        size={size?? 20}
+        color={color ?? (focused ? '#60a5fa' : '#ffffff')}
       />
     )
   },
   {
     id: 8,
     name:"Hospital",
-    symbol:(focused:boolean)=>(
+    symbol:(focused,color,size)=>(
       <Hospital
-        size={30}
-        color={focused?"#60a5fa":"#ffffff"}
+        size={size?? 20}
+        color={color ?? (focused ? '#60a5fa' : '#ffffff')}
       />
     )
   }
@@ -227,4 +227,47 @@ export const AccountIcons:CategoryIconsProps[] = [
       />
     )
   }
+]
+
+
+export const monthData=[
+  {
+    id:"1",
+    month:"Jan"
+  },
+  {
+    id:"2",
+    month:"Feb"
+  },{
+    id:"3",
+    month:"March"
+  },{
+    id:"4",
+    month:"April"
+  },{
+    id:"5",
+    month:"May"
+  },{
+    id:"6",
+    month:"June"
+  },{
+    id:"7",
+    month:"July"
+  },{
+    id:"8",
+    month:"Aug"
+  },{
+    id:"9",
+    month:"Sep"
+  },{
+    id:"10",
+    month:"Oct"
+  },{
+    id:"11",
+    month:"Nov"
+  },{
+    id:"12",
+    month:"Dec"
+  }
+
 ]
