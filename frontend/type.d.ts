@@ -156,6 +156,8 @@ declare global{
     category?:Category
     createdAt?:string 
     updatedAt?:string
+    spent?:Number 
+    remaining?:Number
 
 
   }
@@ -168,7 +170,7 @@ declare global{
   }
 
   //type of icon state
-  type IconFn=(focused:boolean)=>React.JSX.Element
+  type IconFn=(focused:boolean,color?:string,size?:number)=>React.JSX.Element
 
 
   
