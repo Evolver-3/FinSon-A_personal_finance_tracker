@@ -15,7 +15,7 @@ const HeaderList = ({headingText,onPress,inlineText,setQuery}:HeaderListProps) =
 
   return (
     <View className=' px-4 gap-y-4 pt-4'>
-      <TopUserComp
+      <TopUserComp  
         headingText={headingText}/>
         
         <View className='flex-row items-center gap-x-2'>
@@ -23,7 +23,7 @@ const HeaderList = ({headingText,onPress,inlineText,setQuery}:HeaderListProps) =
           onSearch={setQuery}
           inlineText={inlineText}/>
             <Pressable
-            className='rounded-lg p-4 bg-white dark:bg-neutral-600 border border-slate-200 dark:border-neutral-400'
+            className='rounded-lg p-2 bg-white dark:bg-neutral-600 border border-slate-200 dark:border-neutral-400'
             onPress={onPress}>
               <ThemeIcon
               icon={Plus}
