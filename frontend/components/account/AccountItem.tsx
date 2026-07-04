@@ -1,8 +1,9 @@
 import { View, Text, Pressable } from 'react-native'
 import React, { useState } from 'react'
-import { getAccountIconByName, getIconByName } from '../comps/Mode/ModalComp'
+import { getAccountIconByName } from '../comps/Mode/ModalComp'
 import { Pencil } from 'lucide-react-native'
 import UpdateAccount from './UpdateAccount'
+import { useTheme } from '@/hooks/useTheme'
 
 type AccountItemProps={
   item:Account 
@@ -15,19 +16,26 @@ type AccountItemProps={
 const AccountItem = ({item,editAccount,removeAccount,loading,error}:AccountItemProps) => {
   const [openEdit,setOpenEdit]=useState(false)
   const [selectedAccount,setSelectedAccount]=useState<Account| null>(null)
+
+  const {isDark}=useTheme()
+  
   return (
+
     <View className='px-4'>
       <View
-      className='flex-row items-center rounded-xl p-4 '
+      className='flex-row items-center mainborder  rounded-xl p-4 '
       style={{
-        backgroundColor:item.color.darkColor,
-        borderColor:item.color.colors,
-        borderWidth:1
+        backgroundColor:isDark? "#393939":item.color.colors,
+        elevation:2
         }}>
         <View className='flex-grow flex-row gap-x-4 items-center'>
           <View
-          className='pr-2'>
-            {getAccountIconByName(item.icon,false)}
+          className='p-2 items-center rounded-lg '
+          style={{
+            elevation:5,
+            backgroundColor:item.color.darkColor
+          }}>
+            {getAccountIconByName(item.icon,false,"#000000")}
           </View>
        
           <View className=''>

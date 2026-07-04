@@ -7,6 +7,7 @@ import AccountItem from '@/components/account/AccountItem'
 import { categorydynamicColors } from '@/data'
 import HeaderList from '@/components/comps/Flat/HeaderList'
 import FakePageAnimate from '@/components/comps/Animate/FakePageAnimate'
+import { useTheme } from '@/hooks/useTheme'
 
 const AccountPage = () => {
   const {loading,error,creatingAccount,accounts,editAccount,removeAccount,  selectedAccount}=useAccount()
@@ -18,6 +19,8 @@ const AccountPage = () => {
   const [icon,setIcon]=useState<string | null>(null)
   const [type,setType]=useState <"CASH" | "BANK" | "CARD" | "WALLET">("CASH")
   const [balance,setBalance]=useState("") 
+
+  const {isDark}=useTheme()
 
 
   const [pageLoad,setPageLoad]=useState(false)
@@ -95,7 +98,10 @@ const AccountPage = () => {
         >
           {[1,2,3,4,5,6,7,8,9,10].map((item)=>(
           <View key={item}
-          className='w-full h-20 mainbg rounded-md'>
+          className='w-full h-20 rounded-md'
+          style={{
+            backgroundColor:isDark?"#857A83":"#E3C1DE"
+          }}>
           </View>
         ))}
         </FakeLoad>
