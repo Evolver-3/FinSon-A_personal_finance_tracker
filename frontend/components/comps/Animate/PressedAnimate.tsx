@@ -1,12 +1,15 @@
-import {Pressable,View} from 'react-native'
+import {Pressable,View, ViewStyle} from 'react-native'
 import Animated, { interpolateColor, useAnimatedStyle, useSharedValue, withTiming } from 'react-native-reanimated'
 
 type pressedAnimateProps={
   onPress:()=>void
-  children:React.ReactElement
+  children:React.ReactElement,
+  pressedColor:string
+  originalColor:string
+  style:ViewStyle
 }
 const AnimatedPressable=Animated.createAnimatedComponent(Pressable)
-const PressedAnimate = ({onPress,children}:pressedAnimateProps) => {
+const PressedAnimate = ({onPress,children,pressedColor,originalColor,style}:pressedAnimateProps) => {
 
   const pressed=useSharedValue(0)
   
@@ -15,7 +18,7 @@ const PressedAnimate = ({onPress,children}:pressedAnimateProps) => {
     backgroundColor:interpolateColor(
       pressed.value,
       [0,1],
-      ["transparent","rgba(99, 102, 241, 0.16)"]
+      [originalColor,pressedColor]
     ),
     transform:[
       {
@@ -40,15 +43,12 @@ const PressedAnimate = ({onPress,children}:pressedAnimateProps) => {
     
     style={[
       {
-        width:36,
-        height:36,
-        borderRadius:18,
         alignItems:"center",
         justifyContent:"center"
       },
-      animatedStyle
+      animatedStyle,
+      style
     ]}>
-
       {children}
 
     </AnimatedPressable>
