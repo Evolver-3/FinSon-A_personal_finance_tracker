@@ -1,10 +1,10 @@
-import { View, Text ,Pressable, Modal,Animated} from 'react-native'
+import { View, Text ,Pressable, Modal,Animated, ActivityIndicator} from 'react-native'
 import React,{useState,useRef} from 'react'
 import TransactionComp from './TransactionComp'
 import { getIconByName } from '../comps/Mode/ModalComp'
-import { ButtonNeed } from '../comps/ButtonNeed'
-import Animateddrop from '../comps/AnimatedStretch/Animateddrop'
-import OptionBtn from '../comps/OptionBtn'
+import Animateddrop from '../comps/Animate/Animateddrop'
+import PressedAnimate from '../comps/Animate/PressedAnimate'
+import { useTheme } from '@/hooks/useTheme'
 
 type renderTransactionProps={
   item:Transaction 
@@ -16,6 +16,7 @@ type renderTransactionProps={
 }
 const RenderTransaction = ({item,editTransaction,removeTransaction,accounts,categories}:renderTransactionProps) => {
 
+  const {isDark}=useTheme()
   const [editPageLoad,setEditPageLoad]=useState(false)
   const [deleteLoad,setDeleteLoad]=useState(false)
   const [pageError,setPageError]=useState<string| null>('')
@@ -39,37 +40,24 @@ const RenderTransaction = ({item,editTransaction,removeTransaction,accounts,cate
   }
  
 
-  const ShowAmount=({item}:{item:Transaction})=>{
-    if(item.type==="EXPENSE"){
-      return(
-        <View className='bg-red-100 rounded-md px-3 py-1'>
-          <Text className='text-red-400 text-xs font-semibold'>
-            - {item.amount}
-          </Text>
-        </View>
-      )
-    }else{
-      return (
-        <View className='bg-green-200 rounded-xl px-3 py-2'>
-          <Text className="text-green-600 text-xs font-semibold">
-            + {item.amount}
-          </Text>
-        </View>
-      )
-    }
-  }
+
   return (
     <View className='px-4'>
       
       <Animateddrop
+      viewstyle={{
+        backgroundColor:isDark?"#393939":item.category?.color.colors,
+        elevation:2
+      }}
         firstChild={
       <View 
       className=' flex-row justify-between items-center'>
 
-          <View className='flex-row gap-x-5'>
+          <View className='flex-row gap-x-4 items-center '>
              <View className='rounded-lg p-2'
            style={{
-            backgroundColor:item.category?.color.darkColor
+            backgroundColor:item.category?.color.darkColor,
+            elevation:5
            }}>
             {getIconByName(item.category?.icon ?? null,false)}
            </View>
@@ -106,27 +94,40 @@ const RenderTransaction = ({item,editTransaction,removeTransaction,accounts,cate
           <View className='flex-row gap-x-4'>
             <Text className="flex-grow smallText">{item.category?.name}</Text>
 
-
-            <OptionBtn
+          <PressedAnimate
           onPress={()=>setOpenEdit(true)}
-          btnText={"Edit"}
-          disabled={editPageLoad}
-          loading={editPageLoad}
-          />
+          originalColor={isDark?"#41EC4F":"#ADF7B3"}
+          pressedColor={"#CEE9D0"}
+          style={{
+            width:60,
+            height:30,
+            borderRadius:5,
+            paddingVertical:2,
+          }}
+          >
+             <Text
+             className="oppText text-sm"
+             >Edit</Text>
+          </PressedAnimate>
 
-            <OptionBtn
+
+          <PressedAnimate
           onPress={handleDeleteTransaction}
-          btnText={"Remove"}
-          disabled={ deleteLoad}
-          loading={deleteLoad}
-          />
+          originalColor={"#D28E89"}
+          pressedColor={"#EAA59E"}
+          style={{
+            width:70,
+            height:30,
+            borderRadius:5,
+          }}
+          >
+            {deleteLoad ?<ActivityIndicator color={"#ffffff"}/>: <Text className='oppText text-sm'>Remove</Text>}
+          </PressedAnimate>
+          
  
           </View>
       </View>}
-      secStyle={{
-  
-      }}
-      maxExpandedHeight={400}/>
+      secStyle={{}}/>
 
        <TransactionComp
        initialValues={{
@@ -166,3 +167,25 @@ const RenderTransaction = ({item,editTransaction,removeTransaction,accounts,cate
 }
 
 export default RenderTransaction
+
+
+
+export const ShowAmount=({item}:{item:Transaction})=>{
+    if(item.type==="EXPENSE"){
+      return(
+        <View className='bg-red-100 rounded-md px-3 py-1'>
+          <Text className='text-red-600 text-xs font-semibold'>
+            - {item.amount}
+          </Text>
+        </View>
+      )
+    }else{
+      return (
+        <View className='bg-green-200 rounded-xl px-3 py-2'>
+          <Text className="text-green-600 text-xs font-semibold">
+            + {item.amount}
+          </Text>
+        </View>
+      )
+    }
+  }

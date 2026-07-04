@@ -7,9 +7,12 @@ import { useCategory } from '@/hooks/useCategory'
 import CreateTransaction from '@/components/transactionPage/CreateTransaction'
 import HeaderList from '@/components/comps/Flat/HeaderList'
 import RenderTransaction from '@/components/transactionPage/RenderTransaction'
+import { FakeLoad } from '../(usertab)/AccountPage'
+import { useTheme } from '@/hooks/useTheme'
 
 const Transactions = () => {
-  const {transactions,creatingNewTransaction,editTransaction,removeTransaction,fetchTransaction}=useTransaction()
+  const {transactions,creatingNewTransaction,editTransaction,removeTransaction,fetchTransaction,loading}=useTransaction()
+
 
   const {accounts}=useAccount()
   const {categories}=useCategory()
@@ -19,6 +22,9 @@ const Transactions = () => {
   const [openCreate,setOpenCreate]=useState(false)
 
   const [query,setQuery]=useState('')
+
+  const isInitiallyLoading=loading && transactions.length===0
+  const {isDark}=useTheme()
 
   const filteredData=transactions.filter(item=>{
     const searchable=item.title??""
@@ -54,9 +60,21 @@ const Transactions = () => {
         inlineText={"Search transactions..."}/>
       }
       ListEmptyComponent={
-        <View className='px-4'>
-          <Text className="smallText">No transaction exist</Text>
-        </View>
+        <FakeLoad
+        loading={isInitiallyLoading}
+        hasAccounts={transactions.length>0}
+        query={query}
+        unmatchText='No matching transaction found'
+        defaultText='Add an transaction'>
+        {[1,2,3,4,5,6,7,8,9,10].map((item)=>(
+          <View key={item}
+            className='w-full h-20 rounded-md'
+            style={{
+                backgroundColor:isDark?"#857A83":"#E3C1DE"
+                }}>
+          </View>
+        ))}
+        </FakeLoad>
       }
       renderItem={({item})=>(
         <RenderTransaction
