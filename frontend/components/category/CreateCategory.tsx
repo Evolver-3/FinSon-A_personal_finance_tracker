@@ -80,6 +80,7 @@ const CreateCategory = ({visible,setVisible,name,setName,type,setType,color,setC
               <View className='flex-row items-center justify-between '>
                 {CategoryIcons.map((tag)=>(
                   <SelectIcon
+                  style={{}}
                   key={tag.id}
                   name={tag.name}
                   icon={tag?.name}

@@ -6,6 +6,8 @@ import CreateCategory from '@/components/category/CreateCategory'
 import RenderCategory from '@/components/category/RenderCategory'
 import { categorydynamicColors } from '@/data'
 import HeaderList from '@/components/comps/Flat/HeaderList'
+import { FakeLoad } from './AccountPage'
+import { useTheme } from '@/hooks/useTheme'
 
 const CategoryPage = () => {
 
@@ -23,12 +25,15 @@ const CategoryPage = () => {
   const [createError,setCreateError]=useState<string | null>(null)
 
   const [query,setQuery]=useState("")
+  const {isDark}=useTheme()
 
   const filteredData=categories.filter(item=>{
     const searchable=item.name?? ""
     return searchable.toLowerCase().includes(query.toLowerCase())
   })
 
+  const isInitiallyLoading=loading && categories.length===0
+  console.log(isInitiallyLoading)
 
   const handleSubmit=async()=>{
   
@@ -48,7 +53,8 @@ const CategoryPage = () => {
    }
 
   }
-  console.log(categories)
+
+  
   return (
     <Wrapper
     loading={false}>
@@ -65,9 +71,7 @@ const CategoryPage = () => {
         icon={icon}
         setIcon={setIcon}
         handleSubmit={handleSubmit}
-        loading={renderPageLoading}
-        createError={createError}
-        setCreateError={setCreateError}
+        loading={renderPageLoading} 
         />
         
         <FlatList
@@ -84,15 +88,27 @@ const CategoryPage = () => {
         }
         
         ListEmptyComponent={
-          <View className='px-4'>
-            <Text className="smallText">Add Category</Text>
-          </View>
+        <FakeLoad 
+          loading={isInitiallyLoading}
+          hasAccounts={categories.length>0}
+          query={query}
+          unmatchText='No matching category found'
+          defaultText='Add an category'>
+
+          {[1,2,3,4,5,6,7,8,9,10].map((item)=>(
+              <View key={item}
+                className='w-full h-20 rounded-md'
+                style={{
+                    backgroundColor:isDark?"#857A83":"#E3C1DE"
+                  }}>
+              </View>
+          ))}
+        </FakeLoad>
           
         }
         renderItem={({item})=>(
           <RenderCategory
           item={item}
-          error={error}
         loading={renderPageLoading}
         selectedCategory={selectedCategory}
         editCategory={editCategory}

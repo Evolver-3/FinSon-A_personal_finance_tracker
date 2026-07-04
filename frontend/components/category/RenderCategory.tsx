@@ -3,6 +3,7 @@ import { Pencil } from 'lucide-react-native'
 import React,{useState} from 'react'
 import UpdateCategory from './UpdateCategory'
 import { getIconByName } from '../comps/Mode/ModalComp'
+import { useTheme } from '@/hooks/useTheme'
 
 type RenderCategoryProps={
   item:Category
@@ -11,50 +12,56 @@ type RenderCategoryProps={
   editCategory:(id:string,data:updateCategoryProps)=>Promise<void>
   fetchCategory:(id:string)=>Promise<Category>
   removeCategory:(id:string)=>Promise<void>
+  
 }
 
 const RenderCategory = ({loading,editCategory,removeCategory,item}:RenderCategoryProps) => {
 
   const [openEdit,setOpenEdit]=useState(false)
   const [selectedCategory,setSelectedCategory]=useState<Category|null>(null)
+  
+  const {isDark}=useTheme()
 
   return (
     <View className='px-4'>
       <View
-            className='flex-row items-center rounded-xl p-4 '
-            style={{
-              backgroundColor:item.color.darkColor,
-              borderColor:item.color.colors,
-              borderWidth:1
+        className='flex-row items-center rounded-xl p-4 mainborder'
+        style={{
+            backgroundColor:isDark? "#393939":item.color.colors,
+            elevation:2
+          }}>
+          <View className='flex-grow flex-row gap-x-4 items-center'>
+            <View
+              className='p-2 items-center rounded-lg'
+              style={{
+                elevation:5,
+                backgroundColor:item.color.darkColor
               }}>
-              <View className='flex-grow flex-row gap-x-4 items-center'>
-                <View
-                className='pr-2'>
-                  {getIconByName(item.icon,false)}
-                </View>
+              {getIconByName(item.icon,false,"#000000",20)}
+            </View>
              
-                <View className=''>
-                  <View className='flex-row items-center gap-x-4'>
-                    <Text className='text-lg text-neutral-500'>
-                      {item.name}
-                    </Text>
-                    <View className='p-[2px] rounded-xl'
-                    style={{
+            <View className=''>
+              <View className='flex-row items-center gap-x-4'>
+                <Text className='text-lg text-neutral-500'>
+                  {item.name}
+                </Text>
+                <View className='p-[2px] rounded-xl'
+                  style={{
                       backgroundColor:`${item.color.colors}`
                     }}>
-                      <Text
-                      style={{
+                  <Text
+                    style={{
                       color:`${item.color.btncolor}`,
                       fontSize:8
-                      }}>
-                        {item.type}
-                      </Text>
-                    </View>
-                  </View>
-                
+                    }}>
+                      {item.type}
+                  </Text>
                 </View>
-      
               </View>
+                
+            </View>
+      
+          </View>
              
               <Pressable
                 onPress={()=>{
