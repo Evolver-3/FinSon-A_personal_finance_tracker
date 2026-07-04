@@ -7,15 +7,17 @@ type animatedDropProps={
   secStyle?:StyleProp<ViewStyle>
   firstChild:React.ReactNode
   secChild:React.ReactNode
+  viewstyle?:StyleProp<ViewStyle>
 }
-const Animateddrop = ({style,firstChild,secStyle,secChild}:animatedDropProps) => {
+const Animateddrop = ({style,firstChild,secStyle,secChild,viewstyle}:animatedDropProps) => {
   const [expanded,setExpanded]=useState(false)
  
   
   return (
   <Animated.View
   layout={LinearTransition.duration(250)}
-  className="rounded-xl mainbg mainborder p-3 ">
+  className="rounded-xl p-3 mainborder"
+  style={viewstyle}>
    <Pressable
    onPress={()=>setExpanded((prev)=>!prev)} 
    style={style}>
