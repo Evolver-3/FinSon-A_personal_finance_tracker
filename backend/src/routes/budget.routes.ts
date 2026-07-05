@@ -7,13 +7,10 @@ const budgetRouter=Router()
 
 budgetRouter.use(verifyJWT)
 
-budgetRouter.route("/").post(createBudget)
+budgetRouter.route("/").post(createBudget).get(getBudgetValues)
 
 
-budgetRouter.route("/:budgetId").patch(updateBudgetById)
+budgetRouter.route("/:budgetId").patch(updateBudgetById).delete(deleteBudgetById)
 
-budgetRouter.route("/budgetId").delete(deleteBudgetById )
-
-budgetRouter.route('/').get(getBudgetValues)
 
 export default budgetRouter
