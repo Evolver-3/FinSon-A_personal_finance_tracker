@@ -10,6 +10,8 @@ export default function RootLayout(){
 
   const fontsLoaded=useAppFonts()
 
+  if(!fontsLoaded) return null;
+
   return(
     <AuthProvider>
       <BudgetProvider>
