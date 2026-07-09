@@ -25,7 +25,7 @@ const AccountItem = ({item,editAccount,removeAccount,loading,error}:AccountItemP
       <View
       className='flex-row items-center mainborder  rounded-xl p-4 '
       style={{
-        backgroundColor:isDark? "#393939":item.color.colors,
+        backgroundColor:isDark? "#212121":item.color.colors,
         elevation:2
         }}>
         <View className='flex-grow flex-row gap-x-4 items-center'>
