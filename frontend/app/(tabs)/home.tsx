@@ -189,7 +189,10 @@ const index = () => {
                 {budgetFilteredData.map((budget)=>(
                   <View key={budget.id}
                   className='gap-y-2 '>
-                    <Text className='smallText font-bold uppercase text-md'>{budget.category?.name}</Text>
+                    <Text className='smallText  uppercase text-md'
+                    style={{
+                      fontFamily:"Sans-Bold"
+                    }}>{budget.category?.name}</Text>
 
                     <View className='flex-row justify-between'>
                       <Text className='biggerText text-sm'>{formatAmount(Number(budget.spent))}/{formatAmount(Number(budget.amount)) }</Text>
@@ -248,17 +251,18 @@ const index = () => {
         ListEmptyComponent={
           <FakeLoad 
             loading={isInitiallyLoading}
-              hasAccounts={transactionFilteredData.length>0}
-                    unmatchText='No matching budget found'
-                    defaultText='Add an budget'>
-                      {[1,2,3,4,5,6,7,8,9,10].map((item)=>(
-                        <View key={item}
-                          className='w-full h-40 rounded-md'
-                          style={{
-                            backgroundColor:isDark?"#857A83":"#E3C1DE"
-                            }}>
-                        </View>
-                      ))}
+            hasAccounts={transactionFilteredData.length>0}
+            unmatchText='No matching budget found'
+            defaultText='Add an budget'>
+            {[1,2,3,4,5,6,7,8,9,10].map((item)=>(
+              <View
+                key={item}
+                className='w-full h-40 rounded-md'
+                style={{
+                      backgroundColor:isDark?"#857A83":"#E3C1DE"
+                    }}>
+              </View>
+            ))}
           </FakeLoad>
         }
         ItemSeparatorComponent={()=>
