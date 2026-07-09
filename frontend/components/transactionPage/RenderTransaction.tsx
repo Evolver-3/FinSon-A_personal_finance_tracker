@@ -5,6 +5,7 @@ import { getIconByName } from '../comps/Mode/ModalComp'
 import Animateddrop from '../comps/Animate/Animateddrop'
 import PressedAnimate from '../comps/Animate/PressedAnimate'
 import { useTheme } from '@/hooks/useTheme'
+import { formatAmount } from '@/app/(tabs)/home'
 
 type renderTransactionProps={
   item:Transaction 
@@ -39,18 +40,16 @@ const RenderTransaction = ({item,editTransaction,removeTransaction,accounts,cate
     }
   }
  
-
-
   return (
     <View className='px-4'>
       
       <Animateddrop
       viewstyle={{
-        backgroundColor:isDark?"#393939":item.category?.color.colors,
+        backgroundColor:isDark?"#212121":item.category?.color.colors,
         elevation:2
       }}
         firstChild={
-      <View 
+        <View 
       className=' flex-row justify-between items-center'>
 
           <View className='flex-row gap-x-4 items-center '>
@@ -84,10 +83,10 @@ const RenderTransaction = ({item,editTransaction,removeTransaction,accounts,cate
             </Text>
            </View>
 
-      </View>}
+        </View>}
 
-      secChild={
-      <View style={{paddingTop:8,gap:4}}>
+        secChild={
+        <View style={{paddingTop:8,gap:4}}>
           <Text style={{color:"#a3a3a3"}}>
             Account:{item.account?.name}
           </Text>
@@ -126,7 +125,8 @@ const RenderTransaction = ({item,editTransaction,removeTransaction,accounts,cate
           
  
           </View>
-      </View>}
+        </View>}
+        
       secStyle={{}}/>
 
        <TransactionComp
@@ -175,7 +175,7 @@ export const ShowAmount=({item}:{item:Transaction})=>{
       return(
         <View className='bg-red-100 rounded-md px-3 py-1'>
           <Text className='text-red-600 text-xs font-semibold'>
-            - {item.amount}
+            - {formatAmount(item.amount)}
           </Text>
         </View>
       )
@@ -183,7 +183,7 @@ export const ShowAmount=({item}:{item:Transaction})=>{
       return (
         <View className='bg-green-200 rounded-xl px-3 py-2'>
           <Text className="text-green-600 text-xs font-semibold">
-            + {item.amount}
+            + {formatAmount(item.amount)}
           </Text>
         </View>
       )
