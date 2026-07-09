@@ -75,7 +75,7 @@ const CategoryPage = () => {
         />
         
         <FlatList
-        data={filteredData}
+        data={isInitiallyLoading?[]:filteredData}
         keyExtractor={(item)=>item.id}
         contentContainerStyle={{paddingHorizontal:4,paddingTop:6, gap:10}}
 
