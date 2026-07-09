@@ -3,13 +3,14 @@ import Animated, { interpolateColor, useAnimatedStyle, useSharedValue, withTimin
 
 type pressedAnimateProps={
   onPress:()=>void
-  children:React.ReactElement,
+  children:React.ReactNode,
   pressedColor:string
   originalColor:string
   style:ViewStyle
+  className?:string
 }
 const AnimatedPressable=Animated.createAnimatedComponent(Pressable)
-const PressedAnimate = ({onPress,children,pressedColor,originalColor,style}:pressedAnimateProps) => {
+const PressedAnimate = ({onPress,children,pressedColor,originalColor,style,className}:pressedAnimateProps) => {
 
   const pressed=useSharedValue(0)
   
@@ -40,11 +41,11 @@ const PressedAnimate = ({onPress,children,pressedColor,originalColor,style}:pres
     onPressOut={()=>{
       pressed.value=withTiming(0)
     }}
+    className={`${className}`}
     
     style={[
       {
-        alignItems:"center",
-        justifyContent:"center"
+       
       },
       animatedStyle,
       style
