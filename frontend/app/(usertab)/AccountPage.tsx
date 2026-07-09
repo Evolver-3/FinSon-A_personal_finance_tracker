@@ -126,7 +126,7 @@ export default AccountPage
 type fakeLoadProps={
   loading:boolean 
   hasAccounts:boolean 
-  query:string
+  query?:string
   children:React.ReactNode
   unmatchText:string 
   defaultText:string
@@ -142,7 +142,7 @@ export const FakeLoad=({loading,hasAccounts,query,children,unmatchText,defaultTe
         
     )
   }
-  if(hasAccounts && query.trim()){
+  if(hasAccounts && query?.trim()){
     return(
       <View className="px-4">
         <Text className="text-sm smallText">{unmatchText}</Text>
