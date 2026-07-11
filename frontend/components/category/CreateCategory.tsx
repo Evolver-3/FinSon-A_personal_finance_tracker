@@ -30,73 +30,92 @@ const CreateCategory = ({visible,setVisible,name,setName,type,setType,color,setC
     pressableFlex={3}
     viewFlex={2}>
       
-            <TextData
-            keyboardType="default"
-              tagexist={false}
-              tag={''}
-              value={name}
-              placeholder='e.g., Food'
-              onChangeText={setName}
-              secureTextEntry={false}/>
-              <View className='items-center justify-center '>
-                <View className="flex-row gap-x-3 p-1 py-1 bg-neutral-500 rounded-xl">
-                <SelectType
-                  focused={type==="INCOME"}
-                  onPress={()=>setType("INCOME")}
-                  text='Income'/>
+      <TextData
+        keyboardType="default"
+        tagexist={false}
+        tag={''}
+        value={name}
+        placeholder='e.g., Food'
+        onChangeText={setName}
+        secureTextEntry={false}/>
+        
+        <View
+          className='items-center justify-center '>
+                
+          <View 
+            className="flex-row gap-x-3 p-1 py-1 bg-neutral-500 rounded-xl">
+                
+            <SelectType
+              focused={type==="INCOME"}
+              onPress={()=>setType("INCOME")}
+              text='Income'/>
    
-                <SelectType
-                  focused={type==="EXPENSE"}
-                  onPress={()=>
-                  setType("EXPENSE")}
-                  text='Expense'/>
-                </View>
-              </View>
+            <SelectType
+              focused={type==="EXPENSE"}
+              onPress={()=>
+              setType("EXPENSE")}
+              text='Expense'/>
+
+          </View>
+
+        </View>
    
-              <View className=' flex-row gap-x-3'>
-                <Text className='text-md font-semibold text-white'>Choose Color</Text>
-                <ScrollView
-                showsVerticalScrollIndicator={false}
-                horizontal
-                contentContainerClassName='items-center'
-                className='flex-row'
-                contentContainerStyle={{alignItems:"center",
-                  gap:10}}>
-                  {categorydynamicColors.map((col,id)=>(
-                  <View key={id}
-                  className=''>
-                    <SelectColors
+        <View
+          className=' flex-row gap-x-3'>
+          
+          <Text
+            className='text-md font-semibold text-white'>
+              Choose Color
+          </Text>
+          
+          <ScrollView
+            showsVerticalScrollIndicator={false}
+            horizontal
+            contentContainerClassName='items-center'
+            className='flex-row'
+            contentContainerStyle={{
+              alignItems:"center",
+              gap:10
+            }}>
+              
+              {categorydynamicColors.map((col,id)=>(
+                <View
+                  key={id}>
+                  
+                  <SelectColors
                     style={{
                     backgroundColor:col.btncolor
                     }}
                     focused={color.btncolor===col.btncolor}
                     onPress={()=>setColor(col)}
                     />
-                  </View>
+                </View>
                 ))}
-                </ScrollView>
-              </View>
 
-              <View className='flex-row items-center justify-between '>
-                {CategoryIcons.map((tag)=>(
-                  <SelectIcon
-                  style={{}}
-                  key={tag.id}
-                  name={tag.name}
-                  icon={tag?.name}
-                  focused={icon===tag.name}
-                  onPress={()=>setIcon(tag.name)}
-                />
-                ))}
-              </View>
+          </ScrollView>
+        </View>
 
-               <ButtonNeed
-               style={{}}
-              onPress={handleSubmit}
-              text={'Create new'}
-              loading={loading}
-              disabled={loading}
-              />
+        <View 
+          className='flex-row items-center justify-between '>
+                
+          {CategoryIcons.map((tag)=>(
+            <SelectIcon
+              style={{}}
+              key={tag.id}
+              name={tag.name}
+              icon={tag?.name}
+              focused={icon===tag.name}
+              onPress={()=>setIcon(tag.name)}/>))}
+        </View>
+
+        <ButtonNeed
+          style={{}}
+          onPress={handleSubmit}
+          text={'Create new'}
+          loading={loading}
+          disabled={loading}
+          />
+          
     </ModalComp>
   )
 }
