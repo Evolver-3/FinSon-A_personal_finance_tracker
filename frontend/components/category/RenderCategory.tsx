@@ -4,6 +4,7 @@ import React,{useState} from 'react'
 import UpdateCategory from './UpdateCategory'
 import { getIconByName } from '../comps/Mode/ModalComp'
 import { useTheme } from '@/hooks/useTheme'
+import PressedAnimate from '../comps/Animate/PressedAnimate'
 
 type RenderCategoryProps={
   item:Category
@@ -19,67 +20,128 @@ const RenderCategory = ({loading,editCategory,removeCategory,item}:RenderCategor
 
   const [openEdit,setOpenEdit]=useState(false)
   const [selectedCategory,setSelectedCategory]=useState<Category|null>(null)
+  const [removePageLoading,setRemovePageLoading]=useState(false)
   
   const {isDark}=useTheme()
 
+   const handleDeleteCategory=async()=>{
+    try{
+      setRemovePageLoading(true)
+
+      if(!selectedCategory?.id)return 
+
+      await removeCategory(selectedCategory?.id)
+      setOpenEdit(false)
+    }catch(error){
+      console.log(error)
+    }finally{
+      setRemovePageLoading(false)
+
+    }
+    }
+
   return (
-    <View className='px-4'>
+    <View 
+      className='px-4'>
       <View
-        className='flex-row items-center rounded-xl p-4 mainborder'
+        className='rounded-xl py-6 px-4 mainbg mainborder flex-col gap-y-4'
         style={{
-            backgroundColor:isDark? "#212121":item.color.colors,
-            elevation:2
-          }}>
-          <View className='flex-grow flex-row gap-x-4 items-center'>
+          backgroundColor:isDark?"#212121":item.color.colors,
+          elevation:2
+        }}>
+          <View
+            className=' flex-row gap-x-5 items-center'>
             <View
               className='p-2 items-center rounded-lg'
               style={{
                 elevation:5,
                 backgroundColor:item.color.darkColor
               }}>
-              {getIconByName(item.icon,false,"#000000",20)}
+              {getIconByName(item.icon,false,isDark?"#000000":"#ffffff",24)}
             </View>
              
-            <View className=''>
-              <View className='flex-row items-center gap-x-4'>
-                <Text className='text-lg text-neutral-500'>
-                  {item.name}
-                </Text>
-                <View className='p-[2px] rounded-xl'
+            <View 
+              className='flex-row items-center gap-x-4'>
+                <Text 
+                  className=' text-md biggerText uppercase'
                   style={{
-                      backgroundColor:`${item.color.colors}`
+                    fontFamily:"Sans-Bold"
+                  }}>
+                    {item.name}
+                </Text>
+
+                <View 
+                  className='px-2 py-1 rounded-md'
+                  style={{
+                      backgroundColor:"#C4B6D2"
                     }}>
-                  <Text
-                    style={{
-                      color:`${item.color.btncolor}`,
-                      fontSize:8
-                    }}>
-                      {item.type}
-                  </Text>
+                      <Text
+                        style={{
+                          color:isDark?"#000000":"#ffffff",
+                          fontSize:8,
+                          fontFamily:"Sans-Semibold"
+                        }}>
+                          {item.type}
+                      </Text>
                 </View>
-              </View>
-                
             </View>
-      
-          </View>
-             
-              <Pressable
-                onPress={()=>{
-                setOpenEdit(true)
-                setSelectedCategory(item)}}>
-                  <Pencil
-                    color={'#000000'}
-                    size={18}/>
-              </Pressable>
+
+            <View 
+              className='flex-row gap-x-5 justify-end flex-grow'>
+              
+              <PressedAnimate
+                onPress={()=>setOpenEdit(true)}
+                originalColor={isDark?"#518151":"#ADF7B3"}
+                pressedColor={isDark?"#49B649":"#CEE9D0"}
+                style={{
+                  width:40,
+                  height:20,
+                  borderRadius:5,
+                  alignItems:"center",
+                  justifyContent:"center",
+                  elevation:6}}>
+                              
+                  <Text
+                    className="smallText text-xs"
+                    style={{
+                          fontFamily:"Sans-Semibold"
+                        }}>
+                          Edit
+                  </Text>
+              </PressedAnimate>
+                              
+              <PressedAnimate
+                onPress={handleDeleteCategory}
+                originalColor={isDark?"#753B2F":"#D28E89"}
+                pressedColor={"#EAA59E"}
+                style={{
+                  width:60,
+                  height:20,
+                  borderRadius:5,
+                  alignItems:'center',
+                  justifyContent:"center",
+                  elevation:6}}>
+                  
+                    {removePageLoading ?
+                    (<ActivityIndicator color={"#ffffff"} size={10}/>):
+                    <Text 
+                      className="smallText text-xs"
+                      style={{
+                          fontFamily:"Sans-Semibold"
+                      }}>
+                        Remove
+                    </Text>}
+              </PressedAnimate>
+            </View>
           
-            </View>
+          </View>
+      </View>
 
       <UpdateCategory
       openEdit={openEdit}
       setOpenEdit={setOpenEdit}
       selectedCategory={selectedCategory}
       editCategory={editCategory}
-      removeCategory={removeCategory}
       loading={loading}/>
               
     </View>
