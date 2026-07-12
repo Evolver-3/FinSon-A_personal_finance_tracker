@@ -5,7 +5,7 @@ type bottomTabDataProps={
   id:number 
   name:string 
   text:string 
-  icon:(focused:boolean)=>React.ReactNode
+  icon:(focused:boolean,size:number,color:string)=>React.ReactNode
   
 }
 
@@ -14,35 +14,35 @@ export const bottomTabData:bottomTabDataProps[] = [
     id: 1,
     name: "home",
     text: "Home",
-    icon: (focused) => (
+    icon: (focused,size,color) => (
       <Home
-        size={20}
-        color={focused ? "#0a0a0a" : "#a3a3a3"}
-        strokeWidth={focused ? 2.8 : 2}
+        size={size ?? 20}
+        color={color ??(focused ? "#0a0a0a" : "#a3a3a3")}
+        strokeWidth={focused ? 1.6 : 1}
       />
     )
   },
   {
     id: 2,
-    name: "Add",
-    text: "Add",
-    icon: (focused) => (
-      <BadgePlus
-        size={20}
-        color={focused ? "#0a0a0a" : "#a3a3a3"}
-        strokeWidth={focused ? 2.8 : 2}
+    name: "Budget",
+    text: "Budget",
+    icon: (focused,size,color) => (
+      <ChartNoAxesCombinedIcon
+        size={size ?? 20}
+        color={color ??(focused ? "#0a0a0a" : "#a3a3a3")}
+        strokeWidth={focused ? 1.6 : 1}
       />
     )
   },
   {
     id: 3,
-    name: "profile",
-    text: "Profile",
-    icon: (focused) => (
-      <UserRound
-        size={20}
-        color={focused ? "#0a0a0a" : "#a3a3a3"}
-        strokeWidth={focused ? 2.8 : 2}
+    name: "Add",
+    text: "Add",
+    icon: (focused,size,color) => (
+      <BadgePlus
+        size={size ?? 20}
+        color={color ??(focused ? "#0a0a0a" : "#a3a3a3")}
+        strokeWidth={focused ? 1.6 : 1}
       />
     )
   },
@@ -50,23 +50,23 @@ export const bottomTabData:bottomTabDataProps[] = [
     id: 4,
     name: "Transactions",
     text: "Transactions",
-    icon: (focused) => (
+    icon: (focused,size,color) => (
       <Banknote
-        size={20}
-        color={focused ? "#0a0a0a" : "#a3a3a3"}
-        strokeWidth={focused ? 2.8 : 2}
+        size={size ?? 20}
+        color={color ??(focused ? "#0a0a0a" : "#a3a3a3")}
+        strokeWidth={focused ? 1.6 : 1}
       />
     )
   },
-  {
+    {
     id: 5,
-    name: "Budget",
-    text: "Budget",
-    icon: (focused: boolean) => (
-      <ChartNoAxesCombinedIcon
-        size={20}
-        color={focused ? "#0a0a0a" : "#a3a3a3"}
-        strokeWidth={focused ? 2.8 : 2}
+    name: "profile",
+    text: "Profile",
+    icon: (focused,size,color) => (
+      <UserRound
+        size={size ?? 20}
+        color={color ??(focused ? "#0a0a0a" : "#a3a3a3")}
+        strokeWidth={focused ? 1.6 : 1}
       />
     )
   }
@@ -188,31 +188,29 @@ export const AccountIcons:CategoryIconsProps[] = [
   {
     id: 1,
     name:"Landmark",
-    symbol:(focused:boolean)=>(
+    symbol:(focused,color,size)=>(
       <Landmark
-        size={30}
-        color={focused?"#60a5fa":"#ffffff"}
+       size={size ?? 20}
+        color={color ?? (focused ? '#60a5fa' : '#ffffff')}
       />
     )},
   {
     id: 2,
     name:"BankNote",
-    symbol:(focused:boolean)=>(
+    symbol:(focused,color,size)=>(
       <BanknoteIcon
-        size={30}
-        color={focused?"#60a5fa":"#ffffff"}
+        size={size ?? 20}
+        color={color ?? (focused ? '#60a5fa' : '#ffffff')}
       />
-
     )
-    
   },
   {
     id: 3,
     name:"Wallet",
-    symbol:(focused:boolean)=>(
+    symbol:(focused,color,size)=>(
       <Wallet
-        size={30}
-        color={focused?"#60a5fa":"#ffffff"}
+        size={size ?? 20}
+        color={color ?? (focused ? '#60a5fa' : '#ffffff')}
       />
     )
     
@@ -220,10 +218,10 @@ export const AccountIcons:CategoryIconsProps[] = [
   {
     id: 4,
     name:"CreditCard",
-    symbol:(focused:boolean)=>( 
+    symbol:(focused,color,size)=>( 
       <CreditCard
-        size={30}
-        color={focused?"#60a5fa":"#ffffff"}
+        size={size ?? 20}
+        color={color ?? (focused ? '#60a5fa' : '#ffffff')}
       />
     )
   }
@@ -271,3 +269,111 @@ export const monthData=[
   }
 
 ]
+
+export const countryCurrencyData = [
+  {
+    country: "India",
+    code: "IN",
+    currency: "Indian Rupee",
+    currencyCode: "INR",
+    symbol: "₹",
+  },
+  {
+    country: "United States",
+    code: "US",
+    currency: "US Dollar",
+    currencyCode: "USD",
+    symbol: "$",
+  },
+  {
+    country: "United Kingdom",
+    code: "GB",
+    currency: "British Pound",
+    currencyCode: "GBP",
+    symbol: "£",
+  },
+  {
+    country: "European Union",
+    code: "EU",
+    currency: "Euro",
+    currencyCode: "EUR",
+    symbol: "€",
+  },
+  {
+    country: "Japan",
+    code: "JP",
+    currency: "Japanese Yen",
+    currencyCode: "JPY",
+    symbol: "¥",
+  },
+  {
+    country: "China",
+    code: "CN",
+    currency: "Chinese Yuan",
+    currencyCode: "CNY",
+    symbol: "¥",
+  },
+  {
+    country: "Canada",
+    code: "CA",
+    currency: "Canadian Dollar",
+    currencyCode: "CAD",
+    symbol: "C$",
+  },
+  {
+    country: "Australia",
+    code: "AU",
+    currency: "Australian Dollar",
+    currencyCode: "AUD",
+    symbol: "A$",
+  },
+  {
+    country: "Singapore",
+    code: "SG",
+    currency: "Singapore Dollar",
+    currencyCode: "SGD",
+    symbol: "S$",
+  },
+  {
+    country: "United Arab Emirates",
+    code: "AE",
+    currency: "UAE Dirham",
+    currencyCode: "AED",
+    symbol: "د.إ",
+  },
+  {
+    country: "Saudi Arabia",
+    code: "SA",
+    currency: "Saudi Riyal",
+    currencyCode: "SAR",
+    symbol: "﷼",
+  },
+  {
+    country: "Pakistan",
+    code: "PK",
+    currency: "Pakistani Rupee",
+    currencyCode: "PKR",
+    symbol: "₨",
+  },
+  {
+    country: "Bangladesh",
+    code: "BD",
+    currency: "Bangladeshi Taka",
+    currencyCode: "BDT",
+    symbol: "৳",
+  },
+  {
+    country: "Sri Lanka",
+    code: "LK",
+    currency: "Sri Lankan Rupee",
+    currencyCode: "LKR",
+    symbol: "Rs",
+  },
+  {
+    country: "Nepal",
+    code: "NP",
+    currency: "Nepalese Rupee",
+    currencyCode: "NPR",
+    symbol: "रू",
+  },
+];
