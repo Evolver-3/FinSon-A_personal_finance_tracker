@@ -1,5 +1,5 @@
 import { View, Text , FlatList} from 'react-native'
-import React, { useState } from 'react'
+import React, { useCallback, useState } from 'react'
 import Wrapper from '@/components/WrapperPage'
 import { useTransaction } from '@/hooks/useTransaction'
 import { useAccount } from '@/hooks/useAccount'
@@ -9,10 +9,17 @@ import HeaderList from '@/components/comps/Flat/HeaderList'
 import RenderTransaction from '@/components/transactionPage/RenderTransaction'
 import { FakeLoad } from '../(usertab)/AccountPage'
 import { useTheme } from '@/hooks/useTheme'
+import { useFocusEffect } from 'expo-router'
+import Add from './Add'
 
 const Transactions = () => {
-  const {transactions,creatingNewTransaction,editTransaction,removeTransaction,fetchTransaction,loading}=useTransaction()
+  const {transactions,creatingNewTransaction,editTransaction,removeTransaction,fetchTransaction,loading,fetchAllTransactions}=useTransaction()
 
+   useFocusEffect(
+        useCallback(()=>{
+          fetchAllTransactions()
+        },[])
+      )
 
   const {accounts}=useAccount()
   const {categories}=useCategory()
@@ -34,24 +41,12 @@ const Transactions = () => {
   return (
 
     <Wrapper loading={false}>
-
-      <CreateTransaction
-      openCreate={openCreate}
-      setOpenCreate={setOpenCreate}
-      accounts={accounts}
-      categories={categories}
-      pageLoad={pageLoad}
-      setPageLoad={setPageLoad}
-      pageError={pageError}
-      setPageError={setPageError}
-      creatingNewTransaction={creatingNewTransaction}
-      />
-
-      <FlatList
-      data={filteredData}
+      <View className='flex-1'>
+        <FlatList
+      data={isInitiallyLoading?[]:filteredData}
       keyExtractor={(item)=>item.id}
-      contentContainerStyle={{paddingHorizontal:4,paddingTop:6,gap:10}}
-      
+      contentContainerStyle={{paddingHorizontal:4,paddingTop:6,gap:10,paddingBottom:64}}
+       
       ListHeaderComponent={
         <HeaderList
         setQuery={setQuery}
@@ -86,6 +81,7 @@ const Transactions = () => {
         fetchTransaction={fetchTransaction}/>
       )}
       />
+      </View>
     </Wrapper>
 
    
