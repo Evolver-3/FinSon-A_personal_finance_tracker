@@ -1,43 +1,40 @@
 import { View, Text, Pressable, ActivityIndicator } from 'react-native'
 import React, { useState } from 'react'
 import { getAccountIconByName } from '../comps/Mode/ModalComp'
-import { Pencil } from 'lucide-react-native'
-import UpdateAccount from './UpdateAccount'
 import { useTheme } from '@/hooks/useTheme'
-import { formatAmount } from '@/app/(tabs)/home'
 import PressedAnimate from '../comps/Animate/PressedAnimate'
+import { formatAmount } from '../comps/DateFormat'
+import { useCurrency } from '@/context/CurrencyContext'
+import AccountData from './AccountData'
 
-type AccountItemProps={
-  item:Account 
-  editAccount:(id:string,data:updateAccountProps)=>Promise<void>
-  removeAccount:(id:string)=>Promise<void>
-  loading:boolean
-  selectedAccount:Account | null
-  error:string | null
-}
-const AccountItem = ({item,editAccount,removeAccount,loading,error}:AccountItemProps) => {
+
+const AccountItem = ({item,editAccount,removeAccount}:AccountItemProps) => {
   const [openEdit,setOpenEdit]=useState(false)
   const [selectedAccount,setSelectedAccount]=useState<Account| null>(null)
 
+  const {symbol}=useCurrency()
   
-  const [removePageLoading,setRemovePageLoading]=useState(false)
+  const [editLoad,setEditLoad]=useState(false)
+  const [ deleteLoad,setDeleteLoad]=useState(false)
+  const [pageError,setPageError]=useState("")
 
   const {isDark}=useTheme()
 
   const handledeleteAccount=async()=>{
-        try{
-          setRemovePageLoading(true)
-          if(!item?.id)return
 
-          await removeAccount(item?.id)
-          setOpenEdit(false)
+    setDeleteLoad(true)
+    setPageError("")
+    try{
+        if(!item?.id)return
+
+        await removeAccount(item?.id)
           
         }catch(err:any){
-          console.log(error)
-          console.log(err)
+         const message=err?.response?.data?.message || err?.message || "Failed to sign in"
 
+        setPageError(message)
         }finally{
-          setRemovePageLoading(false)
+          setDeleteLoad(false)
         }
       }
   
@@ -71,7 +68,7 @@ const AccountItem = ({item,editAccount,removeAccount,loading,error}:AccountItemP
 
           <Text 
             className="text-green-400 text-md">
-              {formatAmount(item.balance)}
+              {symbol}{formatAmount(item.balance)}
           </Text>
           </View>
 
@@ -125,7 +122,7 @@ const AccountItem = ({item,editAccount,removeAccount,loading,error}:AccountItemP
               justifyContent:"center",
               elevation:6}}>
         
-              {removePageLoading ?
+              {deleteLoad ?
               (<ActivityIndicator color={"#ffffff"} size={10}/>):
               <Text 
                 className="smallText text-xs"
@@ -143,13 +140,34 @@ const AccountItem = ({item,editAccount,removeAccount,loading,error}:AccountItemP
     
       </View>
    
-      <UpdateAccount
-      openEdit={openEdit}
-      setOpenEdit={setOpenEdit}
-      account={selectedAccount}
-      editAccount={editAccount}
-      loading={loading}
-      error={error}/>
+      <AccountData
+      initialValues={{
+        name:item.name,
+        balance:item.balance,
+        type:item.type,
+        color:item.color,
+        icon:item.icon
+      }}
+      submitText={"Edit your account"}
+      openModal={openEdit}
+      setOpenModal={setOpenEdit}
+      loading={editLoad}
+      error={pageError}
+      pressableFlex={2}
+      viewFlex={4}
+      
+      onSubmit={async(values)=>{
+        setEditLoad(true)
+        setPageError("")
+        try{
+          await editAccount(item.id,{...values})
+        }catch(err:any){
+          const message=err?.response?.data?.message || err?.message || "Failed to sign in"
+        setPageError(message)
+        }finally{
+          setEditLoad(false)
+        }
+      }}/>
                  
     </View>
   )
