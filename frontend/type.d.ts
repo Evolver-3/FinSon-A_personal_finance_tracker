@@ -225,27 +225,17 @@ type AccountItemProps={
   item:Account 
   editAccount:(id:string,data:updateAccountProps)=>Promise<void>
   removeAccount:(id:string)=>Promise<void>
-  loading:boolean
   selectedAccount:Account | null
-  error:string | null
 }
 
 type createAccountsProps={
-  openCreate:boolean 
-  setOpenCreate:React.Dispatch<React.SetStateAction<boolean>>
-  name:string 
-  setName:React.Dispatch<React.SetStateAction<string>>
-  type:string
-  setType:React.Dispatch<React.SetStateAction< "CASH" | "BANK" | "CARD" | "WALLET">>
-  color:CategoryColor
-  setColor:React.Dispatch<React.SetStateAction<CategoryColor>>
-  handleCreateAccount:()=>void
-  loading:boolean
-  icon:string|null
-  setIcon:React.Dispatch<React.SetStateAction<string| null>>
-  balance:string
-  setBalance:React.Dispatch<React.SetStateAction<string>>
-  error:string | null
+  creatingAccount:(values:createAccountProps)=>Promise<void>
+  pageError:string
+  setPageError:React.Dispatch<React.SetStateAction<string>>
+  pageLoad:boolean
+  setPageLoad:React.Dispatch<React.SetStateAction<boolean>>
+  openModal:boolean
+  setOpenModal:React.Dispatch<React.SetStateAction<boolean>>
 }
 
 type UpdateAccountProps={
@@ -531,6 +521,33 @@ type authBodyProps={
 type wrapperProps={
   children:ReactNode
   loading:boolean
+}
+
+type CurrencyContextType={
+  countryName:string;
+  setCountryName:(country:string)=>void;
+  symbol:string;
+  currencyCode:string;
+}
+
+type InitialAccountValueProps={
+  name?:string 
+  balance?:string 
+  type?:"CASH" | "BANK" | "CARD" | "WALLET"
+  color?:string 
+  icon?:string
+}
+
+type AccountDataProps={
+  initialValues?:Partial<>
+  error:string | null
+  loading:boolean
+  onSubmit:(values:createAccountProps)=>Promise<void>
+  submitText:string
+  openModal:boolean
+  setOpenModal:React.Dispatch<React.SetStateAction<boolean>>
+  viewFlex:number
+  pressableFlex:number
 }
 
 }
