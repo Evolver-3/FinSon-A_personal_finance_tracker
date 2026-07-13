@@ -4,7 +4,6 @@ import Wrapper from '@/components/WrapperPage'
 import { useAccount } from '@/hooks/useAccount'
 import CreateAccount from '@/components/account/CreateAccount'
 import AccountItem from '@/components/account/AccountItem'
-import { categorydynamicColors } from '@/data'
 import HeaderList from '@/components/comps/Flat/HeaderList'
 import FakePageAnimate from '@/components/comps/Animate/FakePageAnimate'
 import { useTheme } from '@/hooks/useTheme'
@@ -14,17 +13,10 @@ const AccountPage = () => {
   
   const [openCreate,setOpenCreate]=useState(false)
 
-  const [name,setName]=useState("")
-  const [color,setColor]=useState<CategoryColor>(categorydynamicColors[0])
-  const [icon,setIcon]=useState<string | null>(null)
-  const [type,setType]=useState <"CASH" | "BANK" | "CARD" | "WALLET">("CASH")
-  const [balance,setBalance]=useState("") 
-
   const {isDark}=useTheme()
 
-
   const [pageLoad,setPageLoad]=useState(false)
-
+  const [pageError,setPageError]=useState("")
   const [query,setQuery]=useState("")
 
   const filteredData=accounts.filter(item=>{
@@ -34,45 +26,18 @@ const AccountPage = () => {
 
   const isInitiallyLoading=loading && accounts.length===0
 
-  const handleCreateAccount=async()=>{
-    try{
-      setPageLoad(true)
 
-      await creatingAccount ({name,type,color,icon,balance})
-      setName("")
-      setColor(categorydynamicColors[0])
-      setOpenCreate(false)
-      setBalance("0")
-      
-    }catch(err:any){
-      console.log(error)
-      console.log(err)
-
-    }finally{
-      setPageLoad(false)
-    }
-  }
-
-  console.log("Ui render:",accounts)
   return (
     <Wrapper loading={false}>
       
       <CreateAccount
-      error={error}
-      openCreate={openCreate}
-      setOpenCreate={setOpenCreate}
-      loading={pageLoad}
-      handleCreateAccount={handleCreateAccount}
-      name={name}
-      setName={setName}
-      type={type}
-      setType={setType}
-      color={color}
-      setColor={setColor}
-      icon={icon}
-      setIcon={setIcon}
-      balance={balance}
-      setBalance={setBalance}
+      pageError={pageError}
+      pageLoad={pageLoad}
+      creatingAccount={creatingAccount}
+      openModal={openCreate}
+      setOpenModal={setOpenCreate}
+      setPageLoad={setPageLoad}
+      setPageError={setPageError}
       />
 
       <FlatList
@@ -108,12 +73,11 @@ const AccountPage = () => {
       }
       renderItem={({item})=>(
         <AccountItem
-        error={error}
         item={item}
-        loading={pageLoad}
         selectedAccount={selectedAccount}
         editAccount={editAccount}
-        removeAccount={removeAccount}/>
+        removeAccount={removeAccount}
+       />
       )}
       />
     </Wrapper>
