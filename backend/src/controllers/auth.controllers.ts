@@ -2,197 +2,191 @@ import asyncHandler from "../utils/asyncHandler.js";
 import ApiError from "../utils/ApiError.js";
 import ApiResponse from "../utils/ApiResponse.js";
 import {prisma} from '../prisma.js'
-import bcrypt from 'bcrypt'
 import { generateAccessAndRefreshTokens } from "../utils/generateToken.js";
-import crypto from 'crypto'
-import { verificationEmailService } from "../services/mail.service.js";
 import jwt from 'jsonwebtoken'
 import env from '../constant/env.js'
-import { passwordResetEmail } from "../services/resetPassword.service.js";
+import {OAuth2Client} from 'google-auth-library'
 
 
-//register controller
+const googleClient=new OAuth2Client(
+  process.env.GOOGLE_WEB_CLIENT_ID,
+  process.env.GOOGLE_WEB_CLIENT_SECRET
+)
 
-export const registerUser=asyncHandler(async(req,res)=>{
+const googleTokenClient=new OAuth2Client(
+  process.env.GOOGLE_WEB_CLIENT_ID,
+)
 
-  const {name,email,password}=req.body
+export const googleLoginWithCode=asyncHandler(async(req,res)=>{
 
-  if(!name || !email || !password){
-    throw new ApiError(400,"All fields are required")
-  }
+   
+    const {code, codeVerifier,redirectUri}=req.body
 
-  const isValidEmail=(email:string)=>{
-    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)
-  }
-
-  if(!isValidEmail(email)){
-    throw new ApiError(400,"Invalid email format")
-  }
-
-  const existingUser=await prisma.user.findUnique({
-    where:{email}
-  })
-
-  if(existingUser){
-    throw new ApiError(409,"User already esixt")
-  }
-
-  const hashedPassword=await bcrypt.hash(password,10)
-
-  const verificationToken=crypto.randomBytes(32).toString("hex")
-  const verificationExp=new Date(Date.now()+15*60*1000)
-
-  const user=await prisma.user.create({
-    data:{
-      name,email,password:hashedPassword,emailVerified:false,
-      emailVerificationToken:verificationToken,
-      emailVerificationExp:verificationExp
-    },
-    select:{
-      id:true,
-      name:true,
-      email:true,
-      avatar:true,
-      role:true,
-      emailVerified:true,
-      createdAt:true,
-      updatedAt:true,
+    if(!code || !codeVerifier || !redirectUri){
+      throw new ApiError(400,"Code, codeVerifier and redirect Uri is required")
     }
+
+    const {tokens}=await googleClient.getToken({
+      code,
+      codeVerifier,
+      redirect_uri:redirectUri
     })
 
-    await verificationEmailService(email,verificationToken)
+    const idToken=tokens.id_token
 
-    return res.status(201).json(new ApiResponse(201,user,"User created Successfully"))
+    if(!idToken){
+      throw new ApiError(400,"Google ID token is required.") 
+    }
+ 
+    const ticket=await googleClient.verifyIdToken({
+      idToken, 
+      audience: process.env.GOOGLE_WEB_CLIENT_ID!
+    })
 
-})
+    const googleUser=ticket.getPayload()
 
-//login controller
+    if(!googleUser?.email || !googleUser.sub){
+      throw new ApiError(401,"Invalid Google token.")
+    }
 
-export const loginUser=asyncHandler(async(req,res)=>
-{
-  
-  const {email,password}=req.body
-
-  if(!email || !password){
-    throw new ApiError(400,"fields are empty")
+    if (!googleUser.email_verified) {
+    throw new ApiError(403, "Please verify your Google email first.");
   }
 
-  const user=await prisma.user.findUnique({
-    where:{email}
-  })
+    let user=await prisma.user.findFirst({
+      where:{
+        OR:[
+          {googleId:googleUser.sub},
+          {email:googleUser.email}
+        ]
+      }
+    })
 
-  if(!user){
-    throw new ApiError(401,"Invalid credentials")
-  }
+    if(!user){
+      user=await prisma.user.create({
+        data:{
+          googleId:googleUser.sub,
+          name:googleUser.name || googleUser.given_name||"User", 
+          email:googleUser.email,
+          avatar:googleUser.picture || null,
 
-  const isPassword=await bcrypt.compare(password,user.password)
+        }
+      })
+    }else if(!user.googleId){
+      user=await prisma.user.update({
+        where:{id:user.id},
+        data:{
+          googleId:googleUser.sub,
+          avatar:user.avatar || googleUser.picture || null
+        }
+      })
+    }
 
-  if(!isPassword){
-    throw new ApiError(401,"Invalid credentials")
-  }
-
-  // if(!user.emailVerified){
-  //   throw new ApiError(401,"Invalid")
-  // } 
-
-  const {accessToken,refreshToken}=generateAccessAndRefreshTokens(user.id)
+    const {accessToken,refreshToken}= generateAccessAndRefreshTokens(user.id)
 
   await prisma.refreshToken.create({
     data:{
       token:refreshToken,
       userId:user.id,
-      expiresIn:new Date(Date.now()+7 * 24 * 60* 60* 1000)
+      expiresAt:new Date(Date.now()+7 * 24 * 60* 60* 1000)
     }
   })
 
-  return res.status(200).json(new ApiResponse(200,{
+
+  return res.status(200).json(
+    new ApiResponse(200,{
     user:{
       id:user.id,
       name:user.name,
       email:user.email,
       avatar:user.avatar,
-      role:user.role,
-      emailVerified:user.emailVerified
     },
     accessToken,
     refreshToken
-  },"Login successfull !!"
-))
+  },"Login successfull !!")) 
+
 })
 
-//controller for getting verifying link of the user email
+export const googleLogin=asyncHandler(async(req,res)=>{
 
-export const verifyEmail=asyncHandler(async(req,res)=>{
-  const token =req.query.token as string
+  const {idToken}=req.body
 
-  if(!token){
-    throw new ApiError(400,"Token is required")
+  
+    if(!idToken){
+      throw new ApiError(400,"Google ID token is required.") 
+    }
+ 
+    const ticket=await googleTokenClient.verifyIdToken({
+      idToken, 
+      audience:  [
+    process.env.GOOGLE_WEB_CLIENT_ID!,
+    process.env.GOOGLE_ANDROID_CLIENT_ID!]
+    })
+
+    const googleUser=ticket.getPayload()
+
+    if(!googleUser?.email || !googleUser.sub){
+      throw new ApiError(401,"Invalid Google token.")
+    }
+
+    if (!googleUser.email_verified) {
+    throw new ApiError(403, "Please verify your Google email first.");
   }
 
-  const user=await prisma.user.findFirst({
-    where:{
-      emailVerificationToken:token,
-      emailVerificationExp:{
-        gt:new Date()
+    let user=await prisma.user.findFirst({
+      where:{
+        OR:[
+          {googleId:googleUser.sub},
+          {email:googleUser.email}
+        ]
       }
+    })
+
+    if(!user){
+      user=await prisma.user.create({
+        data:{
+          googleId:googleUser.sub,
+          name:googleUser.name || googleUser.given_name||"User", 
+          email:googleUser.email,
+          avatar:googleUser.picture || null,
+
+        }
+      })
+    }else if(!user.googleId){
+      user=await prisma.user.update({
+        where:{id:user.id},
+        data:{
+          googleId:googleUser.sub,
+          avatar:user.avatar || googleUser.picture || null
+        }
+      })
     }
-  })
 
-  if(!user){
-    throw new ApiError(400,"Invalid or expired verification token")
-  }
+    const {accessToken,refreshToken}= generateAccessAndRefreshTokens(user.id)
 
-  await prisma.user.update({
-    where:{id:user.id},
+  await prisma.refreshToken.create({
     data:{
-      emailVerified:true,
-      emailVerificationToken:null,
-      emailVerificationExp:null
+      token:refreshToken,
+      userId:user.id,
+      expiresAt:new Date(Date.now()+7 * 24 * 60* 60* 1000)
     }
   })
 
-  return res.status(200).json(new ApiResponse(200,null,"Email verified, now you can Sign In"))
+
+  return res.status(200).json(
+    new ApiResponse(200,{
+    user:{
+      id:user.id,
+      name:user.name,
+      email:user.email,
+      avatar:user.avatar,
+    },
+    accessToken,
+    refreshToken
+  },"Login successfull !!")) 
+
 })
 
-//controller for verifying the email link
-
-export const resendVerificationEmail=asyncHandler(async(req,res)=>{
-
-  const {email}=req.body 
-
-  if(!email){
-    throw new ApiError(400,"Email is required")
-  }
-
-  const user=await prisma.user.findUnique({
-    where:{email}
-  })
-
-  if(!user){
-    throw new ApiError(404,"User not found")
-  }
-
-  if(user.emailVerified){
-    throw new ApiError(400,"Email is already verified")
-  }
-
-  const verificationToken=crypto.randomBytes(32).toString("hex")
-  const verificationExp=new Date(Date.now()+15*60*1000)
-
-  await prisma.user.update({
-    where:{id:user.id},
-    data:{
-      emailVerificationToken:verificationToken,
-      emailVerificationExp:verificationExp
-    }
-  })
-
-  await verificationEmailService(user.email,verificationToken)
-
-  return res.status(200).json(new ApiResponse(200,null,"Verification email send successfully"))
-
-
-})
 
 //user logged out controllers
 
@@ -251,14 +245,13 @@ export const refreshAccessToken=asyncHandler(async(req,res)=>{
 
     const user=await prisma.user.findUnique({
       where:{
-        id:decodedToken?.id
+        id:decodedToken.id
       },
       select:{
         id:true,
         name:true,
         email:true,
-        avatar:true,
-        role:true
+        avatar:true
       }
     })
 
@@ -272,11 +265,11 @@ export const refreshAccessToken=asyncHandler(async(req,res)=>{
       }
     })
 
-    if(!storedRefreshToken){
+    if(!storedRefreshToken || storedRefreshToken.userId !==user.id){
       throw new ApiError(401,"Refresh token not found")
     }
 
-    if(storedRefreshToken.expiresIn< new Date()){
+    if(storedRefreshToken.expiresAt< new Date()){
       await prisma.refreshToken.delete({
         where:{
           id:storedRefreshToken.id
@@ -288,19 +281,16 @@ export const refreshAccessToken=asyncHandler(async(req,res)=>{
 
     const {accessToken,refreshToken}=generateAccessAndRefreshTokens(user.id)
 
-    await prisma.refreshToken.delete({
-      where:{
-        id:storedRefreshToken.id
-      }
-    })
-
-    await prisma.refreshToken.create({
-      data:{
-        token:refreshToken,
-        userId:user.id,
-        expiresIn:new Date(Date.now()+ 7*24*60*60*1000)
-      }
-    })
+     await prisma.$transaction([
+      prisma.refreshToken.delete({ where: { id: storedRefreshToken.id } }),
+      prisma.refreshToken.create({
+        data: {
+          token: refreshToken,
+          userId: user.id,
+          expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
+        },
+      }),
+    ]);
 
     return res.status(200).json(new ApiResponse(200,{
       user,accessToken,refreshToken
@@ -308,158 +298,14 @@ export const refreshAccessToken=asyncHandler(async(req,res)=>{
 
  
   }catch(error:any){
+
+    if(error instanceof ApiError){
+      throw error;
+    }
     throw new ApiError(401,error.message)
   }
 
 })
 
-//changing the user password
 
-export const changePassword=asyncHandler(async(req,res)=>{
-
-  const userId=req.user?.id
-
-  if(!userId){
-    throw new ApiError(400,"User id doesn't exist")
-  }
-
-   const {currentPassword,newPassword,confirmNewPassword}=req.body
-
-   if((!currentPassword)||(!newPassword)||(!confirmNewPassword)){
-    throw new ApiError(400,"currentpassword and new password is required")
-   }
-
-   if(newPassword===currentPassword){
-    throw new ApiError(400,"new password must be diffferent from the current Password")
-   }
-
-   if(newPassword!==confirmNewPassword){
-    throw new ApiError(400,"newpassword and confirmation password doesn't match")
-   }
-
-  const user=await prisma.user.findUnique({
-    where:{
-      id:userId
-    }
-  })
-
-  if(!user){
-    throw new ApiError(404,"user not found")
-  }
-  const isPasswordCorrect=await bcrypt.compare(currentPassword,user?.password)
-
-  if(!isPasswordCorrect){
-    throw new ApiError(401,"current password is incorrect")
-  }
-
-  const hashedNewPassword=await bcrypt.hash(newPassword, 10)
-
-  await prisma.user.update({
-    where:{
-      id:userId
-    },
-    data:{
-      password:hashedNewPassword
-    }
-  })
-
-   return res.status(200).json(new ApiResponse(200,null,"Password changed successfully "))
-
-})
-
-//forgot password--sends the link to the user email
-
-export const forgotPassword=asyncHandler(async(req,res)=>{
-
-  const {email}=req.body
-
-  if(!email){
-    throw new ApiError(400,"Email is required")
-  }
-
-  const user=await prisma.user.findFirst({
-    where:{
-      email
-    }
-  })
-
-  if(!user){
-    throw new ApiError(400,"Invalid email given")
-  }
-
-  const resetToken=crypto.randomBytes(32).toString("hex")
-  const resetExp=new Date(Date.now()+15*60*1000)
-
-   await prisma.user.update({
-    where:{id:user.id},
-    data:{
-      passwordResetToken:resetToken,
-      passwordResetExp:resetExp
-    }
-  })
-
-  await passwordResetEmail(user.email,resetToken)
-
-  return res.status(200).json(new ApiResponse(200,null,"Verification link sended on email successfully"))
-})
-
-//reset the password after getting the link
-
-export const resetPassword=asyncHandler(async(req,res)=>{
-
-  const token=req.query.token as string
-
-  if(!token){
-    throw new ApiError(400,"unauthorized user")
-  }
-
-  const user=await prisma.user.findFirst({
-    where:{
-      passwordResetToken:token,
-      passwordResetExp:{
-        gt:new Date()
-      }}
-    })
-
-  if(!user){
-    throw new ApiError(400,"Invalid or expired token")
-  }
-
-  const {newPassword,confirmNewPassword}=req.body
-
-  if(!newPassword||!confirmNewPassword){
-    throw new ApiError(400,"fields should not be empty")
-  }
-
-  if(newPassword!==confirmNewPassword){
-    throw new ApiError(400,"both password should be equal")
-  }
-
-  const checkNewPassword=await bcrypt.compare(newPassword,user.password)
-
-  if(checkNewPassword){
-    throw new ApiError(400,"new password is same as previous password")
-  }
-
-  const hashedNewPassword=await bcrypt.hash(newPassword, 10)
-
-   await prisma.user.update({
-    where:{
-      id:user.id
-    },
-    data:{
-      password:hashedNewPassword,
-      passwordResetExp:null,
-      passwordResetToken:null
-    }
-  })
-
-  await prisma.refreshToken.deleteMany({
-    where:{
-      userId:user.id
-    }
-  })
-
-  return res.status(200).json(new ApiResponse(200,null,"Password reset successfully"))
-})
 
