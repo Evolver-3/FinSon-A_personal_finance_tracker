@@ -7,7 +7,9 @@ import { prisma } from "../prisma.js";
 export const verifyJWT=asyncHandler(async(req,res,next)=>{
 
   try{
-    const token=req.header("Authorization")?.replace("Bearer ","")
+    // const token=req.header("Authorization")?.replace("Bearer ","")
+
+     const token = req.headers.authorization?.replace('Bearer ','');
 
     if(!token){
       throw new ApiError(401,"Invalid accessToken")
@@ -17,7 +19,9 @@ export const verifyJWT=asyncHandler(async(req,res,next)=>{
     try{
       
       decodedToken=jwt.verify(token,env.ACCESS_TOKEN_SECRET) as AccessTokenPayload
+
     }catch(jwtError:any){
+      
       if(jwtError.name==="TokenExpiredError"){
         throw new ApiError(401,"Access Token expired")
       }
@@ -33,8 +37,7 @@ export const verifyJWT=asyncHandler(async(req,res,next)=>{
         id:true,
         name:true,
         email:true,
-        avatar:true,
-        role:true
+        avatar:true
       }
     })
 
@@ -45,7 +48,9 @@ export const verifyJWT=asyncHandler(async(req,res,next)=>{
     req.user=user
 
     next()
-  }catch(error){
+  }catch(error:any){
+    console.log("backend auth error:", error.response?.data)
     next(error)
+
   }
 })
