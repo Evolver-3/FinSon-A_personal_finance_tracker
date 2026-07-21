@@ -17,15 +17,8 @@ model User {
   id           String        @id @default(uuid())
   name         String
   email        String        @unique
-  password     String
   avatar       String?
-  role         Role          @default(USER)
-  emailVerified     Boolean      @default(false)
-  emailVerificationToken     String?
-  emailVerificationExp       DateTime?  
-
-  passwordResetToken    String?
-  passwordResetExp      DateTime?
+  googleId     String?       @unique
 
   refreshTokens RefreshToken[]
   accounts     Account[]
@@ -42,7 +35,7 @@ model RefreshToken {
   token        String        @unique
   userId       String
   user         User          @relation(fields: [userId], references:[id], onDelete:Cascade)
-  expiresIn    DateTime
+  expiresAt    DateTime
   createdAt    DateTime      @default(now())
 }
 
