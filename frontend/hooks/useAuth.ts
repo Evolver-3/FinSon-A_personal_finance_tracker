@@ -1,4 +1,4 @@
-import { registerUser,loginUser, verifyEmail, resendEmail, refreshToken, logout, logoutAllDevice, passwordReset, forgotPassword, resetPassword} from "@/services/authServices";
+import { googleLogin, refreshToken, logout, logoutAllDevice, googleLoginWithCode} from "@/services/authServices";
 import { useState } from "react";
 import {saveTokens, clearTokens} from '../services/tokenStorage'
 
@@ -33,23 +33,38 @@ export const useAuth=()=>{
     loading,
     error,
 
-    register:(data:registrationProps)=>
-      run(()=>registerUser(data)),
-
-    login:(data:loginProps)=>
+    loginCodeHook:(data:createLoginPageHookProps)=>
       run(async()=>{
-        const res=await loginUser(data)
-        
-        await saveTokens(res.data.accessToken,res.data.refreshToken)
+        const res=await googleLoginWithCode(data)
 
-        return res
+          console.log("android res:", res)           // full response
+          console.log("android res.data:", res.data) // { statusCode, data, message }
+          console.log("android res.data.data:", res.data.data)
+
+        const {accessToken,refreshToken}=res.data.data
+         console.log('Hook: saving tokens...');
+        await saveTokens(accessToken,refreshToken)
+          console.log('Hook: tokens saved');
+
+        return res.data.data
       }),
 
-    verifyEmailToken:(token:string)=>
-      run(()=>verifyEmail(token)),
+    loginTokenHook:(idToken:string)=>
+      run(async()=>{
 
-    resendVerificationEmail: (email: string) =>
-      run(() => resendEmail(email)),
+        const res=await googleLogin(idToken)
+
+        //  console.log("google res:", res)           // full response
+        //   console.log("google res.data:", res.data) // { statusCode, data, message }
+        //   console.log("google res.data.data:", res.data.data)
+
+        const {accessToken,refreshToken}=res.data.data
+         console.log('Hook: saving tokens...');
+        await saveTokens(accessToken,refreshToken)
+          console.log('Hook: tokens saved');
+
+        return res.data.data
+      }),
 
     refreshAuthToken: (token: string) =>
       run(() => refreshToken(token)),
@@ -62,15 +77,6 @@ export const useAuth=()=>{
       }),
 
     logoutEverywhere: () =>
-      run(() => logoutAllDevice()),
-
-    changePassword: (data: changePasswordProps) =>
-      run(() => passwordReset(data)),
-
-    sendForgotPasswordEmail: (email: string) =>
-      run(() => forgotPassword(email)),
-
-    resetUserPassword: (token: string, data: resetPasswordProps) =>
-      run(() => resetPassword(token, data))
+      run(() => logoutAllDevice())
   }
 }
