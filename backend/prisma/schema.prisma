@@ -19,6 +19,7 @@ model User {
   email        String        @unique
   avatar       String?
   googleId     String?       @unique
+  clerkId      String?       @unique 
 
   refreshTokens RefreshToken[]
   accounts     Account[]
@@ -112,10 +113,6 @@ model Budget {
   @@unique([userId, categoryId, month, year])
 }
 
-enum Role {
-  USER
-  ADMIN
-}
 
 enum AccountType {
   CASH
