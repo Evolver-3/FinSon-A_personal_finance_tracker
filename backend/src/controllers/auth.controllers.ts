@@ -2,193 +2,66 @@ import asyncHandler from "../utils/asyncHandler.js";
 import ApiError from "../utils/ApiError.js";
 import ApiResponse from "../utils/ApiResponse.js";
 import {prisma} from '../prisma.js'
-import { generateAccessAndRefreshTokens } from "../utils/generateToken.js";
-import jwt from 'jsonwebtoken'
-import env from '../constant/env.js'
-import {OAuth2Client} from 'google-auth-library'
+import {clerkClient} from '@clerk/clerk-sdk-node'
 
 
-const googleClient=new OAuth2Client(
-  process.env.GOOGLE_WEB_CLIENT_ID,
-  process.env.GOOGLE_WEB_CLIENT_SECRET
-)
+export const syncUserController=asyncHandler(async(req,res)=>{
 
-const googleTokenClient=new OAuth2Client(
-  process.env.GOOGLE_WEB_CLIENT_ID,
-)
+  console.log("sync controller hit:....")
+  console.log("req.user:", req.clerkUserId)
 
-export const googleLoginWithCode=asyncHandler(async(req,res)=>{
+  const clerkUserId=req.clerkUserId
 
-   
-    const {code, codeVerifier,redirectUri}=req.body
-
-    if(!code || !codeVerifier || !redirectUri){
-      throw new ApiError(400,"Code, codeVerifier and redirect Uri is required")
-    }
-
-    const {tokens}=await googleClient.getToken({
-      code,
-      codeVerifier,
-      redirect_uri:redirectUri
-    })
-
-    const idToken=tokens.id_token
-
-    if(!idToken){
-      throw new ApiError(400,"Google ID token is required.") 
-    }
- 
-    const ticket=await googleClient.verifyIdToken({
-      idToken, 
-      audience: process.env.GOOGLE_WEB_CLIENT_ID!
-    })
-
-    const googleUser=ticket.getPayload()
-
-    if(!googleUser?.email || !googleUser.sub){
-      throw new ApiError(401,"Invalid Google token.")
-    }
-
-    if (!googleUser.email_verified) {
-    throw new ApiError(403, "Please verify your Google email first.");
+  if(!clerkUserId){
+    throw new ApiError(401, "Unauthorized")
   }
 
-    let user=await prisma.user.findFirst({
-      where:{
-        OR:[
-          {googleId:googleUser.sub},
-          {email:googleUser.email}
-        ]
-      }
-    })
+  const clerkUser=await clerkClient.users.getUser(clerkUserId)
 
-    if(!user){
-      user=await prisma.user.create({
-        data:{
-          googleId:googleUser.sub,
-          name:googleUser.name || googleUser.given_name||"User", 
-          email:googleUser.email,
-          avatar:googleUser.picture || null,
+  console.log("clerkUser:",clerkUser)
 
-        }
-      })
-    }else if(!user.googleId){
-      user=await prisma.user.update({
-        where:{id:user.id},
-        data:{
-          googleId:googleUser.sub,
-          avatar:user.avatar || googleUser.picture || null
-        }
-      })
-    }
-
-    const {accessToken,refreshToken}= generateAccessAndRefreshTokens(user.id)
-
-  await prisma.refreshToken.create({
-    data:{
-      token:refreshToken,
-      userId:user.id,
-      expiresAt:new Date(Date.now()+7 * 24 * 60* 60* 1000)
+  const user=await prisma.user.upsert({
+    where:{
+      clerkId:clerkUserId
+    },
+    update:{
+      name:`${clerkUser.firstName} ${clerkUser.lastName}`,
+      email: clerkUser.emailAddresses[0]?.emailAddress! ,
+      avatar: clerkUser.imageUrl
+    },
+    create:{
+      clerkId: clerkUserId,
+      name: `${clerkUser.firstName} ${clerkUser.lastName}`,
+      email: clerkUser.emailAddresses[0]?.emailAddress!,
+      avatar: clerkUser.imageUrl,
+      // Set defaults for required fields
+      googleId: null,
     }
   })
 
+  console.log("User synced successfully:",user)
 
-  return res.status(200).json(
-    new ApiResponse(200,{
-    user:{
-      id:user.id,
-      name:user.name,
-      email:user.email,
-      avatar:user.avatar,
-    },
-    accessToken,
-    refreshToken
-  },"Login successfull !!")) 
-
+  return res.status(200).json(new ApiResponse(200, user,"User synced successfully"))
 })
 
-export const googleLogin=asyncHandler(async(req,res)=>{
 
-  const {idToken}=req.body
+export const userController=asyncHandler(async(req,res)=>{
 
-  
-    if(!idToken){
-      throw new ApiError(400,"Google ID token is required.") 
-    }
- 
-    const ticket=await googleTokenClient.verifyIdToken({
-      idToken, 
-      audience:  [
-    process.env.GOOGLE_WEB_CLIENT_ID!,
-    process.env.GOOGLE_ANDROID_CLIENT_ID!]
-    })
-
-    const googleUser=ticket.getPayload()
-
-    if(!googleUser?.email || !googleUser.sub){
-      throw new ApiError(401,"Invalid Google token.")
-    }
-
-    if (!googleUser.email_verified) {
-    throw new ApiError(403, "Please verify your Google email first.");
+  if(!req.user){
+    throw new ApiError(400, "user doesn't exist")
   }
 
-    let user=await prisma.user.findFirst({
-      where:{
-        OR:[
-          {googleId:googleUser.sub},
-          {email:googleUser.email}
-        ]
-      }
-    })
+  console.log("controller res:",req.user)
 
-    if(!user){
-      user=await prisma.user.create({
-        data:{
-          googleId:googleUser.sub,
-          name:googleUser.name || googleUser.given_name||"User", 
-          email:googleUser.email,
-          avatar:googleUser.picture || null,
-
-        }
-      })
-    }else if(!user.googleId){
-      user=await prisma.user.update({
-        where:{id:user.id},
-        data:{
-          googleId:googleUser.sub,
-          avatar:user.avatar || googleUser.picture || null
-        }
-      })
-    }
-
-    const {accessToken,refreshToken}= generateAccessAndRefreshTokens(user.id)
-
-  await prisma.refreshToken.create({
-    data:{
-      token:refreshToken,
-      userId:user.id,
-      expiresAt:new Date(Date.now()+7 * 24 * 60* 60* 1000)
-    }
-  })
-
-
-  return res.status(200).json(
-    new ApiResponse(200,{
-    user:{
-      id:user.id,
-      name:user.name,
-      email:user.email,
-      avatar:user.avatar,
-    },
-    accessToken,
-    refreshToken
-  },"Login successfull !!")) 
-
+  return res.status(201).json(new ApiResponse(
+    200,
+    {
+      user:req.user
+  },"Login successfully"
+    
+  ))
 })
 
-
-//user logged out controllers
 
 export const logoutUser=asyncHandler(async(req,res)=>{
   const {refreshToken}=req.body
@@ -224,87 +97,6 @@ export const AllLogout=asyncHandler(async(req,res)=>{
   })
 
   return res.status(200).json(new ApiResponse(200,null,"Logged out from all devices"))
-})
-
-//controller for refresh accesstoken with the help of refresh token 
-
-export const refreshAccessToken=asyncHandler(async(req,res)=>{
-
-  const {refreshToken:incomingRefreshToken}=req.body
-
-  if(!incomingRefreshToken){
-    throw new ApiError(400,"Refresh token is required")
-  }
-
-  try{
-    const decodedToken=jwt.verify(incomingRefreshToken,env.REFRESH_TOKEN_SECRET) as TokenPayload
-
-    if(!decodedToken){
-      throw new ApiError(401,"Invalid refresh Token")
-    }
-
-    const user=await prisma.user.findUnique({
-      where:{
-        id:decodedToken.id
-      },
-      select:{
-        id:true,
-        name:true,
-        email:true,
-        avatar:true
-      }
-    })
-
-    if(!user){
-      throw new ApiError(401,"Invalid refresh token")
-    }
-
-    const storedRefreshToken=await prisma.refreshToken.findUnique({
-      where:{
-        token:incomingRefreshToken
-      }
-    })
-
-    if(!storedRefreshToken || storedRefreshToken.userId !==user.id){
-      throw new ApiError(401,"Refresh token not found")
-    }
-
-    if(storedRefreshToken.expiresAt< new Date()){
-      await prisma.refreshToken.delete({
-        where:{
-          id:storedRefreshToken.id
-        }
-      })
-
-      throw new ApiError(401,"Refresh token expired")
-    }
-
-    const {accessToken,refreshToken}=generateAccessAndRefreshTokens(user.id)
-
-     await prisma.$transaction([
-      prisma.refreshToken.delete({ where: { id: storedRefreshToken.id } }),
-      prisma.refreshToken.create({
-        data: {
-          token: refreshToken,
-          userId: user.id,
-          expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
-        },
-      }),
-    ]);
-
-    return res.status(200).json(new ApiResponse(200,{
-      user,accessToken,refreshToken
-    },"Access token refreshed successfully "))
-
- 
-  }catch(error:any){
-
-    if(error instanceof ApiError){
-      throw error;
-    }
-    throw new ApiError(401,error.message)
-  }
-
 })
 
 
