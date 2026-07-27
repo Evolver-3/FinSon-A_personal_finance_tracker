@@ -1,37 +1,39 @@
-import asyncHandler from "../utils/asyncHandler.js";
-import  jwt from "jsonwebtoken";
+import asyncHandler from "../utils/asyncHandler.js"
 import ApiError from '../utils/ApiError.js'
-import env from '../constant/env.js'
 import { prisma } from "../prisma.js";
+import { verifyToken } from "@clerk/express";
+
 
 export const verifyJWT=asyncHandler(async(req,res,next)=>{
 
   try{
-    // const token=req.header("Authorization")?.replace("Bearer ","")
-
-     const token = req.headers.authorization?.replace('Bearer ','');
+    // console.log("getting through verifyJWT...")
+  
+     const token = req.headers.authorization?.replace('Bearer ', '');
 
     if(!token){
       throw new ApiError(401,"Invalid accessToken")
     }
 
-    let decodedToken:AccessTokenPayload
-    try{
-      
-      decodedToken=jwt.verify(token,env.ACCESS_TOKEN_SECRET) as AccessTokenPayload
+    //logs
+    // console.log("auth-middleware-log:...")
 
-    }catch(jwtError:any){
-      
-      if(jwtError.name==="TokenExpiredError"){
-        throw new ApiError(401,"Access Token expired")
-      }
-      throw new ApiError(401,"Invalid access token")
+    // console.log("token:",token)
 
-    }
+    
+    const payload=await verifyToken(token,{
+        secretKey:process.env.CLERK_SECRET_KEY,
+    })
+
+    // console.log("now check payload:",payload)
+
+    const clerkUserId=payload.sub;
+
+    // console.log("Does the clerkUserId is there:",clerkUserId)
 
     const user=await prisma.user.findUnique({
       where:{
-        id:decodedToken?.id
+        clerkId:clerkUserId
       },
       select:{
         id:true,
@@ -41,6 +43,8 @@ export const verifyJWT=asyncHandler(async(req,res,next)=>{
       }
     })
 
+    // console.log("User exist?????:", user)
+
     if(!user){
       throw new ApiError(401,"Invalid access token")
     }
@@ -49,7 +53,7 @@ export const verifyJWT=asyncHandler(async(req,res,next)=>{
 
     next()
   }catch(error:any){
-    console.log("backend auth error:", error.response?.data)
+    // console.log("backend auth error authMiddleware:", error.message)
     next(error)
 
   }
