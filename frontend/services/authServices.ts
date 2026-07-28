@@ -1,11 +1,30 @@
 import {api} from './api'
 
-export const googleLoginWithCode=(data:createLoginPageHookProps)=>{
-  return api.post("/auth/google/code",data)
+export const syncbackend=async(token:string)=>{
+  const res=await api.post("/auth/sync",{},
+   { 
+    headers:{
+    Authorization:`Bearer ${token}`
+  }})
+
+
+  console.log("syncBackend services:")
+  console.log("response:", res)
+
+  return res.data.data || res.data
 }
 
-export const googleLogin=(idToken:string)=>{
-  return api.post("/auth/google",{idToken})
+export const getMe=async(token:string)=>{
+  const res=await api.get("/auth/user",{
+    headers:{
+      Authorization:`Bearer ${token}`
+    }
+  })
+
+  console.log("getMe service:....")
+  console.log("response:", res)
+
+  return res.data.data || res.data
 }
 
 export const refreshToken=async(refreshToken:string)=>{
