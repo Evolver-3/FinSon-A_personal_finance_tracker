@@ -1,6 +1,6 @@
 import React, { createContext,useContext,useEffect,useState } from 'react'
-import { clearTokens, getAccessToken } from '@/services/tokenStorage'
-import { getProfile } from '@/services/userServices'
+
+import {useAuth,useUser} from '@clerk/clerk-expo'
 
 const AuthContext =createContext<AuthContextType | null> (null) 
 
@@ -8,56 +8,29 @@ export const AuthProvider=({children}:{children:React.ReactNode})=>{
 
   const [user,setUser]=useState<User|null>(null)
   const [loading,setLoading]=useState(true)
-  const [initialized,setInitialized]=useState(false)
 
+  const {isLoaded,isSignedIn}=useAuth()
+  const {user:clerkUser}=useUser()
 
-    const loadUser=async()=>{
-
-      if(initialized)return;
-
-      try{ 
-
-        console.log("loadUser: starting...")
-        setLoading(true)
-        const token=await getAccessToken()
-
-        console.log('loadUser: token?',token?'exists':"missing")
-
-        if(!token){
-
-          console.log('loadUser: no token, setting user null')
-          setUser(null)
-          return
-        }
-
-        console.log('loadUser: calling getProfile...')
-
-        const res=await getProfile()
-
-        console.log("loadUser: getProfile returned:", JSON.stringify(res, null, 2));
-    
-        console.log("loadUser: res.data?", res.data);
-
-
-        setUser(res.data || res)
-
-
-      }catch(error:any){
-       if(error?.response?.status=== 401){
-        setUser(null)
-        await clearTokens()
-       }
-      }finally{
-        setLoading(false)
-        setInitialized(true)
-      }
-    }
   useEffect(()=>{
-      loadUser()
-  },[])
+    if(!isLoaded)return ;
+
+    if(isSignedIn && clerkUser){
+      setUser({
+        id:clerkUser.id,
+        name:`${clerkUser.firstName} ${clerkUser.lastName}`,
+        email:clerkUser.emailAddresses[0]?.emailAddress,
+        avatar:clerkUser.imageUrl
+      })
+    }else{
+      setUser(null)
+    }
+
+    setLoading(false)
+  },[isLoaded,isSignedIn,clerkUser])
 
   return(
-    <AuthContext.Provider value={{user,loading,setUser,loadUser,initialized}}>
+    <AuthContext.Provider value={{user,loading,setUser}}>
       {children}
     </AuthContext.Provider>
   )
