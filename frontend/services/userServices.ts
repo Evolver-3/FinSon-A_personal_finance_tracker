@@ -1,13 +1,6 @@
 import {api} from './api'
 
 
-export const getProfile=async()=>{
-  const res=await api.get("/user/profile")
-  console.log("getProfile",res.data)
-  return res.data
-
-}
-
 export const profileUpdate=async(data:{name:string})=>{
   const res=await api.patch("/user/profile-update",data)
  

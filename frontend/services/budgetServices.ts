@@ -13,6 +13,7 @@ export const updateBudget=async(budgetId:string,data:updateBudgetProps)=>{
 
 export const deleteBudget=async(budgetId:string)=>{
   const res=await api.delete(`/budget/${budgetId}`)
+  console.log("service data",res.data)
   return res.data
 } 
 
