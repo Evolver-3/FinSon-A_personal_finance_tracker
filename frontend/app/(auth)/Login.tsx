@@ -1,144 +1,64 @@
-import { View, Text, ActivityIndicator, Pressable,Alert, Platform } from 'react-native'
-import {useEffect,useState} from 'react'
+import { useAuth, useSSO} from '@clerk/clerk-expo'
+import * as WebBrowser from 'expo-web-browser'
 import { useRouter } from 'expo-router'
-import * as WebBrowser from "expo-web-browser"
-import * as Google from "expo-auth-session/providers/google"
-import { makeRedirectUri } from 'expo-auth-session';
-import { useAuth } from '@/hooks/useAuth'
-import { useAuthContext } from '@/context/AuthContext'
-import { getAccessToken } from '@/services/tokenStorage'
+import {View, Text, Pressable, ActivityIndicator, Platform} from 'react-native'
+import{ useState } from 'react'
+import { useAuthHook } from '@/hooks/useAuthHook'
+import * as Linking from 'expo-linking'
+import { setAuthToken } from '@/services/setAuthToken'
 
 WebBrowser.maybeCompleteAuthSession()
 
-const login = () => {
-
+const Login = () => {
   const router=useRouter()
   const [loading,setLoading]=useState(false)
-  const {loginCodeHook,loginTokenHook}=useAuth()
-  const {loadUser,setUser}=useAuthContext()
+  const {getToken}=useAuth()
+  const {startSSOFlow}=useSSO()
+  const {syncBackendHook}=useAuthHook()
 
-  const isWeb = Platform.OS === 'web';
+  
+  const redirectUrl=Linking.createURL("sso-callback")
 
- const REDIRECT_URI = isWeb 
-    ? 'http://localhost:8081' 
-    : 'https://auth.expo.io/@evo-ash/FinSon';
-
-
-  const [webRequest, webResponse, webPromptAsync] = Google.useIdTokenAuthRequest({
-  androidClientId: process.env.EXPO_PUBLIC_GOOGLE_ANDROID_CLIENT_ID,
-  webClientId: process.env.EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID,
-  redirectUri:REDIRECT_URI,
-  scopes: ['openid', 'profile', 'email']
-});
-
-const [nativeRequest, nativeResponse, nativePromptAsync] = Google.useAuthRequest({
-  androidClientId: process.env.EXPO_PUBLIC_GOOGLE_ANDROID_CLIENT_ID,
-  clientId: process.env.EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID,
-  redirectUri:REDIRECT_URI,
-  scopes: ['openid', 'profile', 'email'],
-  usePKCE: true,
-});
-
-  const request=isWeb?webRequest:nativeRequest
-  const response=isWeb?webResponse:nativeResponse
-  const promptAsync=isWeb?webPromptAsync:nativePromptAsync
-
-
-  useEffect(()=>{
-
-
-    if (response?.type==="success"){
-      if(isWeb){
-
-        const {id_token}=response.params
-
-        console.log("web tokenId:", id_token)
-        if(id_token){
-          loginWithGoogle(id_token)
-        }else{
-          console.log('Full response:',JSON.stringify(response,null,2))
-          Alert.alert('Error',"Could not get ID token from google")
-        }
-      }else{
-        const {code}=response.params
-      console.log("Native code:", code)
-
-      if(code){
-         loginWithGoogleCode(code,request?.codeVerifier)
-      }
-      }
-    
-    }
-
-    if(response?.type==="error"){
-      Alert.alert("Google login failed",response.error?.message || "Please try again.")
-    }
-
-  },[response])
-
-
-  useEffect(() => { 
-  if (request) {
-    console.log('Platform:', Platform.OS)
-    console.log('useProxy:',!isWeb)
-    console.log("actual redirect URI:", request.redirectUri)
-  }
-}, [request])
-
-const loginWithGoogle=async(idToken:string)=>{
-  try{
-    setLoading(true)
-
-    const res=await loginTokenHook(idToken)
-    console.log("success on web:", res)
-    console.log("success on web user:",res.user)
-
-    if(res.user){
-      setUser(res.user)
-    }
-    router.replace("/(tabs)/home")
-  }catch(err:any){
-    Alert.alert("login failed with web:",err.message)
-  }finally{
-    setLoading(false)
-  }
-}
-
-const loginWithGoogleCode=async(code:string,codeVerifier?:string)=>{
+  const handleLogin=async()=>{
     try{
       setLoading(true)
-      console.log("sending idToken to backend:", code)
-
-      const res=await loginCodeHook({
-        code,
-        codeVerifier:codeVerifier || "",
-        redirectUri:REDIRECT_URI
+      const {createdSessionId, setActive}=await startSSOFlow({
+        strategy:'oauth_google',
+        redirectUrl
       })
+      console.log("Clerk redirectUrl:", redirectUrl)
 
+      if(createdSessionId && setActive){
+        await setActive({session:createdSessionId})
+      }
 
-      // await loadUser()
+      const token=await getToken()
 
-    console.log("success on android:", res)
-    console.log("success on android user:",res.user)
+      if(!token){
+        return null
+      }
 
+      await setAuthToken(token)
 
-    if(res.user){
-      setUser(res.user)
-    }
+      await syncUserToBackend(token)
 
       router.replace("/(tabs)/home")
     }catch(err:any){
-      console.log("status:",err?.response?.status)
-      console.log("data:",err?.response?.data)
-      
+      console.log('SSo Error:', err.message)
 
-      Alert.alert("Login failed",err.message || "Something went wront. Please try again.")
     }finally{
       setLoading(false)
     }
   }
 
-    return (
+  const syncUserToBackend = async (token: string) => {
+    const user = await syncBackendHook(token)
+
+    console.log('User synced to Prisma:',user);
+    
+  };
+
+  return (
     <View
       style={{
         flex: 1,
@@ -169,8 +89,8 @@ const loginWithGoogleCode=async(code:string,codeVerifier?:string)=>{
       </Text>
 
       <Pressable
-        disabled={!request || loading}
-        onPress={() => promptAsync({showInRecents:false})}
+        disabled={ loading}
+        onPress={handleLogin}
         style={{
           height: 54,
           borderRadius: 10,
@@ -179,7 +99,7 @@ const loginWithGoogleCode=async(code:string,codeVerifier?:string)=>{
           backgroundColor: "#FFFFFF",
           justifyContent: "center",
           alignItems: "center",
-          opacity: !request || loading ? 0.6 : 1,
+          opacity:  loading ? 0.6 : 1,
         }}
       >
         {loading ? (
@@ -197,7 +117,7 @@ const loginWithGoogleCode=async(code:string,codeVerifier?:string)=>{
         )}
       </Pressable>
     </View>
-  );
+  )
 }
 
-export default login
+export default Login
