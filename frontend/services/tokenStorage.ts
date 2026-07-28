@@ -1,40 +1,18 @@
-import { Platform } from "react-native"
-import * as SecureStore from "expo-secure-store"
+import * as SecureStore from 'expo-secure-store';
 
-export const getAccessToken = async () => {
-  if (Platform.OS === "web") {
-    return localStorage.getItem("accessToken")
-  }
-
-  return SecureStore.getItemAsync("accessToken")
-}
-
-export const getRefreshToken = async () => {
-  if (Platform.OS === "web") {
-    return localStorage.getItem("refreshToken")
-  }
-
-  return SecureStore.getItemAsync("refreshToken")
-}
-
-export const saveTokens = async (accessToken: string, refreshToken: string) => {
-  if (Platform.OS === "web") {
-    localStorage.setItem("accessToken", accessToken)
-    localStorage.setItem("refreshToken", refreshToken)
-    return
-  }
-
-  await SecureStore.setItemAsync("accessToken", accessToken)
-  await SecureStore.setItemAsync("refreshToken", refreshToken)
-}
-
-export const clearTokens = async () => {
-  if (Platform.OS === "web") {
-    localStorage.removeItem("accessToken")
-    localStorage.removeItem("refreshToken")
-    return
-  }
-
-  await SecureStore.deleteItemAsync("accessToken")
-  await SecureStore.deleteItemAsync("refreshToken")
-}
+export const tokenStorage = {
+  async getToken(key: string): Promise<string | null> {
+    try {
+      return await SecureStore.getItemAsync(key);
+    } catch {
+      return null;
+    }
+  },
+  async saveToken(key: string, value: string): Promise<void> {
+    try {
+      return await SecureStore.setItemAsync(key, value);
+    } catch {
+      return;
+    }
+  },
+};
