@@ -10,7 +10,5 @@ export const useAppFonts=()=>{
     "Sans-Semibold":require("../assets/fonts/PlusJakartaSans-SemiBold.ttf")
   })
 
-  if(!fontsLoaded) return null;
-  
   return fontsLoaded
 }
