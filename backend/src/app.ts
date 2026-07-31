@@ -42,6 +42,12 @@ import budgetRouter from './routes/budget.routes.js'
 
 app.use("/api/v1/budget",budgetRouter)
 
+//ai routes
+
+import aiRouter from './routes/ai.routes.js'
+
+app.use("/api/v1/ai",aiRouter)
+
 app.use((err:any,req:any,res:any,next:any)=>{
   const statusCode=err.statusCode || 500
   const message=err.message || "Internal server error"
