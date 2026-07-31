@@ -26,6 +26,7 @@ model User {
   transactions Transaction[]
   categories   Category[]
   budgets      Budget[]
+  AiInsights    AiInsight[]
 
   createdAt    DateTime      @default(now())
   updatedAt    DateTime      @updatedAt
@@ -111,6 +112,17 @@ model Budget {
   updatedAt    DateTime      @updatedAt
 
   @@unique([userId, categoryId, month, year])
+}
+
+model AiInsight {
+  id        String    @id @default(uuid())
+  userId    String
+  user      User      @relation(fields:[userId], references: [id], onDelete: Cascade)
+  content   String
+  period    String    @default("month")
+  createdAt DateTime  @default(now())
+
+  @@index([userId,period, createdAt])
 }
 
 
