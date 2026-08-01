@@ -120,6 +120,10 @@ model AiInsight {
   user      User      @relation(fields:[userId], references: [id], onDelete: Cascade)
   content   String
   period    String    @default("month")
+
+  summary   Json?
+  dateRange Json?
+  
   createdAt DateTime  @default(now())
 
   @@index([userId,period, createdAt])
