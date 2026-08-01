@@ -1,4 +1,4 @@
-import { Home, BadgePlus, UserRound, Banknote, ChartNoAxesCombinedIcon, Utensils ,Fuel, Hamburger, GlobeCheck, CarTaxiFrontIcon, Landmark, BanknoteIcon, Wallet, CreditCard, Toolbox, Clapperboard, Hospital} from 'lucide-react-native'
+import { Home, BadgePlus, UserRound, Banknote, ChartNoAxesCombinedIcon, Utensils ,Fuel, Hamburger, GlobeCheck, CarTaxiFrontIcon, Landmark, BanknoteIcon, Wallet, CreditCard, Toolbox, Clapperboard, Hospital, GitGraphIcon} from 'lucide-react-native'
 import React from 'react'
 
 type bottomTabDataProps={
@@ -48,10 +48,10 @@ export const bottomTabData:bottomTabDataProps[] = [
   },
   {
     id: 4,
-    name: "Transactions",
-    text: "Transactions",
+    name: "ai",
+    text: "Review",
     icon: (focused,size,color) => (
-      <Banknote
+      <GitGraphIcon
         size={size ?? 20}
         color={color ??(focused ? "#0a0a0a" : "#a3a3a3")}
         strokeWidth={focused ? 1.6 : 1}
@@ -376,4 +376,12 @@ export const countryCurrencyData = [
     currencyCode: "NPR",
     symbol: "रू",
   },
+];
+
+export const PERIODS: { key: Period; label: string }[] = [
+  { key: 'day', label: 'Today' },
+  { key: 'week', label: 'Week' },
+  { key: 'month', label: 'Month' },
+  { key: 'quarter', label: 'Quarter' },
+  { key: 'year', label: 'Year' },
 ];
