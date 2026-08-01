@@ -1,13 +1,10 @@
 import { View, Text } from 'react-native'
 import  { useCallback, useState } from 'react'
 import Wrapper from '@/components/WrapperPage'
-import CreateTransaction from '@/components/transactionPage/CreateTransaction'
 import { useFocusEffect, useRouter } from 'expo-router'
 import { useTransaction } from '@/hooks/useTransaction'
-import TransactionComp from '@/components/transactionPage/TransactionComp'
 import { useAccount } from '@/hooks/useAccount'
 import { useCategory } from '@/hooks/useCategory'
-import { useTheme } from '@/hooks/useTheme'
 import React from 'react'
 import TransactionForm from '@/components/transactionPage/TransactionForm'
 
@@ -62,7 +59,7 @@ const {creatingNewTransaction,fetchAllTransactions}=useTransaction()
         })
 
         router.navigate({
-          pathname:"/(tabs)/Transactions"
+          pathname:"/(usertab)/Transactions"
         })
 
         }catch(err:any){
