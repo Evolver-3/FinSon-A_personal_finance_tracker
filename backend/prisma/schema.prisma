@@ -122,7 +122,8 @@ model AiInsight {
   period    String    @default("month")
 
   summary   Json?
-  dateRange Json?
+  dateStart String?
+  dateEnd   String?
   
   createdAt DateTime  @default(now())
 
