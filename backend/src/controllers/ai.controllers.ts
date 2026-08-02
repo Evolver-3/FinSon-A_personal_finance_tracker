@@ -23,23 +23,25 @@ export const financeInsightsControllers=asyncHandler(async(req,res)=>{
   const period=(req.query.period as Period) || 'month'
 
   const {start,end}=getRange(period)
+
   const periodLabel=getPeriodLabel(period)
+
+
 
   const insightExist=await prisma.aiInsight.findFirst({
     where:{
       userId,
-      period:periodLabel,
-      dateRange:{
-        end:end,
-        start:start
-      }
+      period:period,
+      dateStart:start.toDateString(),
+      dateEnd:end.toDateString()
+      
     }
   })
 
   console.log("backend insight does exist ??...", insightExist)
 
   if(insightExist){
-    throw new ApiError(301,"insight already exist for that particular time period!!")
+    throw new ApiError(409,"insight already exist for that particular time period!!")
   }
 
   const transactions=await prisma.transaction.findMany({
@@ -166,9 +168,8 @@ await prisma.aiInsight.create({
       transactionsCount,
       topCategory:topCategory?{name:topCategory[0], amount:topCategory[1]}:null
     },
-    dateRange:{
-      start,end
-    }
+    dateStart:start.toDateString(),
+    dateEnd:end.toDateString()
   }
 })
 
@@ -203,16 +204,13 @@ export const getInsights=asyncHandler(async(req,res)=>{
   const period=(req.query.period as Period) || 'month'
 
   const {start,end}=getRange(period)
-  const periodLabel=getPeriodLabel(period)
 
   const insightExist=await prisma.aiInsight.findFirst({
     where:{
       userId,
-      period:periodLabel,
-      dateRange:{
-        end:end,
-        start:start
-      }
+      period:period,
+      dateStart:start.toDateString(),
+      dateEnd:end.toDateString()
     }})
 
   if(!insightExist){
