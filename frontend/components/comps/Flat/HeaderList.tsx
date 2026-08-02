@@ -5,12 +5,7 @@ import { Plus} from 'lucide-react-native'
 import ThemeIcon from '@/components/Theme/ThemeIcon'
 import SearchBar from '@/components/Search/SearchBar'
 
-type HeaderListProps={
-  headingText:string 
-  onPress:()=>void
-  inlineText:string
-  setQuery:React.Dispatch<React.SetStateAction<string>>
-}
+
 const HeaderList = ({headingText,onPress,inlineText,setQuery}:HeaderListProps) => {
 
   return (
@@ -22,14 +17,14 @@ const HeaderList = ({headingText,onPress,inlineText,setQuery}:HeaderListProps) =
           <SearchBar
           onSearch={setQuery}
           inlineText={inlineText}/>
-            <Pressable
-            className='rounded-lg p-2 bg-white dark:bg-neutral-600 border border-slate-200 dark:border-neutral-400'
+          <Pressable
+            className='addBtn borderOne'
             onPress={onPress}>
               <ThemeIcon
               icon={Plus}
-              size={20}/>
+              size={30}/>
             </Pressable>
-          </View>
+        </View>
       </View>
   )
 }
