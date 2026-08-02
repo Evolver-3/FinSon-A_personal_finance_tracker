@@ -6,7 +6,7 @@ import ThemeIcon from '@/components/Theme/ThemeIcon'
 import SearchBar from '@/components/Search/SearchBar'
 
 
-const HeaderList = ({headingText,onPress,inlineText,setQuery}:HeaderListProps) => {
+const HeaderList = ({headingText,onPress,inlineText,setQuery,pressableNeeded}:HeaderListProps) => {
 
   return (
     <View className=' px-4 gap-y-4 pt-4'>
@@ -17,13 +17,13 @@ const HeaderList = ({headingText,onPress,inlineText,setQuery}:HeaderListProps) =
           <SearchBar
           onSearch={setQuery}
           inlineText={inlineText}/>
-          <Pressable
+         {pressableNeeded && <Pressable
             className='addBtn borderOne'
             onPress={onPress}>
               <ThemeIcon
               icon={Plus}
               size={30}/>
-            </Pressable>
+            </Pressable>}
         </View>
       </View>
   )
