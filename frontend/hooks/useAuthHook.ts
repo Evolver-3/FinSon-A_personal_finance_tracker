@@ -36,18 +36,13 @@ export const useAuthHook=()=>{
 
     syncBackendHook:(token:string)=>run(async()=>{
       const res=await syncbackend(token)
+      console.log("token in hook:",token)
       return res
     }),
 
     refreshAuthToken: (token: string) =>
       run(() => refreshToken(token)),
 
-    // logoutUser: (token: string) =>
-    //   run(async()=>{
-    //     const res=await logout(token)
-    //     await clearTokens()
-    //     return res
-    //   }),
 
     logoutEverywhere: () =>
       run(() => logoutAllDevice())
