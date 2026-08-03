@@ -158,7 +158,7 @@ export const getTransactionById=asyncHandler(async(req,res)=>{
     select:{
       id:true,
       title:true,
-      amout:true,
+      amount:true,
       type:true,
       note:true,
       date:true,
@@ -191,6 +191,57 @@ export const getTransactionById=asyncHandler(async(req,res)=>{
 
   return res.status(200).json(new ApiResponse(200,transaction,"Transactions by id"))
   
+})
+
+
+//get by month and year 
+
+export const getTransactionByMonthYear=asyncHandler(async(req,res)=>{
+  
+  console.log("running is it?")
+  const userId=req.user?.id
+
+  if(!userId){
+    throw new ApiError(401,"authorization error")
+  }
+
+  const year=Number(req.query.year) || new Date().getFullYear()
+
+  const month=req.query.month?Number(req.query.month) : (new Date().getMonth()+1)
+
+  if(month<1 || month>12){
+    throw new ApiError(400, "Month must be between 1 and 12")
+  }
+
+  const start=new Date(year, month-1,1,0,0,0,0)
+  const end=new Date(year,month,1,0,0,0,0)
+
+
+  const transactions=await prisma.transaction.findMany({
+    where:{
+      userId,
+      date:{
+        gte:start,
+        lt:end
+      }
+    },
+    include:{
+      category:true,
+      account:true
+    },
+    orderBy:{
+      date:"desc"
+    }
+  })
+
+  console.log("is it working:",transactions)
+
+    if(!transactions){
+    throw new ApiError(401,"transactions doesn't exist in the given period")
+  }
+
+  return res.status(200).json(new ApiResponse(200,transactions,"transaction according to time period"))
+
 })
 
 //update a single transaction by id
