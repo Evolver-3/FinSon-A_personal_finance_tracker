@@ -4,6 +4,7 @@ import ApiError from "../utils/ApiError.js";
 import ApiResponse from "../utils/ApiResponse.js";
 
 
+
 //create transaction controller
 export const createTransaction=asyncHandler(async(req,res)=>{
   const userId=req.user?.id 
@@ -84,57 +85,6 @@ export const createTransaction=asyncHandler(async(req,res)=>{
 })
 
 
-//getting all transaction controller
-export const getAllTransaction=asyncHandler(async(req,res)=>{
-
-  const userId=req.user?.id
-
-  if(!userId){
-     throw new ApiError(401,"authorization error")
-  }
-
-  const transaction=await prisma.transaction.findMany({
-    where:{
-      userId
-    },
-    select:{
-      id:true,
-      title:true,
-      amount:true,
-      type:true,
-      note:true,
-      date:true,
-      account:{
-        select:{
-          id:true,
-        name:true,
-        type:true,
-        icon:true,
-        color:true
-        }
-      },
-      category:{
-        select:{
-          id:true,
-          name:true,
-          color:true,
-          icon:true,
-          type:true
-        }
-      },
-      createdAt:true,
-      updatedAt:true
-    },
-    orderBy:{
-      date:"desc"
-    }
-  })
-
-  return res.status(200).json(new ApiResponse(200,transaction,"All transactions"))
-  
-})
-
-
 //get a single transaction with its transactio id
 export const getTransactionById=asyncHandler(async(req,res)=>{
 
@@ -194,35 +144,33 @@ export const getTransactionById=asyncHandler(async(req,res)=>{
 })
 
 
-//get by month and year 
+//get by year
 
-export const getTransactionByMonthYear=asyncHandler(async(req,res)=>{
-  
-  console.log("running is it?")
+export const getTransactionByYear=asyncHandler(async(req,res)=>{
+
   const userId=req.user?.id
 
   if(!userId){
-    throw new ApiError(401,"authorization error")
+    throw new ApiError(400,"Authorization error")
   }
 
-  const year=Number(req.query.year) || new Date().getFullYear()
+  const year=Number(req.query.year)|| new Date().getFullYear()
 
-  const month=req.query.month?Number(req.query.month) : (new Date().getMonth()+1)
+  const now=new Date()
 
-  if(month<1 || month>12){
-    throw new ApiError(400, "Month must be between 1 and 12")
-  }
+  const isCurrentYear=year===now.getFullYear()
 
-  const start=new Date(year, month-1,1,0,0,0,0)
-  const end=new Date(year,month,1,0,0,0,0)
+  const lastMonth=isCurrentYear?now.getMonth()+1:12
 
+  const start=new Date(year,0,1,0,0,0,0)
+  const end=new Date(year,lastMonth,1,0,0,0,0)
 
-  const transactions=await prisma.transaction.findMany({
+  const transactionsdetails=await prisma.transaction.findMany({
     where:{
       userId,
       date:{
         gte:start,
-        lt:end
+        lt:end,
       }
     },
     include:{
@@ -230,22 +178,59 @@ export const getTransactionByMonthYear=asyncHandler(async(req,res)=>{
       account:true
     },
     orderBy:{
-      date:"desc"
+      date:"asc"
     }
   })
 
-  console.log("is it working:",transactions)
+  const monthly=Array.from({length:lastMonth},(_,index)=>({
+    month:index+1,
+    label:new Date(year, index,1).toLocaleString("en-US",{
+      month:'short'
+    }),
+    income:0,
+    expense:0,
+    savings:0,
+    count:0,
+    transactions:[] as (typeof transactionsdetails)[number][]
+  }))
 
-    if(!transactions){
-    throw new ApiError(401,"transactions doesn't exist in the given period")
-  }
+  transactionsdetails.forEach((t)=>{
+    const monthIndex=t.date.getMonth()
+    const amount=Number(t.amount)
 
-  return res.status(200).json(new ApiResponse(200,transactions,"transaction according to time period"))
+    if(!monthly[monthIndex]) return;
 
+    monthly[monthIndex].transactions.push(t)
+
+    if(t.type==="INCOME"){
+      monthly[monthIndex].income+=amount
+    }
+
+    if(t.type==="EXPENSE"){
+      monthly[monthIndex].expense+=amount
+    }
+
+    monthly[monthIndex].count+=1
+
+  })
+
+  const result=monthly.map((m)=>({
+    ...m,savings:m.income-m.expense
+  }))
+
+  console.log(result)
+
+  return res.status(200).json(
+    new ApiResponse(200,{
+      year,
+      months:result,
+      transactionsdetails
+    },"Transactions fetched")
+  )
 })
 
 //update a single transaction by id
-export const updateById=asyncHandler(async(req,res)=>{
+  export const updateById=asyncHandler(async(req,res)=>{
 
   const userId=req.user?.id
 
@@ -358,7 +343,7 @@ export const updateById=asyncHandler(async(req,res)=>{
 
   return res.status(200).json(new ApiResponse(200, transaction ,"Transaction updated successfully"))
 
-})
+  })
 
 
 //delete by Id
