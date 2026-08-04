@@ -1,5 +1,5 @@
 import { createContext,ReactNode } from "react";
-import { createTransaction, getAllTransaction, getTransaction, updateTransaction, deleteTransaction, getTransactionByMonth } from "@/services/transactionServices";
+import { createTransaction, getTransaction, updateTransaction, deleteTransaction, getTransactionByYear } from "@/services/transactionServices";
 import {useState,useEffect} from 'react'
 
 export const TransactionContext=createContext<TransactionContextType| null>(null)
@@ -9,6 +9,14 @@ export const TransactionProvider=({children}:{children:ReactNode})=>{
   
     const [transactions,setTransactions]=useState<Transaction[]>([])
     const [transactionsMonthly,setTransactionsMonthly]=useState<Transaction[]>([])
+
+    const [transactionsYearly,setTransactionsYearly]=useState<TransactionsYearlyProps>(
+      {
+        transactionsdetails:[],
+        months:[],
+        year:new Date().getFullYear().toString()
+      })
+
   
     const [singleTransaction,setSingleTransaction]=useState<Transaction |null>(null)
   
@@ -45,26 +53,7 @@ export const TransactionProvider=({children}:{children:ReactNode})=>{
         setLoading(false)
       }
     }
-  
-    const fetchAllTransactions=async()=>{
-      try{
-        setLoading(true)
-        setError(null)
-        const res=await getAllTransaction()
-  
-        setTransactions(res.data)
-  
-        return res.data
-  
-  
-      }catch(error:any){
-        handleError(error)
-        return null
-  
-      }finally{
-        setLoading(false)
-      }
-    }
+
   
     const fetchTransaction=async(id:string)=>{
       try{
@@ -83,19 +72,20 @@ export const TransactionProvider=({children}:{children:ReactNode})=>{
       }
     }
 
-    const getTransactionByPeriod=async(year:number,month:number)=>{
+    const getByYear=async(year:number)=>{
       try{
         setLoading(true)
         setError(null)
+        const res=await getTransactionByYear(year)
 
-        console.log("In the hook:")
-        const res=await getTransactionByMonth(year,month)
+        console.log("real hook:",res.data)
 
-        console.log("hooks:",res)
-        const transactions=Array.isArray(res.data)? res.data:[]
-        setTransactionsMonthly(transactions || [])
-        console.log("Hook consoled:",transactions)
-        return transactions
+        const transactionsdetail=(res.data)?res.data:[]
+
+        setTransactionsYearly(transactionsdetail || [])
+        console.log("hooks consoled:",transactionsdetail)
+
+        return transactionsdetail
 
       }catch(error:any){
         handleError(error)
@@ -103,11 +93,9 @@ export const TransactionProvider=({children}:{children:ReactNode})=>{
       }finally{
         setLoading(false)
       }
-      
-      
     }
   
-      const editTransaction=async(id:string,data:updateTransactionProps)=>{
+    const editTransaction=async(id:string,data:updateTransactionProps)=>{
       try{
         setLoading(true)
         setError(null)
@@ -131,7 +119,7 @@ export const TransactionProvider=({children}:{children:ReactNode})=>{
       }
     }
   
-      const removeTransaction=async(id:string)=>{
+    const removeTransaction=async(id:string)=>{
       try{
         setLoading(true)
         setError(null)
@@ -153,7 +141,8 @@ export const TransactionProvider=({children}:{children:ReactNode})=>{
   let year=Number(new Date().getFullYear)
   let month=Number(new Date().getMonth())
     useEffect(()=>{
-      getTransactionByPeriod(year,month)
+      // getTransactionByPeriod(year,month)
+      getByYear(year)
     },[])
 
 
@@ -165,11 +154,11 @@ export const TransactionProvider=({children}:{children:ReactNode})=>{
     error,
     loading,
     creatingNewTransaction,
-    fetchAllTransactions,
     fetchTransaction,
-    getTransactionByPeriod,
+    getByYear,
     editTransaction,
-    removeTransaction}}>
+    removeTransaction,
+    transactionsYearly}}>
         {children}
       </TransactionContext.Provider>
     )
