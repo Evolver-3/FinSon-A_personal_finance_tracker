@@ -5,21 +5,17 @@ export const createTransaction=async(data: createTransactionProps)=>{
   return res.data
 }
 
-export const getAllTransaction=async()=>{
-  const res=await api.get("/transaction")
-  return res.data
-}
 
 export const getTransaction=async(transactionId:string)=>{
   const res=await api.get(`/transaction/${transactionId}`)
   return res.data
 }
 
-export const getTransactionByMonth=async(year:number, month:number)=>{
-  // console.log("does it reaches service:")
-  const res=await api.get(`/transaction/period?year=${year}&month=${month}`)
+export const getTransactionByYear=async(year:number)=>{
 
-  // console.log("data from service:", res.data)
+  const res=await api.get(`/transaction/queryYear?year=${year}`)
+
+  console.log("service:",res.data)
 
   return res.data
 }
