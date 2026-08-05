@@ -8,11 +8,9 @@ export const TransactionProvider=({children}:{children:ReactNode})=>{
 
   
     const [transactions,setTransactions]=useState<Transaction[]>([])
-    const [transactionsMonthly,setTransactionsMonthly]=useState<Transaction[]>([])
-
+    
     const [transactionsYearly,setTransactionsYearly]=useState<TransactionsYearlyProps>(
       {
-        transactionsdetails:[],
         months:[],
         year:new Date().getFullYear().toString()
       })
@@ -78,12 +76,12 @@ export const TransactionProvider=({children}:{children:ReactNode})=>{
         setError(null)
         const res=await getTransactionByYear(year)
 
-        console.log("real hook:",res.data)
+        // console.log("real hook:",res.data)
 
         const transactionsdetail=(res.data)?res.data:[]
 
         setTransactionsYearly(transactionsdetail || [])
-        console.log("hooks consoled:",transactionsdetail)
+        // console.log("hooks consoled:",transactionsdetail)
 
         return transactionsdetail
 
@@ -150,7 +148,6 @@ export const TransactionProvider=({children}:{children:ReactNode})=>{
       <TransactionContext.Provider 
       value={{transactions,
     singleTransaction,
-    transactionsMonthly,
     error,
     loading,
     creatingNewTransaction,
