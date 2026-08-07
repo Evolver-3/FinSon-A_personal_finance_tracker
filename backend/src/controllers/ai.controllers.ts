@@ -222,3 +222,52 @@ export const getInsights=asyncHandler(async(req,res)=>{
   ))
 
 })
+
+
+export const getInsightSchedule=asyncHandler(async(req,res)=>{
+
+  const userId=req.user?.id
+
+  if(!userId){
+    throw new ApiError(401,"Authorization error")
+  }
+  
+  const {weekly=false,monthly=true,enabled=true,dayOfWeek,dayOfMonth, time="09:00"}=req.body
+
+
+  if(dayOfWeek !==undefined && (dayOfWeek<0 || dayOfWeek>6)){
+    throw new ApiError(400,'dayOfWeek must be between 0 and 6')
+  }
+
+  if(dayOfMonth !==undefined && (dayOfMonth<1 || dayOfMonth>31)){
+    throw new ApiError(400,'dayOfMonth must be between 1 and 28')
+  }
+
+  const scheduling=await prisma.aiInsightSchedule.upsert({
+    where:{
+      userId
+    },
+    update:{
+      weekly,
+      monthly,
+      enabled,
+      dayOfWeek,
+      dayOfMonth,
+      time
+    },
+    create:{
+      userId,
+      weekly,
+      monthly,
+      enabled,
+      dayOfWeek,
+      dayOfMonth,
+      time
+    }
+  })
+
+  console.log("Backend working if this is logged ....:", scheduling)
+
+  return res.status(200).json(new ApiResponse(200,scheduling,"Scheduling updated successfully"))
+
+})
