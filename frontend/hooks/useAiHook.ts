@@ -1,4 +1,4 @@
-import { generateInsights, getInsights } from "@/services/aiServices"
+import { generateInsights, getInsights, getInsightSchedule } from "@/services/aiServices"
 import { useState } from "react"
 
 export const useAiHook=()=>{
@@ -53,8 +53,29 @@ export const useAiHook=()=>{
       setLoading(false)
     }
   }
+
+  const insightSchedule=async(data:InsightScheduleProps)=>{
+    try{
+      setLoading(true)
+      setError(null)
+
+      const res=await getInsightSchedule({data})
+
+      console.log("hooks schedule res:", res.data)
+
+    }catch(error:any){
+      handleError(error)
+      throw null
+
+    }finally{
+      setLoading(false)
+
+    }   
+  }
+
+
   return {
     error,loading,creatingInsights,
-    foundInsights
+    foundInsights,insightSchedule
   }
 }

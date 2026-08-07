@@ -14,3 +14,10 @@ export const getInsights=async(period:string)=>{
   console.log("insight founded, call from service:", res.data)
   return res.data
 }
+
+export const getInsightSchedule=async({data}:{data:InsightScheduleProps})=>{
+  const res=await api.post('/ai/insightSchedule',data)
+
+  console.log("Is service is working?:", res.data)
+  return res.data
+}
