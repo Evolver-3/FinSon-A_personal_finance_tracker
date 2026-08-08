@@ -14,122 +14,140 @@ datasource db {
 }
 
 model User {
-  id           String        @id @default(uuid())
-  name         String
-  email        String        @unique
-  avatar       String?
-  googleId     String?       @unique
-  clerkId      String?       @unique 
+  id       String  @id @default(uuid())
+  name     String
+  email    String  @unique
+  avatar   String?
+  clerkId  String? @unique
 
-  refreshTokens RefreshToken[]
-  accounts     Account[]
-  transactions Transaction[]
-  categories   Category[]
-  budgets      Budget[]
-  AiInsights    AiInsight[]
+  refreshTokens     RefreshToken[]
+  accounts          Account[]
+  transactions      Transaction[]
+  categories        Category[]
+  budgets           Budget[]
+  AiInsights        AiInsight[]
+  aiInsightSchedule AiInsightSchedule?
+  googleId          String?
 
-  createdAt    DateTime      @default(now())
-  updatedAt    DateTime      @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 model RefreshToken {
-  id           String        @id @default(uuid())
-  token        String        @unique
-  userId       String
-  user         User          @relation(fields: [userId], references:[id], onDelete:Cascade)
-  expiresAt    DateTime
-  createdAt    DateTime      @default(now())
+  id        String   @id @default(uuid())
+  token     String   @unique
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  expiresAt DateTime
+  createdAt DateTime @default(now())
 }
 
 model Account {
-  id           String        @id @default(uuid())
-  name         String
-  type         AccountType
-  balance      Decimal       @default(0)
-  icon         String?
-  color        Json?
+  id      String      @id @default(uuid())
+  name    String
+  type    AccountType
+  balance Decimal     @default(0)
+  icon    String?
+  color   Json?
 
-  userId       String
-  user         User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   transactions Transaction[]
 
-  createdAt    DateTime      @default(now())
-  updatedAt    DateTime      @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 model Category {
-  id           String        @id @default(uuid())
-  name         String
-  color        Json?
-  icon         String?
-  type         TransactionType
+  id    String          @id @default(uuid())
+  name  String
+  color Json?
+  icon  String?
+  type  TransactionType
 
-  userId       String
-  user         User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   transactions Transaction[]
   budgets      Budget[]
 
-  createdAt    DateTime      @default(now())
-  updatedAt    DateTime      @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 model Transaction {
-  id           String          @id @default(uuid())
-  title        String
-  amount       Decimal
-  type         TransactionType
-  note         String?
-  date         DateTime        @default(now())
+  id     String          @id @default(uuid())
+  title  String
+  amount Decimal
+  type   TransactionType
+  note   String?
+  date   DateTime        @default(now())
 
-  userId       String
-  user         User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  accountId    String
-  account      Account         @relation(fields: [accountId], references: [id], onDelete: Cascade)
+  accountId String
+  account   Account @relation(fields: [accountId], references: [id], onDelete: Cascade)
 
-  categoryId   String
-  category     Category        @relation(fields: [categoryId], references: [id], onDelete: Restrict)
+  categoryId String
+  category   Category @relation(fields: [categoryId], references: [id], onDelete: Restrict)
 
-  createdAt    DateTime        @default(now())
-  updatedAt    DateTime        @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 model Budget {
-  id           String        @id @default(uuid())
-  amount       Decimal
-  month        Int
-  year         Int
+  id     String  @id @default(uuid())
+  amount Decimal
+  month  Int
+  year   Int
 
-  userId       String
-  user         User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  categoryId   String
-  category     Category      @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  categoryId String
+  category   Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
 
-  createdAt    DateTime      @default(now())
-  updatedAt    DateTime      @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   @@unique([userId, categoryId, month, year])
 }
 
 model AiInsight {
-  id        String    @id @default(uuid())
-  userId    String
-  user      User      @relation(fields:[userId], references: [id], onDelete: Cascade)
-  content   String
-  period    String    @default("month")
+  id      String @id @default(uuid())
+  userId  String
+  user    User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  content String
+  period  String @default("month")
 
   summary   Json?
   dateStart String?
   dateEnd   String?
-  
-  createdAt DateTime  @default(now())
 
-  @@index([userId,period, createdAt])
+  createdAt DateTime @default(now())
+
+  @@index([userId, period, createdAt])
 }
 
+model AiInsightSchedule {
+  id     String @id @default(uuid())
+  userId String @unique
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  weekly  Boolean @default(false)
+  monthly Boolean @default(true)
+
+  dayOfWeek  Int?
+  dayOfMonth Int?
+  time       String?
+
+  enabled Boolean @default(true)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
 
 enum AccountType {
   CASH
