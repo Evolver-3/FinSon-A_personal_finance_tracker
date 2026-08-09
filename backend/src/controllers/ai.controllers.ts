@@ -27,7 +27,6 @@ export const financeInsightsControllers=asyncHandler(async(req,res)=>{
   const periodLabel=getPeriodLabel(period)
 
 
-
   const insightExist=await prisma.aiInsight.findFirst({
     where:{
       userId,
@@ -41,7 +40,7 @@ export const financeInsightsControllers=asyncHandler(async(req,res)=>{
   console.log("backend insight does exist ??...", insightExist)
 
   if(insightExist){
-    throw new ApiError(409,"insight already exist for that particular time period!!")
+    return 
   }
 
   const transactions=await prisma.transaction.findMany({
@@ -58,7 +57,7 @@ export const financeInsightsControllers=asyncHandler(async(req,res)=>{
     orderBy:{date:'desc'}
   })
 
-  if(!transactions){
+  if(!transactions || transactions.length===0){
     throw new ApiError(400,"failed to find the transactions details")
   }
 
@@ -199,19 +198,20 @@ export const getInsights=asyncHandler(async(req,res)=>{
     throw new ApiError(401,"Authorization error")
   }
 
-  console.log("Authorization successfull....")
+  console.log("Authorization successfull....in userd")
 
-  const period=(req.query.period as Period) || 'month'
+  const period=(req.query.period as Period) || 'day'
 
   const {start,end}=getRange(period)
 
-  const insightExist=await prisma.aiInsight.findFirst({
+  const insightExist=await prisma.aiInsight.findMany({
     where:{
       userId,
       period:period,
       dateStart:start.toDateString(),
       dateEnd:end.toDateString()
     }})
+    console.log("does insight exist ?? in getInsights controllers:", insightExist)
 
   if(!insightExist){
     throw new ApiError(401, "insight doesn't exist for this time period!!")
@@ -270,4 +270,44 @@ export const getInsightSchedule=asyncHandler(async(req,res)=>{
 
   return res.status(200).json(new ApiResponse(200,scheduling,"Scheduling updated successfully"))
 
+})
+
+export const insightsByPeriod=asyncHandler(async(req,res)=>{
+
+  const userId=req.user?.id
+
+  if(!userId){
+    throw new ApiError(401,"Authorization error")
+  }
+
+  const {period='month'}=req.query as {period:Period}
+
+  if(!period || !['day','week','month','year'].includes(period)){
+    throw new ApiError(400,"Period must be one of 'day', 'week','month','year'")
+  }
+
+  const insights=await prisma.aiInsight.findMany({
+    where:{
+      userId,
+      period
+    },
+    orderBy:{
+      createdAt:'desc',
+      
+    }
+  })
+
+
+  const periodicData=Array.from(insights).map((insight)=>({
+    id:insight.id,
+    period:insight.period,
+    insightPeriodically:{
+      content:insight.content,
+      summary:insight.summary,
+      dateStart:insight.dateStart,
+      dateEnd:insight.dateEnd
+    }
+  }))
+
+  return res.status(200).json(new ApiResponse(200,periodicData,"Insights fetched for the period successfully"))
 })
