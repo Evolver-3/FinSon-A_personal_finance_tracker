@@ -21,3 +21,10 @@ export const getInsightSchedule=async({data}:{data:InsightScheduleProps})=>{
   console.log("Is service is working?:", res.data)
   return res.data
 }
+
+export const getInsightsByPeriod=async(period:string)=>{
+  const res=await api.get(`/ai/insights/by-period?period=${period}`)
+
+  console.log("insight found by their period:", res.data)
+  return res.data
+}
