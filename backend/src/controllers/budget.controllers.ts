@@ -3,8 +3,6 @@ import asyncHandler from "../utils/asyncHandler.js";
 import ApiError from "../utils/ApiError.js";
 import ApiResponse from "../utils/ApiResponse.js";
 
-
-//create a new Budget
 export const createBudget=asyncHandler(async(req,res)=>{
 
   const userId=req.user?.id

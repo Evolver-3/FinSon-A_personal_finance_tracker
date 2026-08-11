@@ -6,6 +6,8 @@ import asyncHandler from "../utils/asyncHandler.js";
 export const verifyClerk=asyncHandler(async(req,res,next)=>{
 
   try{
+
+    console.log("i am on the verify clerk middleware")
   const token=req.headers.authorization?.replace("Bearer ", "")
 
   if(!token){
@@ -16,12 +18,13 @@ export const verifyClerk=asyncHandler(async(req,res,next)=>{
     secretKey:process.env.CLERK_SECRET_KEY,
   })
 
+  console.log("Does payload exist??", !!payload)
+
   req.clerkUserId=payload.sub
 
   next()
 
   }catch(error:any){
-    // console.log("backend auth error:", error.message)
     next(error)
 
   }

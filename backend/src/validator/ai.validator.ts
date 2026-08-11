@@ -2,7 +2,7 @@ import {z} from 'zod'
 
 export const insightSchema=z.object({
   period:z.enum(
-    ['day','week','month','quater','year']
+    ['day','week','month','year']
   ).default('month')
 })
 

@@ -297,17 +297,5 @@ export const insightsByPeriod=asyncHandler(async(req,res)=>{
     }
   })
 
-
-  const periodicData=Array.from(insights).map((insight)=>({
-    id:insight.id,
-    period:insight.period,
-    insightPeriodically:{
-      content:insight.content,
-      summary:insight.summary,
-      dateStart:insight.dateStart,
-      dateEnd:insight.dateEnd
-    }
-  }))
-
   return res.status(200).json(new ApiResponse(200,insights,"Insights fetched for the period successfully"))
 })

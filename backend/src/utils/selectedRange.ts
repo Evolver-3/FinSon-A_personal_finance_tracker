@@ -1,4 +1,4 @@
-export type Period='day'|'week'|'month'|'quarter'|'year'
+export type Period='day'|'week'|'month'|'year'
 
 export const getRange=(period:Period)=>{
   const now=new Date()
@@ -14,9 +14,6 @@ export const getRange=(period:Period)=>{
     case "month":
       start.setMonth(now.getMonth()-1)
       break;
-    case "quarter":
-      start.setMonth(now.getMonth()-3)
-      break;
     case "year":
       start.setFullYear(now.getFullYear()-1)
       break;
@@ -30,7 +27,6 @@ export const getPeriodLabel=(period:Period)=>{
     day:"Today",
     week:"This Week",
     month:"This Month",
-    quarter:"This Quarter",
     year:"This Year"
   }
   return labels[period]
