@@ -153,12 +153,12 @@ const modalSelection=await groq.chat.completions.create({
   temperature:0.7
 })
 
-const insights=modalSelection.choices[0]?.message.content
+const contentdata=modalSelection.choices[0]?.message.content
 
 await prisma.aiInsight.create({
   data:{
     userId,
-    content:insights!,
+    content:contentdata!,
     period,
     summary:{
       income:totalIncome,
@@ -174,7 +174,7 @@ await prisma.aiInsight.create({
 
 return res.status(200).json(new ApiResponse(200,
   {
-    insights,
+    content:contentdata,
     period,
     periodLabel,
     dateRange:{start,end},
@@ -198,9 +198,9 @@ export const getInsights=asyncHandler(async(req,res)=>{
     throw new ApiError(401,"Authorization error")
   }
 
-  console.log("Authorization successfull....in userd")
+  console.log("Authorization successfull....in user")
 
-  const period=(req.query.period as Period) || 'day'
+  const period=(req.query.period as Period) || 'month'
 
   const {start,end}=getRange(period)
 
@@ -309,5 +309,5 @@ export const insightsByPeriod=asyncHandler(async(req,res)=>{
     }
   }))
 
-  return res.status(200).json(new ApiResponse(200,periodicData,"Insights fetched for the period successfully"))
+  return res.status(200).json(new ApiResponse(200,insights,"Insights fetched for the period successfully"))
 })
