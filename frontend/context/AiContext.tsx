@@ -1,4 +1,4 @@
-import { handleError } from "@/lib/handleError";
+
 import { generateInsights, getInsights, getInsightsByPeriod, getInsightSchedule } from "@/services/aiServices";
 import { createContext,ReactNode } from "react";
 import { useState,useEffect } from "react";
@@ -7,17 +7,17 @@ export const AiContext=createContext<AiContextProps| null>(null)
 
 export const AiProvider=({children}:{children:ReactNode})=>{
 
-  const [wholeData,setWholeData]=useState<InsightDataProps[]>([])
-  const [existData,setExistData]=useState<InsightDataProps | null>(null)
-
-  const [aiPeriodData,setAiPeriodData]=useState<aiPeriodDataProps[]>([{
-    id:"",
-    period:"month",
-    insightPeriodically:[]
-  }])
 
   const [loading, setLoading] = useState(false);
   const [error,setError]=useState<string| null>(null)
+
+      const handleError=(error:any)=>{
+      const message=error?.response?.data?.message || error?.message || "Something went wrong"
+  
+      setError(message)
+      throw error
+  
+    }
 
 
   
@@ -27,10 +27,13 @@ export const AiProvider=({children}:{children:ReactNode})=>{
       setError('')
 
       const res=await generateInsights(period)
-      console.log("hooks ai data response:",res.data)
+      const datafetched=res.data
 
-      setWholeData((prev)=>[res.data,...prev])
-      return res.data
+      const single=Array.isArray(datafetched)?datafetched[0]:datafetched
+
+      console.log("hooks createInsights:", single)
+
+      return single
       
     }catch(error:any){
       handleError(error)
@@ -48,12 +51,13 @@ export const AiProvider=({children}:{children:ReactNode})=>{
       setError("")
       
       const res=await getInsights(period)
+      const datafetched=res.data
 
-      setExistData(res.data)
+      const single=Array.isArray(datafetched)?datafetched[0]:datafetched
 
-      console.log("hooks getInsights:", res.data)
+      console.log("hooks getInsights:", single)
 
-      return res.data
+      return single
 
     }catch(error:any){
       handleError(error)
@@ -71,6 +75,7 @@ export const AiProvider=({children}:{children:ReactNode})=>{
       const res=await getInsightSchedule({data})
 
       console.log("hooks schedule res:", res.data)
+      return res.data
 
     }catch(error:any){
       handleError(error)
@@ -89,10 +94,6 @@ export const AiProvider=({children}:{children:ReactNode})=>{
 
       const res=await getInsightsByPeriod(period)
       console.log("hooks working:", res.data)
-
-      
-
-      setAiPeriodData(res.data)
       return res.data
 
     }catch(err:any){
@@ -109,11 +110,8 @@ export const AiProvider=({children}:{children:ReactNode})=>{
       foundInsights,
       insightSchedule,
       insightsByPeriod,
-      wholeData,
-      aiPeriodData,
       loading,
-      error,
-      existData
+      error
 
     }}>
       {children}

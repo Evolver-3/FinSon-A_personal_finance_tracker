@@ -1,3 +1,4 @@
+import { handleError } from "@/lib/handleError";
 import { createContext,ReactNode } from "react";
 import { createTransaction, getTransaction, updateTransaction, deleteTransaction, getTransactionByYear } from "@/services/transactionServices";
 import {useState,useEffect} from 'react'
@@ -20,18 +21,6 @@ export const TransactionProvider=({children}:{children:ReactNode})=>{
   
     const [loading,setLoading]=useState(false)
     const [error,setError]=useState<string|null>(null)
-  
-    const handleError=(error:any)=>{
-  
-      console.log("=== FULL ERROR in hooks ===")
-      console.log("error.response:", error?.response)
-      console.log("error.response?.data:", error?.response?.data)
-      
-      const message=error?.response?.data?.message || error?.message || "Something went wrong"
-  
-      setError(message)
-  
-    }
   
     const creatingNewTransaction=async(data:createTransactionProps)=>{
       try{
@@ -76,12 +65,9 @@ export const TransactionProvider=({children}:{children:ReactNode})=>{
         setError(null)
         const res=await getTransactionByYear(year)
 
-        // console.log("real hook:",res.data)
-
         const transactionsdetail=(res.data)?res.data:[]
 
         setTransactionsYearly(transactionsdetail || [])
-        // console.log("hooks consoled:",transactionsdetail)
 
         return transactionsdetail
 
