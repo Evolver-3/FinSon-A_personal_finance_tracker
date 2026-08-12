@@ -1,5 +1,6 @@
-import { Home, BadgePlus, UserRound, Banknote, ChartNoAxesCombinedIcon, Utensils ,Fuel, Hamburger, GlobeCheck, CarTaxiFrontIcon, Landmark, BanknoteIcon, Wallet, CreditCard, Toolbox, Clapperboard, Hospital, GitGraphIcon} from 'lucide-react-native'
+import { Home, BadgePlus, UserRound, Banknote, ChartNoAxesCombinedIcon, Utensils ,Fuel, Hamburger, GlobeCheck, CarTaxiFrontIcon, Landmark, BanknoteIcon, Wallet, CreditCard, Toolbox, Clapperboard, Hospital, GitGraphIcon, User, SunIcon, Speaker, Languages, LucideGitGraph} from 'lucide-react-native'
 import React from 'react'
+import { Href } from 'expo-router'
 
 type bottomTabDataProps={
   id:number 
@@ -382,6 +383,53 @@ export const PERIODS: { key: Period; label: string }[] = [
   { key: 'day', label: 'Today' },
   { key: 'week', label: 'Week' },
   { key: 'month', label: 'Month' },
-  { key: 'quarter', label: 'Quarter' },
   { key: 'year', label: 'Year' },
 ];
+
+export const settingsItem:{
+  id:number,
+  key:string,
+  items:{
+    name:string,
+    href:Href,
+    symbol:any
+  }[]
+}[]=[
+  {
+    id:1,
+    key:'General',
+    items:[
+      {
+        'name':'Profile',
+        'href':"/(usertab)/ProfilePage/UserProfile",
+        'symbol':User
+      },
+      {
+        'name':'Theme settings',
+        'href':"/(usertab)/ProfilePage/ThemeSettings",
+        'symbol':SunIcon
+      },
+      {
+        'name':'Language Selection',
+        'href':"/(usertab)/ProfilePage/Language",
+        'symbol':Languages
+      },
+      {
+        'name':'Notification settings',
+        'href':"/(usertab)/ProfilePage/Notification",
+        'symbol':Speaker
+      },
+    ]
+  },
+  {
+    id:2,
+    key:'Personalization',
+    items:[
+      {
+        'name':'Insight Schedule',
+        'href':"/(usertab)/ProfilePage/InsightSchedule",
+        'symbol':LucideGitGraph
+      }
+  ]
+  }
+]
