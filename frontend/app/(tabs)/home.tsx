@@ -1,7 +1,7 @@
 import { View, Text,ScrollView,Pressable} from 'react-native'
-import React,{useCallback, useEffect} from 'react'
+import React,{useCallback, useEffect, useMemo} from 'react'
 import { useAccount } from '@/hooks/useAccount'
-import Wrapper from '@/components/WrapperPage'
+import Wrapper from '@/components/mainUi/WrapperPage'
 import TopUserComp from '@/components/comps/TopUserComp'
 import { useBudget } from '@/hooks/useBudget'
 import { FlatList } from 'react-native'
@@ -11,26 +11,30 @@ import PressedAnimate from '@/components/comps/Animate/PressedAnimate'
 import { useFocusEffect, useRouter } from 'expo-router'
 import { useTheme } from '@/hooks/useTheme'
 import BudgetSpentBar from '@/components/comps/Animate/BudgetSpentBar'
-import { FakeLoad } from '../(usertab)/AccountPage'
-import { formatDate } from '@/components/comps/DateFormat'
+import { FakeLoad } from '@/components/comps/Animate/FakeLoad'
+import { formatAmount, formatDate } from '@/components/comps/DateFormat'
 import { useUser } from '@/hooks/useUser'
+import { useCurrency } from '@/context/CurrencyContext'
+import ThemeIcon from '@/components/Theme/ThemeIcon'
 
 const index = () => {
 
   const {user}=useUser()
    const {fetchAllAccounts,accounts,loading}=useAccount()
    const {budgets,spendingBudget}=useBudget()
-   const {transactions,fetchAllTransactions}=useTransaction()
+   const {getByYear,transactionsYearly}=useTransaction()
    const router=useRouter()
 
    const {isDark}=useTheme()
+   const {symbol}=useCurrency()
 
+     useEffect(()=>{
 
-    useEffect(()=>{
-  
-      fetchAllAccounts()
-
-    },[])
+      const year=new Date().getFullYear()
+      getByYear(year)
+      console.log(transactionsYearly.months)
+      console.log(transactionFilteredData)
+     },[])
 
     useFocusEffect(
       useCallback(()=>{
@@ -39,19 +43,18 @@ const index = () => {
       },[])
     )
 
-    useFocusEffect(
-      useCallback(()=>{
-        fetchAllTransactions()
-      },[])
-    )
-  
+
     const totalBalance=accounts.reduce((total,account)=>{
       return total+Number(account.balance)
     },0)
 
-    const transactionFilteredData=[...(transactions ?? [])]?.sort((a,b)=>new Date(b.createdAt ?? 0).getTime()- new Date(a.createdAt ?? 0).getTime()).slice(0,3)
+    const transactionFilteredData=useMemo(()=>{
+      return transactionsYearly.months.flatMap(m=>m.transactions).sort((a,b)=>new Date(b.createdAt ?? 0).getTime()-new Date(a.createdAt?? 0).getTime()).slice(0,3)
+    },[transactionsYearly.months])  
+
 
     const budgetFilteredData=[...(budgets ?? [])]?.sort((a,b)=>new Date(b.createdAt ?? 0).getTime()-new Date(a.createdAt ?? 0).getTime()).slice(0,3)
+
 
     const percentageBudget=({remain,total}:{remain:number,total:number})=>{
 
@@ -63,14 +66,15 @@ const index = () => {
 
   return (
     <Wrapper loading={false}>
-       <View className='boxInnerSize flex-1'>
+      
+      <View className='boxInnerSize flex-1'>
       <TopUserComp
       >
         <Text className="biggerText text-xl"
         style={{
-                fontFamily:"Sans-Extrabold"
+                fontFamily:"Sans-Semibold"
               }}
-        >Welcome {user?.name}</Text>
+        >{user?.name}</Text>
       </TopUserComp>
     
 
@@ -92,10 +96,13 @@ const index = () => {
               }}
               >TOTAL{"  "}BALANCE</Text>
               
+              <View>
+                <ThemeIcon icon={symbol} size={20}/>
               <Text className=' text-3xl text-green-500'
               style={{
                 fontFamily:"Sans-Bold"
               }}>{formatAmount(totalBalance? totalBalance: 0)}</Text>
+              </View>
 
             </View>
 
@@ -140,11 +147,17 @@ const index = () => {
                       style={{
                         fontFamily:"Sans-Semibold"
                       }}>{acc.name}</Text>
-                     <Text className="text-green-400 text-lg font-semibold"
+
+                      <View>
+                        <ThemeIcon icon={symbol} size={20}/>
+
+                        <Text className="text-green-400 text-lg font-semibold"
                      style={{
                     fontFamily:"Sans-Bold"
                     }}
                     >{formatAmount(acc.balance)}</Text>
+                      </View>
+                     
                    </View>
                 </PressedAnimate>
               ))}
@@ -195,7 +208,15 @@ const index = () => {
                     }}>{budget.category?.name}</Text>
 
                     <View className='flex-row justify-between'>
-                      <Text className='biggerText text-sm'>{formatAmount(Number(budget.spent))}/{formatAmount(Number(budget.amount)) }</Text>
+
+                      <View>
+                        <ThemeIcon icon={symbol} size={20}/>
+                        <Text className='biggerText text-sm'>{formatAmount(Number(budget.spent))}/</Text>
+                      </View>
+                      
+                        <ThemeIcon icon={symbol} size={20}/>
+                        <Text>
+                        {formatAmount(Number(budget.amount)) }</Text>
 
                       <Text className='text-xs text-green-600 dark:text-green-500'
                       style={{
@@ -241,9 +262,12 @@ const index = () => {
                   pressedColor={"rgba(99, 102, 241, 0.16)"}
                   onPress={()=>{
                     router.push({
-                        pathname:"/(tabs)/Transactions",
+                        pathname:"/(usertab)/Transactions",
                       })}}>
-                     <Text className='text-sm font-semibold text-blue-700'>VIEW ALL</Text>
+                     <Text className='text-sm text-blue-700'
+                     style={{
+                      fontFamily:"Sans-Bold"
+                     }}>VIEW ALL</Text>
               </PressedAnimate>
             </View>
           </View>
@@ -251,9 +275,9 @@ const index = () => {
         ListEmptyComponent={
           <FakeLoad 
             loading={isInitiallyLoading}
-            hasAccounts={transactionFilteredData.length>0}
-            unmatchText='No matching budget found'
-            defaultText='Add an budget'>
+            hasData={transactionFilteredData.length>0}
+            unmatchText='No transactions found'
+            defaultText='Add a transaction'>
             {[1,2,3,4,5,6,7,8,9,10].map((item)=>(
               <View
                 key={item}
@@ -298,10 +322,13 @@ const index = () => {
             </View>
 
               {item.type==="EXPENSE" ? (
+                <View><ThemeIcon icon={symbol} size={20}/>
                 <Text className="font-semibold text-xl biggerText  text-red-400 dark:text-red-400 "
-                >-{formatAmount(item.amount)}</Text>
+                >{formatAmount(item.amount)}</Text></View>
               ):(
-                <Text className="font-semibold text-sm biggerText  text-green-400 px-2 py-1 rounded-lg bg-green-100  dark:bg-gray-600">+{formatAmount(item.amount)}</Text>
+                <View><ThemeIcon icon={symbol} size={20}/>
+                <Text className="font-semibold text-sm biggerText  text-green-400 px-2 py-1 rounded-lg bg-green-100  dark:bg-gray-600">{symbol}{formatAmount(item.amount)}</Text>
+                </View>
               )}
              
           </View>
@@ -310,8 +337,7 @@ const index = () => {
         />
        
 
-    </View>
-
+      </View>
     </Wrapper>
   ) 
 }
@@ -319,6 +345,3 @@ const index = () => {
 export default index
 
 
-export const formatAmount=(amount:Number | string)=>{
-  return Number(amount).toLocaleString("en-IN");
-}

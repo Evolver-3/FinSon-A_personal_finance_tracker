@@ -1,17 +1,19 @@
 import { View, Text ,FlatList} from 'react-native'
 import React, { useCallback, useState } from 'react'
-import Wrapper from '@/components/WrapperPage'
+import Wrapper from '@/components/mainUi/WrapperPage'
 import { useBudget } from '@/hooks/useBudget'
 import CreateBudget from '@/components/budget/CreateBudget'
 import { useCategory } from '@/hooks/useCategory'
 import RenderBudget from '@/components/budget/RenderBudget'
 import HeaderList from '@/components/comps/Flat/HeaderList'
 import { monthData } from '@/data'
-import { FakeLoad } from '../(usertab)/AccountPage'
+import {FakeLoad} from '@/components/comps/Animate/FakeLoad'
 import { useTheme } from '@/hooks/useTheme'
 import { useFocusEffect } from 'expo-router'
-import { formatDate } from '@/components/comps/DateFormat'
-import { formatAmount } from './home'
+import { useCurrency } from '@/context/CurrencyContext'
+import { formatAmount } from '@/components/comps/DateFormat'
+import ThemeIcon from '@/components/Theme/ThemeIcon'
+
 
 const Budget = () => {
 
@@ -23,7 +25,7 @@ const Budget = () => {
   const [openModal,setOpenModal]=useState(false)
 
   const {isDark}=useTheme()
-
+  const {symbol}=useCurrency()
  useFocusEffect(
        useCallback(()=>{
          const now=new Date()
@@ -82,6 +84,7 @@ const Budget = () => {
       ListHeaderComponent={
         <View className='flex-col gap-y-4'>
           <HeaderList 
+          pressableNeeded
           setQuery={setQuery}
           headingText={'Add your monthly Budgets'}
           inlineText={"Search Budgets..."}
@@ -99,17 +102,17 @@ const Budget = () => {
               }}>Monthly{"  "}Budget{"  "}Remains</Text>
 
             <View className='flex-row gap-x-2 items-end'>
+              <ThemeIcon icon={symbol} size={20}/>
               <Text className=' text-3xl text-green-500'
               style={{
                 fontFamily:"Sans-Bold"
               }}>{formatAmount(getRemainingPerMonth)}</Text> 
-              <Text className=' smallText text-xs '
-              style={{
-                fontFamily:"Sans-Light",
-                marginBottom:3
-              }}>
-                remains of {formatAmount(getTotalPerMonth)}  
-              </Text>
+              <View className=' smallText text-xs '
+              >
+                <Text>remains of</Text>
+                <ThemeIcon icon={symbol} size={20}/>
+                <Text>{formatAmount(getTotalPerMonth)}</Text> 
+              </View>
             </View>
           </View>
           </View>
@@ -118,7 +121,7 @@ const Budget = () => {
       ListEmptyComponent={
         <FakeLoad 
           loading={isInitiallyLoading}
-          hasAccounts={budgets.length>0}
+          hasData={budgets.length>0}
           query={query}
           unmatchText='No matching budget found'
           defaultText='Add an budget'>
@@ -134,7 +137,8 @@ const Budget = () => {
         }
       renderItem={({item})=>(
         <RenderBudget
-        item={item}/>
+        item={item}
+        symbol={symbol}/>
       )}
       />
     </Wrapper>

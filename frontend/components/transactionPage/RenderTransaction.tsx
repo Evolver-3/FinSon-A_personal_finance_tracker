@@ -1,20 +1,14 @@
-import { View, Text ,Pressable, Modal,Animated, ActivityIndicator} from 'react-native'
-import React,{useState,useRef} from 'react'
+import { View, Text , ActivityIndicator} from 'react-native'
+import React,{useState} from 'react'
 import TransactionComp from './TransactionComp'
 import { getIconByName } from '../comps/Mode/ModalComp'
 import Animateddrop from '../comps/Animate/Animateddrop'
 import PressedAnimate from '../comps/Animate/PressedAnimate'
 import { useTheme } from '@/hooks/useTheme'
-import { formatAmount } from '@/app/(tabs)/home'
+import { formatDate,formatAmount } from '../comps/DateFormat'
+import { useCurrency } from '@/context/CurrencyContext'
+import ThemeIcon from '@/components/Theme/ThemeIcon'
 
-type renderTransactionProps={
-  item:Transaction 
-  editTransaction:(id:string, data:updateTransactionProps)=>Promise<void>
-  removeTransaction:(id:string)=>Promise<void>
-  accounts:Account[]
-   categories:Category[]
-   fetchTransaction:(id:string)=>Promise<void>
-}
 const RenderTransaction = ({item,editTransaction,removeTransaction,accounts,categories}:renderTransactionProps) => {
 
   const {isDark}=useTheme()
@@ -22,14 +16,13 @@ const RenderTransaction = ({item,editTransaction,removeTransaction,accounts,cate
   const [deleteLoad,setDeleteLoad]=useState(false)
   const [pageError,setPageError]=useState<string| null>('')
   const [openEdit,setOpenEdit]=useState(false)
-
-  console.log(item.account)
+  const {symbol}=useCurrency()
 
   const handleDeleteTransaction=async()=>{
     setDeleteLoad(true)
     setPageError("")
     try{
-      await removeTransaction(item.id)
+      await removeTransaction(item?.transactions.id)
     }catch(err:any){
 
       const message=err?.response?.data?.message || err?.message || "Failed to sign in"
@@ -39,106 +32,157 @@ const RenderTransaction = ({item,editTransaction,removeTransaction,accounts,cate
       setDeleteLoad(false)
     }
   }
- 
+
   return (
     <View className='px-4'>
-      
       <Animateddrop
       viewstyle={{
-        backgroundColor:isDark?"#212121":item.category?.color.colors,
+        backgroundColor:isDark?"#212121":"#F2F2F2",
         elevation:2
       }}
         firstChild={
         <View 
       className=' flex-row justify-between items-center'>
 
-          <View className='flex-row gap-x-4 items-center '>
-             <View className='rounded-lg p-2'
-           style={{
-            backgroundColor:item.category?.color.darkColor,
-            elevation:5
-           }}>
-            {getIconByName(item.category?.icon ?? null,false)}
-           </View>
+          <View className='flex-row gap-x-5 items-center '>
+            <View
+              className='p-2 items-center rounded-lg'
+              style={{ 
+                elevation:5,
+                backgroundColor:item.transactions.category?.color.darkColor
+              }}>
+                {getIconByName(item.transactions.category?.icon ?? null,false,isDark?"#000000":"#ffffff",24)}
+            </View>
 
            <View className='flex-col gap-y-2'>
-            <Text className='biggerText font-semibold'>{item.title}</Text>
-            <View className='flex-row gap-3 '>
-              <Text className='smallText text-xs'>
-                {item.account?.name}
+            <Text className='smallText font-semibold uppercase'>{item.transactions.title}</Text>
+
+              
+              <Text className='text-xs minText'
+                style={{
+                  fontFamily:"Sans-ExtraBold"
+                }}>
+                {formatDate(item.transactions.date)}
               </Text>
-              <Text className='smallText text-xs '>
-                {item.date}
-              </Text>
-            </View>
+  
            </View>
+
+           <View 
+          className='px-2 py-1 rounded-md'
+          style={{
+                backgroundColor:"#C4B6D2"
+                }}>
+            <Text
+              style={{
+                  color:isDark?"#000000":"#ffffff",
+                  fontSize:8,
+                  fontFamily:"Sans-Semibold"
+                }}>
+              {item.transactions.account?.name}
+            </Text>
+                      
+          </View>
+          <View 
+          className='px-2 py-1 rounded-md'
+          style={{
+                backgroundColor:"#C4B6D2"
+                }}>
+            <Text
+              style={{
+                  color:isDark?"#000000":"#ffffff",
+                  fontSize:8,
+                  fontFamily:"Sans-Semibold"
+                }}>
+              {item.transactions.category?.name}
+            </Text>
+                      
           </View>
 
-           <View>
+          </View>
 
-            <Text>
-              <ShowAmount
-              item={item}
-              />
-            </Text>
-           </View>
+          
+           {item.transactions.type==="EXPENSE" ? (
+            <View>
+              <Text>-</Text>
+            <ThemeIcon icon={symbol} size={20}/>
+            <Text className="font-semibold text-xl biggerText  text-red-400 dark:text-red-400 "
+            >{formatAmount(item.transactions.amount)}</Text>
+             </View> 
+              ):(
+                <View>
+                <Text>+</Text>
+                <ThemeIcon icon={symbol} size={20}/>
+              <Text className="font-semibold text-sm biggerText  text-green-400 px-2 py-1 rounded-lg bg-green-100  dark:bg-gray-600">{formatAmount(item.transactions.amount)}</Text>
+              </View>
+            )}
 
         </View>}
 
         secChild={
-        <View style={{paddingTop:8,gap:4}}>
-          <Text style={{color:"#a3a3a3"}}>
-            Account:{item.account?.name}
-          </Text>
-          <View className='flex-row gap-x-4'>
-            <Text className="flex-grow smallText">{item.category?.name}</Text>
-
-          <PressedAnimate
-          onPress={()=>setOpenEdit(true)}
-          originalColor={isDark?"#41EC4F":"#ADF7B3"}
-          pressedColor={"#CEE9D0"}
-          style={{
-            width:60,
-            height:30,
-            borderRadius:5,
-            paddingVertical:2,
-          }}
-          >
-             <Text
-             className="oppText text-sm"
-             >Edit</Text>
-          </PressedAnimate>
-
-
-          <PressedAnimate
-          onPress={handleDeleteTransaction}
-          originalColor={"#D28E89"}
-          pressedColor={"#EAA59E"}
-          style={{
-            width:70,
-            height:30,
-            borderRadius:5,
-          }}
-          >
-            {deleteLoad ?<ActivityIndicator color={"#ffffff"}/>: <Text className='oppText text-sm'>Remove</Text>}
-          </PressedAnimate>
-          
- 
+        <View style={{paddingTop:8,gap:4,flexDirection:"row",
+          justifyContent:"space-between"
+        }}>
+          <View className='flex-row gap-x-5 justify-end flex-grow'>
+            <PressedAnimate
+                      onPress={()=>setOpenEdit(true)}
+                      originalColor={isDark?"#518151":"#ADF7B3"}
+                      pressedColor={isDark?"#49B649":"#CEE9D0"}
+                      style={{
+                        width:40,
+                        height:20,
+                        borderRadius:5,
+                        alignItems:"center",
+                        justifyContent:"center",
+                        elevation:6}}>
+                              
+                      <Text
+                        className="smallText text-xs"
+                        style={{
+                                fontFamily:"Sans-Semibold"
+                              }}>
+                                Edit
+                      </Text>
+                    </PressedAnimate>
+                              
+                    <PressedAnimate
+                      onPress={handleDeleteTransaction}
+                      originalColor={isDark?"#753B2F":"#D28E89"}
+                      pressedColor={"#EAA59E"}
+                      style={{
+                        width:60,
+                        height:20,
+                        borderRadius:5,
+                        alignItems:'center',
+                        justifyContent:"center",
+                        elevation:6}}>
+                  
+                        {deleteLoad ?
+                        (<ActivityIndicator color={"#ffffff"} size={10}/>):
+                        <Text 
+                          className="smallText text-xs"
+                          style={{
+                                    fontFamily:"Sans-Semibold"
+                                }}>
+                            Remove
+                        </Text>}
+                    </PressedAnimate>
           </View>
-        </View>}
+          
+          </View>}
         
       secStyle={{}}/>
 
        <TransactionComp
        initialValues={{
-        title:item.title,
-        amount:item.amount,
-        type:item.type,
-        note:item.note ?? "",
-        date:new Date(item.date),
-        accountId:item.accountId,
-        categoryId:item.categoryId
+        title:item.transactions.title,
+        amount:item.transactions.amount,
+        type:item.transactions.type,
+        note:item.transactions.note ?? "",
+        date:new Date(item.transactions.date),
+        accountId:item.transactions.accountId,
+        categoryId:item.transactions.categoryId
        }}
+       textBlock={"Edit your transaction"}
        error={pageError}
        pressableFlex={2}
        viewFlex={3}
@@ -153,7 +197,7 @@ const RenderTransaction = ({item,editTransaction,removeTransaction,accounts,cate
         setEditPageLoad(true)
         setPageError('')
         try{
-        await editTransaction(item.id,{...values})
+        await editTransaction(item.transactions.id,{...values})
         }catch(err:any){
           const message=err?.response?.data?.message || err?.message || "Failed to sign in"
         setPageError(message)
@@ -162,30 +206,11 @@ const RenderTransaction = ({item,editTransaction,removeTransaction,accounts,cate
         setEditPageLoad(false)
         
           }}}/>
+
+
     </View>
   )
 }
 
 export default RenderTransaction
 
-
-
-export const ShowAmount=({item}:{item:Transaction})=>{
-    if(item.type==="EXPENSE"){
-      return(
-        <View className='bg-red-100 rounded-md px-3 py-1'>
-          <Text className='text-red-600 text-xs font-semibold'>
-            - {formatAmount(item.amount)}
-          </Text>
-        </View>
-      )
-    }else{
-      return (
-        <View className='bg-green-200 rounded-xl px-3 py-2'>
-          <Text className="text-green-600 text-xs font-semibold">
-            + {formatAmount(item.amount)}
-          </Text>
-        </View>
-      )
-    }
-  }

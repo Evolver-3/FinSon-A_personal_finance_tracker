@@ -6,6 +6,7 @@ import PressedAnimate from '../comps/Animate/PressedAnimate'
 import { formatAmount } from '../comps/DateFormat'
 import { useCurrency } from '@/context/CurrencyContext'
 import AccountData from './AccountData'
+import ThemeIcon from '@/components/Theme/ThemeIcon'
 
 
 const AccountItem = ({item,editAccount,removeAccount}:AccountItemProps) => {
@@ -66,10 +67,14 @@ const AccountItem = ({item,editAccount,removeAccount}:AccountItemProps) => {
               {item.name}
           </Text>
 
+          <View>
+          <ThemeIcon icon={symbol} size={20}/>
+
           <Text 
             className="text-green-400 text-md">
-              {symbol}{formatAmount(item.balance)}
+              {formatAmount(item.balance)}
           </Text>
+          </View>
           </View>
 
           <View 
@@ -145,7 +150,7 @@ const AccountItem = ({item,editAccount,removeAccount}:AccountItemProps) => {
         name:item.name,
         balance:item.balance,
         type:item.type,
-        color:item.color,
+        color:item?.color.btncolor,
         icon:item.icon
       }}
       submitText={"Edit your account"}
