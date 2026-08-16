@@ -1,3 +1,4 @@
+import { Href } from "expo-router"
 import React from "react"
 
 declare global{
@@ -28,7 +29,7 @@ declare global{
     name:string 
     type:"CASH" | "BANK" | "CARD" | "WALLET" 
     balance?:string
-    icon?:string | null
+    icon?:string 
     color?:CategoryColor
   }
 
@@ -36,7 +37,7 @@ declare global{
     name?:string 
     type?:"CASH" | "BANK" | "CARD" | "WALLET" 
     balance?:string
-    icon?:string | null
+    icon?:string
     color?:CategoryColor
   }
 
@@ -87,17 +88,34 @@ declare global{
     categoryId?:string
   }
 
+  type contextMonths={
+    month:number,
+    label:string,
+    income:number,
+    savings:number,
+    count:number,
+    transactions:Transaction[]
+  }
+
+  type TransactionsYearlyProps={
+  months:contextMonths[]
+  year:string
+}
+
   type TransactionContextType = {
   transactions: Transaction[]
   singleTransaction:Transaction | null
+  transactionsYearly:TransactionsYearlyProps
   loading: boolean
   error: string | null
   creatingNewTransaction: (data: createTransactionProps) => Promise<void>
-  fetchAllTransactions:()=>Promise<void>
   fetchTransaction:(id:string)=>Promise<void>
+  getByYear:(year:number)=>Promise<void>
   editTransaction:(id: string, data: updateTransactionProps) => Promise<void>
   removeTransaction: (id: string) => Promise<void>
 }
+
+
 
 
   interface createBudgetProps{
@@ -129,24 +147,21 @@ type BudgetContextType = {
     id:string 
     name:string 
     email:string 
-    avatar:string | null
-    role:"USER"| "ADMIN"
-    emailVerified:boolean 
-    createdAt?:string 
-    updatedAt?:string
+    avatar:string
+ 
   }
 
   type Account={
     id:string
     name:string 
     type:"CASH" | "BANK" | "CARD" | "WALLET" 
-    color:{
+    color?:{
       btncolor:string 
       colors:string 
       darkColor:string
     }
-    icon:string
-    balance:string
+    icon?:string
+    balance?:string
     createdAt?:string 
     updatedAt?:string
   }
@@ -201,7 +216,6 @@ type BudgetContextType = {
     user:User|null
     loading:boolean 
     setUser:React.Dispatch<React.SetStateAction<User|null>>
-    loadUser:()=>Promise<void>
   }
 
   //type of icon state
@@ -347,9 +361,10 @@ type pressedAnimateProps={
 
 type HeaderListProps={
   headingText:string 
-  onPress:()=>void
+  onPress?:()=>void
   inlineText:string
   setQuery:React.Dispatch<React.SetStateAction<string>>
+  pressableNeeded?:boolean
 }
 
 type ModalCompProps={
@@ -462,9 +477,14 @@ type ThemeIconProps={
   lightColor?:string
 }
 
+type renderItemProps={
+  label:string
+  transactions:Transaction
+}
+
 
 type renderTransactionProps={
-  item:Transaction 
+  item:renderItemProps
   editTransaction:(id:string, data:updateTransactionProps)=>Promise<void>
   removeTransaction:(id:string)=>Promise<void>
   accounts:Account[]
@@ -511,6 +531,15 @@ type TransactionFormProps={
     error:string | null
 }
 
+type fakeLoadProps={
+  loading:boolean 
+  hasData:boolean 
+  query?:string
+  children:React.ReactNode
+  unmatchText:string 
+  defaultText:string
+}
+
 
 type authBodyProps={
   children: ReactNode
@@ -526,7 +555,7 @@ type wrapperProps={
 type CurrencyContextType={
   countryName:string;
   setCountryName:(country:string)=>void;
-  symbol:string;
+  symbol:any;
   currencyCode:string;
 }
 
@@ -539,7 +568,7 @@ type InitialAccountValueProps={
 }
 
 type AccountDataProps={
-  initialValues?:Partial<>
+  initialValues?:Partial<InitialAccountValueProps>
   error:string | null
   loading:boolean
   onSubmit:(values:createAccountProps)=>Promise<void>
@@ -548,6 +577,122 @@ type AccountDataProps={
   setOpenModal:React.Dispatch<React.SetStateAction<boolean>>
   viewFlex:number
   pressableFlex:number
+}
+
+type createLoginPageHookProps={
+  code?:string,
+  idToken?:string,
+  codeVerifier?:string,
+  redirectUri?:string
+}
+
+type InsightScheduleProps={
+  weekly:boolen
+  monthly:boolean
+  enabled:boolean
+  dayOfWeek?:number
+  dayOfMonth?:number
+  time?:string
+}
+
+type SummaryProps={
+  expense:number
+  income:number
+  savings:number
+  topCategory:{name:string,amount:number} | null
+  transactionsCount:number
+
+}
+
+type InsightDataProps={
+  content:string
+  createdAt:string 
+  dateEnd:string
+  dateStart:string 
+  id:string 
+  userId:string
+  period:Period
+  summary:SummaryProps
+}
+
+type insightPeriodicallyProps={
+  content:string
+  summary:SummaryProps
+  dateStart:string
+  dateEnd:string
+}
+
+type aiPeriodDataProps={
+  id:string
+  period:Period
+  insightPeriodically:insightPeriodicallyProps[]
+}
+
+type AiContextProps={
+  creatingInsights:(period:Period)=>Promise<InsightDataProps| null>
+  foundInsights:(period:Period)=>Promise<InsightDataProps| null>
+  insightSchedule:(data:InsightScheduleProps)=>Promise<void>
+  insightsByPeriod:(period:Period)=>Promise<InsightDataProps[]>
+  loading:boolean
+  error:string | null
+}
+
+type dataMapProps={
+  id:number,
+  key:string,
+  items:{
+    name:string,
+    href:Href,
+    symbol:any
+  }[]
+}
+
+type LinkDataProps={
+  dataMap?:dataMapProps[]
+}
+
+type UnLinkDataProps={
+  icon:any
+  insideText:string
+}
+
+
+
+type ProfileWrapProps={
+  textValue:string
+  dataHasHref:boolean
+  dataMap?:dataMapProps[]
+  extraChild?:React.ReactNode
+  children:React.ReactNode
+}
+
+type Period = 'day' | 'week' | 'month' | 'year';
+
+type countryCurrencyDataProps={
+  id:number
+  country:string 
+  code:string 
+  currency:string
+  currencyCode:string
+  symbol:any
+}
+
+type preferenceType={
+  currencyCode:string
+  currencySymbol:any
+  theme:string
+}
+type GuestContextProps={
+  accounts:Account[]
+  categories:Category[]
+  transactions:Transaction[]
+  preferences:preferenceType
+  isGuest:boolean
+  addAccount:(data:Account)=>void
+  addCategory:(data:Category)=>void
+  addTransaction:(data:Transaction)=>void
+  updatedAccount: (id: string, data: Partial<Account>) => void
+  removeAccount: (id: string) => void
 }
 
 }
