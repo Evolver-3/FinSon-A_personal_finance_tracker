@@ -1,12 +1,31 @@
 import { createCategory, getCategories, getCategory, updateCategory, deleteCategory } from "@/services/categoryServices";
 import { useState,useEffect } from "react";
+import {useAuth as useClerkAuth} from '@clerk/clerk-expo'
+import { useGuest } from "./useGuest";
 
 export const useCategory=()=>{
+  const {isSignedIn}=useClerkAuth()
+  const guest=useGuest()
 
-  const [categories,setCategories]=useState<Category[]>([])
+  const isGuest=!isSignedIn
+
+  const [categories,setCategories]=useState<Category[]>(isGuest?guest.categories:[])
+
   const [selectedCategory,setSelectedCategory]=useState<Category | null>(null)
   const [loading,setLoading]=useState(false)
   const [error,setError]=useState<string|null>(null)
+
+  useEffect(()=>{
+    if(isGuest){
+      setCategories(guest.categories)
+    }
+  },[guest.categories,isGuest])
+
+  useEffect(()=>{
+    if(!isGuest){
+      fetchAllCategory()
+    }
+  },[isGuest])
 
   const handleError=(error:any)=>{
     const message=error?.message?.data?.message || error?.message || "Something went wrong"
@@ -16,16 +35,25 @@ export const useCategory=()=>{
   }
 
   const creatingCategory=async(data:createCategoryProps)=>{
-    try{
       setLoading(true)
       setError(null)
+    try{
+      const newCategory:Category={
+        id:Date.now().toString(),
+        ...data,
+        createdAt:new Date().toISOString()
+      }
+
+      if(isGuest){
+        guest.addCategory(newCategory)
+      }
 
       const res=await createCategory(data)
+      console.log("category created:",res.data)
 
       setCategories((prev)=>[res.data, ...prev])
 
       return res.data
-
 
     }catch(error:any){
       
@@ -36,9 +64,11 @@ export const useCategory=()=>{
   }
 
   const fetchAllCategory=async()=>{
-    try{
+    if(isGuest) return guest.categories
       setLoading(true)
       setError(null)
+
+    try{
 
       const res=await getCategories()
       setCategories(res.data)
@@ -55,6 +85,12 @@ export const useCategory=()=>{
   }
 
   const fetchCategory=async(id:string)=>{
+    
+    if(isGuest){
+      const found=guest.categories.find((c)=>c.id===id) || null
+      setSelectedCategory(found)
+      return found
+    }
     try{
       setLoading(true)
       setError(null)
@@ -79,9 +115,20 @@ export const useCategory=()=>{
   }
 
   const editCategory=async(id:string,data:updateCategoryProps)=>{
-    try{
       setLoading(true)
       setError(null)
+    try{
+      if(isGuest){
+        guest.updatedCategory(id,data)
+
+        setCategories((prev)=>
+        prev.map((cat)=>cat.id===id?{...cat,...data}:cat))
+        setSelectedCategory((prev)=>
+        prev?.id===id?{...prev,...data}:prev)
+
+        return {...selectedCategory,...data} as Category
+      }
+
       const res=await updateCategory(id,data)
       console.log("edit category:",res)
 
@@ -102,9 +149,15 @@ export const useCategory=()=>{
   }
 
   const removeCategory=async(id:string)=>{
-    try{
       setLoading(true)
       setError(null)
+    try{
+
+      if(isGuest){
+        guest.removeCategory(id)
+        setSelectedCategory((prev)=>(prev?.id===id?null:prev))
+        return
+      }
       await deleteCategory(id)
 
       setCategories((prev)=>prev.filter((category)=>category.id !==id))
