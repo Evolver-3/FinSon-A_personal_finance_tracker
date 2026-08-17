@@ -81,17 +81,31 @@ export const GuestProvider=({children}:{children:React.ReactNode})=>{
     setIsGuest(false)
   }
 
+  const enterGuestMode=async()=>{
+    await AsyncStorage.setItem('@app_mode', "guest")
+    setIsGuest(true)
+  }
+
+  useEffect(()=>{
+    const loadMode=async()=>{
+      const mode=await AsyncStorage.getItem("@app_mode")
+
+      if(mode==="guest"){
+        setIsGuest(true)
+      }
+    }
+    loadMode()
+  },[])
+
   const addAccount=(newAccount:Account)=>{
     setAccounts((prev)=>{
       const updated =[newAccount,...prev]
-      AsyncStorage.setItem('@guest_accounts',JSON.stringify(updated))
       return updated;
     })
   }
   const removeAccount=(id:string)=>{
     setAccounts((prev)=>{
       const updated=prev.filter((acc)=>acc.id!==id)
-      AsyncStorage.setItem('@guest_accounts',JSON.stringify(updated))
       return updated
     })
   }
@@ -99,8 +113,6 @@ export const GuestProvider=({children}:{children:React.ReactNode})=>{
   const updatedAccount=(id:string,data:Partial<Account>)=>{
     setAccounts((prev)=>{
       const updated=prev.map((acc)=>acc.id===id?{...acc,...data}:acc)
-    
-    AsyncStorage.setItem('@guest_accounts',JSON.stringify(updated))
     return updated
     }
   )
@@ -110,7 +122,21 @@ export const GuestProvider=({children}:{children:React.ReactNode})=>{
   const addCategory=(newCategory:Category)=>{
     setCategories((prev)=>{
       const updated=[newCategory, ...prev]
-      AsyncStorage.setItem('@guest_data',JSON.stringify(updated))
+      return updated
+    })
+  }
+
+  const removeCategory=(id:string)=>{
+    setCategories((prev)=>{
+      const updated=prev.filter((cat)=>cat.id!==id)
+
+      return updated
+    })
+  }
+
+  const updatedCategory=(id:string,data:Partial<Category>)=>{
+    setCategories((prev)=>{
+      const updated=prev.map((cat)=>cat.id===id?{...cat,...data}:cat)
       return updated
     })
   }
@@ -118,14 +144,28 @@ export const GuestProvider=({children}:{children:React.ReactNode})=>{
   const addTransaction=(newTransaction:Transaction)=>{
     setTransactions((prev)=>{
       const updated=[newTransaction, ...prev]
-      AsyncStorage.setItem('@guest_data',JSON.stringify(updated))
+      return updated
+    })
+  }
+
+  const removeTransaction=(id:string)=>{
+    setTransactions((prev)=>{
+      const updated=prev.filter((tran)=>tran.id!==id)
+      return updated
+    })
+  }
+
+  const updatedTransaction=(id:string,data:Partial<Transaction>)=>{
+    setTransactions((prev)=>{
+      const updated=prev.map((tran)=>tran.id===id?{...tran,...data}:tran)
       return updated
     })
   }
 
   return(
-    <GuestContext.Provider value={{accounts,categories,transactions,preferences,isGuest,addAccount,addCategory,addTransaction,
-      removeAccount,updatedAccount
+    <GuestContext.Provider value={{accounts,categories,transactions,preferences,isGuest,setIsGuest,
+      addAccount,addCategory,addTransaction,
+      removeAccount,updatedAccount,removeCategory,updatedCategory,removeTransaction,updatedTransaction,enterGuestMode
       
     }}>
       {children}
