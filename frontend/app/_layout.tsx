@@ -8,7 +8,9 @@ import { useAppFonts } from "@/hooks/useAppFonts";
 import { CurrencyProvider } from "@/context/CurrencyContext";
 import { ClerkProvider } from "@clerk/clerk-expo";
 import { tokenStorage } from "@/services/tokenStorage";
-import { AuthTokenSync } from "@/components/AuthTokenSync";
+import { AuthTokenSync } from "@/components/mainUi/AuthTokenSync";
+import { AiProvider } from "@/context/AiContext";
+import { GuestProvider } from "@/context/GuestContext";
 
 export default function RootLayout(){
 
@@ -17,6 +19,7 @@ export default function RootLayout(){
   if(!fontsLoaded) return null;
   
   return(
+    <GuestProvider>
     <ClerkProvider 
     publishableKey={
       process.env.EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY!
@@ -24,17 +27,20 @@ export default function RootLayout(){
     tokenCache={tokenStorage}>
     <AuthTokenSync/>
       <AuthProvider>
-      <BudgetProvider>
-        <TransactionProvider>
-          <CurrencyProvider>
-        <Stack
-      screenOptions={{
-      headerShown:false
-      }}/>
-      </CurrencyProvider>
-      </TransactionProvider>
-      </BudgetProvider>
-    </AuthProvider>
+        <BudgetProvider>
+          <TransactionProvider>
+            <CurrencyProvider>
+              <AiProvider>
+              <Stack
+              screenOptions={{
+              headerShown:false
+              }}/>
+              </AiProvider>
+            </CurrencyProvider>
+          </TransactionProvider>
+        </BudgetProvider>
+      </AuthProvider>
     </ClerkProvider>
+    </GuestProvider>
   )
 }
