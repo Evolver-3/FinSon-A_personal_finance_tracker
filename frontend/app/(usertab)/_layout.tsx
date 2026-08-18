@@ -1,10 +1,11 @@
 import { Redirect, Stack } from "expo-router"
 import { ActivityIndicator, View } from "react-native"
-import { useAuthContext } from "@/context/AuthContext"
+import { useAuthHook } from "@/hooks/useAuthHook"
+import {useGuest} from '@/hooks/useGuest'
 
 export default function AuthLayout() {
-  const { user, loading } = useAuthContext()
-
+  const { backendUser, loading } = useAuthHook()
+  const {isGuest}=useGuest()
   if (loading) {
     return (
       <View className="flex-1 items-center justify-center">
@@ -13,8 +14,8 @@ export default function AuthLayout() {
     )
   }
 
-  if (!user) {
-    return <Redirect href="/(auth)/sign-in" /> 
+  if (!backendUser && !isGuest) {
+    return <Redirect href="/(auth)/Login" /> 
   }
 
   return <Stack screenOptions={{ headerShown: false }} />

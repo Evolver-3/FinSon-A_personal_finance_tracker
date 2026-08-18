@@ -1,9 +1,11 @@
 import { Redirect } from "expo-router"
 import { ActivityIndicator, View } from "react-native"
-import { useAuthContext } from "@/context/AuthContext"
+import { useAuthHook } from "@/hooks/useAuthHook"
+import { useGuest } from "@/hooks/useGuest"
 
 export default function Index() {
-  const { user, loading } = useAuthContext()
+  const { backendUser, loading } = useAuthHook()
+  const {isGuest}=useGuest()
 
   if (loading) {
     return (
@@ -13,9 +15,9 @@ export default function Index() {
     )
   }
  
-  if (user) {
+  if (backendUser && isGuest) {
     return <Redirect href="/(tabs)/home" />
   }
 
-  return <Redirect href="/(auth)/sign-in" />
+  return <Redirect href="/(auth)/Login" />
 } 

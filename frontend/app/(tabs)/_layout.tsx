@@ -1,13 +1,15 @@
-import { useAuthContext } from "@/context/AuthContext"
+import { useAuthHook } from "@/hooks/useAuthHook"
 import { Redirect, Tabs } from "expo-router"
 import { ActivityIndicator, View ,Text} from "react-native"
 import { bottomTabData } from "@/data"
 import { Plus } from "lucide-react-native"
 import { useTheme } from "@/hooks/useTheme"
+import { useGuest } from "@/hooks/useGuest"
 
 
 export default function TabsLayout() {
-  const { user,loading } = useAuthContext()
+  const { backendUser,loading } = useAuthHook()
+  const {isGuest}=useGuest()
   const {isDark}=useTheme()
 
   if (loading) {
@@ -18,8 +20,8 @@ export default function TabsLayout() {
     )
   }
 
-  if (!user) {
-    return <Redirect href="/(auth)/sign-in" />
+  if (!backendUser && !isGuest) {
+    return <Redirect href="/(auth)/Login" />
   }
 
   
@@ -82,7 +84,7 @@ export default function TabsLayout() {
                   <TabIcon
                   text={data.text}
                   focused={focused}
-                  icon={data.icon(focused ,24,isDark? (focused? "#AAAAAA":"#ffffff"):"#000000")} />
+                  icon={data.icon(focused,24,isDark? (focused? "#250030":"#ffffff"):"#000000")} />
                 )
               }}/>
               )
@@ -90,11 +92,7 @@ export default function TabsLayout() {
             </Tabs> 
 }
 
-type TabIconProps={
-  focused:boolean 
-  icon: React.ReactNode
-  text:string
-}
+
 
 const TabIcon=({focused,icon,text}:TabIconProps)=>{
   const {isDark}=useTheme()
