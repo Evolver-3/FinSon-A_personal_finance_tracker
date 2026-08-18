@@ -1,47 +1,103 @@
 import React, { createContext,useContext,useEffect,useState } from 'react'
 
-import {useAuth,useUser} from '@clerk/clerk-expo'
+import {useAuth} from '@clerk/clerk-expo'
+import { getMe, logoutAllDevice, refreshToken, syncbackend } from '@/services/authServices'
 
-const AuthContext =createContext<AuthContextType | null> (null) 
+export const AuthContext =createContext<AuthContextType | null> (null) 
 
 export const AuthProvider=({children}:{children:React.ReactNode})=>{
 
-  const [user,setUser]=useState<User|null>(null)
+  const [backendUser,setBackendUser]=useState<User|null>(null)
   const [loading,setLoading]=useState(true)
+  const [error,setError]=useState<string|null>(null)
 
-  const {isLoaded,isSignedIn}=useAuth()
-  const {user:clerkUser}=useUser()
+  const {isLoaded,isSignedIn,getToken}=useAuth()
+
+  //error handling
+  const handleError=(error:any)=>{
+  const message=error?.response?.data?.message || error?.message || "Something went wrong"
+  
+  setError(message)
+  throw error
+  }
+  
+
+
+  //loadBackendUser with the token
+  const loadBackendUser=async()=>{
+    try{
+      if(!isLoaded)return
+      setLoading(true)
+
+      if(!isSignedIn){
+        setBackendUser(null)
+        return
+      }
+
+      const token=await getToken()
+
+      if(!token){
+        setBackendUser(null)
+        return
+      }
+
+      const user=await getMe()
+      setBackendUser(user)
+    }catch(err:any){
+      handleError(err)
+      setBackendUser(null)
+    }finally{
+      setLoading(false)
+    }
+  }
 
   useEffect(()=>{
-    if(!isLoaded)return ;
+    loadBackendUser()
+  },[isLoaded,isSignedIn])
 
-    if(isSignedIn && clerkUser){
-      setUser({
-        id:clerkUser.id,
-        name:`${clerkUser.firstName} ${clerkUser.lastName}`,
-        email:clerkUser.emailAddresses[0]?.emailAddress,
-        avatar:clerkUser.imageUrl
-      })
-    }else{
-      setUser(null)
-    }
+  const syncBackendHook=async(token:string)=>{
+    setLoading(true)
+    setError(null)
+    try{
+        const res=await syncbackend(token)
+        console.log("token in hook:",token)
+        return res
 
+    }catch(err:any){
+      setError(err)
+
+    }finally{
     setLoading(false)
-  },[isLoaded,isSignedIn,clerkUser])
+    }
+    }
+  
+  const refreshAuthToken=async(token: string)=>{
+    setLoading(true)
+    setError(null)
+    try{
+      await refreshToken(token)
+    }catch(error:any){
+      handleError(error)
+    }finally{
+      setLoading(false)
+    }} 
+
+  const logoutEverywhere=async()=>{
+    setLoading(true)
+    setError(null)
+    try{
+      await logoutAllDevice()
+    }catch(error:any){
+      handleError(error)
+    }finally{
+      setLoading(false)
+    }} 
+  
 
   return(
-    <AuthContext.Provider value={{user,loading,setUser}}>
+    <AuthContext.Provider value={{backendUser,loading,setBackendUser,loadBackendUser,syncBackendHook,refreshAuthToken,logoutEverywhere}}>
       {children}
     </AuthContext.Provider>
   )
 }
 
-export const useAuthContext=()=>{
-  const context=useContext(AuthContext)
-
-  if(!context){
-    throw new Error("useAuthContext must be used inside AuthProvider")
-  }
-
-  return context
-}
