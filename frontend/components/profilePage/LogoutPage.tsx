@@ -1,7 +1,7 @@
 import { View, Text, Pressable, ActivityIndicator } from 'react-native'
 import React,{useState} from 'react'
 import { router } from 'expo-router'
-import { useAuthContext } from '@/context/AuthContext'
+import { useAuthHook } from '@/hooks/useAuthHook'
 import { useClerk } from '@clerk/clerk-expo'
 import { useTheme } from '@/hooks/useTheme'
 
@@ -9,7 +9,7 @@ const LogoutPage = () => {
 
   const [loading,setLoading]=useState(false)
   const { signOut}=useClerk()
-  const {setUser}=useAuthContext()
+  const {setBackendUser}=useAuthHook()
   const {isDark}=useTheme()
 
   const handleLogout=async()=>{
@@ -17,7 +17,7 @@ const LogoutPage = () => {
     setLoading(true)
     try{
       await signOut()
-   setUser(null)
+   setBackendUser(null)
    router.replace("/(auth)/Login")
     }finally{
       setLoading(false)
