@@ -1,5 +1,4 @@
-import React, { createContext,useContext,useEffect,useState } from 'react'
-
+import React, { createContext,useEffect,useState } from 'react'
 import {useAuth} from '@clerk/clerk-expo'
 import { getMe, logoutAllDevice, refreshToken, syncbackend } from '@/services/authServices'
 
@@ -20,8 +19,6 @@ export const AuthProvider=({children}:{children:React.ReactNode})=>{
   setError(message)
   throw error
   }
-  
-
 
   //loadBackendUser with the token
   const loadBackendUser=async()=>{
@@ -41,7 +38,8 @@ export const AuthProvider=({children}:{children:React.ReactNode})=>{
         return
       }
 
-      const user=await getMe()
+      const user:User=await getMe()
+      console.log("token is correct, then getMe should give user details")
       setBackendUser(user)
     }catch(err:any){
       handleError(err)
@@ -59,9 +57,10 @@ export const AuthProvider=({children}:{children:React.ReactNode})=>{
     setLoading(true)
     setError(null)
     try{
-        const res=await syncbackend(token)
-        console.log("token in hook:",token)
-        return res
+      const res=await syncbackend(token)
+      console.log("token in hook is correct then get res from syncbackend:", res)
+      setBackendUser(res)
+      return res
 
     }catch(err:any){
       setError(err)
@@ -95,7 +94,7 @@ export const AuthProvider=({children}:{children:React.ReactNode})=>{
   
 
   return(
-    <AuthContext.Provider value={{backendUser,loading,setBackendUser,loadBackendUser,syncBackendHook,refreshAuthToken,logoutEverywhere}}>
+    <AuthContext.Provider value={{backendUser,loading,setBackendUser,loadBackendUser,syncBackendHook,refreshAuthToken,logoutEverywhere,error}}>
       {children}
     </AuthContext.Provider>
   )
