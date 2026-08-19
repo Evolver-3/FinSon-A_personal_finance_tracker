@@ -9,6 +9,7 @@ export const GuestProvider=({children}:{children:React.ReactNode})=>{
   const [accounts,setAccounts]=useState<Account[]>([])
   const [categories,setCategories]=useState<Category[]>([])
   const [transactions,setTransactions]=useState<Transaction[]>([])
+  const [budgets,setBudgets]=useState<Budget[]>([])
   const [preferences,setPreferences]=useState({
     currencyCode:'USD',
     currencySymbol:'$',
@@ -22,7 +23,6 @@ export const GuestProvider=({children}:{children:React.ReactNode})=>{
   setError(message)
   throw error
   }
-  
 
   useEffect(()=>{
     const loadGuest=async()=>{
@@ -36,6 +36,7 @@ export const GuestProvider=({children}:{children:React.ReactNode})=>{
         setCategories(parsed.categories || [])
         setTransactions(parsed.transactions || [])
         setPreferences(parsed.preferences || {})
+        setBudgets(parsed.budgets || [])
       }
     }catch(err:any){
       console.log("Failed to load guest data:",err)
@@ -59,6 +60,7 @@ export const GuestProvider=({children}:{children:React.ReactNode})=>{
       accounts,
       categories,
       transactions,
+      budgets,
       preferences
     }))
 
@@ -78,13 +80,20 @@ export const GuestProvider=({children}:{children:React.ReactNode})=>{
     setAccounts([])
     setCategories([])
     setTransactions([])
+    setBudgets([])
     setIsGuest(false)
   }
 
-  const enterGuestMode=async()=>{
-    await AsyncStorage.setItem('@app_mode', "guest")
-    setIsGuest(true)
-  }
+const enterGuestMode = async () => {
+  console.log("Are we here:");
+
+  await AsyncStorage.setItem("@app_mode", "guest");
+
+  const storedMode = await AsyncStorage.getItem("@app_mode");
+  console.log("stored mode:", storedMode); // should be "guest"
+
+  setIsGuest(true);
+};
 
   useEffect(()=>{
     const loadMode=async()=>{
@@ -103,6 +112,7 @@ export const GuestProvider=({children}:{children:React.ReactNode})=>{
       return updated;
     })
   }
+
   const removeAccount=(id:string)=>{
     setAccounts((prev)=>{
       const updated=prev.filter((acc)=>acc.id!==id)
@@ -117,7 +127,6 @@ export const GuestProvider=({children}:{children:React.ReactNode})=>{
     }
   )
   }
-
 
   const addCategory=(newCategory:Category)=>{
     setCategories((prev)=>{
@@ -162,10 +171,31 @@ export const GuestProvider=({children}:{children:React.ReactNode})=>{
     })
   }
 
+  const addBudget=(newBudget:Budget)=>{
+    setBudgets((prev)=>{
+      const created=[newBudget,...prev]
+      return created
+    })
+  }
+
+  const removeBudget=(id:string)=>{
+    setBudgets((prev)=>{
+      const updated=prev.filter((bud)=>bud.id!==id)
+      return updated
+    })
+  }
+
+  const updatedBudget=(id:string,data:Partial<Budget>)=>{
+    setBudgets((prev)=>{
+      const updated=prev.map((bud)=>bud.id===id?{...bud,...data}:bud)
+      return updated
+    })
+  }
+
   return(
-    <GuestContext.Provider value={{accounts,categories,transactions,preferences,isGuest,setIsGuest,
+    <GuestContext.Provider value={{accounts,categories,transactions,budgets,preferences,isGuest,setIsGuest,
       addAccount,addCategory,addTransaction,
-      removeAccount,updatedAccount,removeCategory,updatedCategory,removeTransaction,updatedTransaction,enterGuestMode
+      removeAccount,updatedAccount,removeCategory,updatedCategory,removeTransaction,updatedTransaction,enterGuestMode,addBudget,removeBudget,updatedBudget
       
     }}>
       {children}
