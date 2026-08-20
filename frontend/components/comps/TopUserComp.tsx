@@ -1,40 +1,44 @@
-import { View, Text ,Image} from 'react-native'
+import { View, Text ,Image,Pressable} from 'react-native'
 import React,{useEffect} from 'react'
 import { useUser } from '@/hooks/useUser'
 import { BellIcon, UserRound } from 'lucide-react-native'
+import ThemeIcon from '../Theme/ThemeIcon'
+import { useGuest } from '@/hooks/useGuest'
+import { useAuth } from '@clerk/clerk-expo'
 
+const TopUserComp = ({otherText,headingText,children}:headingTextProps) => {
+   const {fetchUserProfile,backendUser}=useUser()
+     const guest=useGuest()
+     const {isSignedIn}=useAuth()
+     const isGuest=!isSignedIn
 
-const TopUserComp = ({headingText}:headingTextProps) => {
-   const {fetchUserProfile,user,loading}=useUser()
-
-   useEffect(()=>{
-      
-    fetchUserProfile()
-   },[])
+    const userData=isGuest?guest.userInfo:backendUser
 
   return (
     <View className="topHead">
 
       <View className="imageText">
-        {user?.avatar ? (
+        {backendUser?.avatar ? (
         <Image 
-        source={{uri:user?.avatar as any}}
+        source={{uri:backendUser?.avatar as any}}
         className='mainImage borderOne'
         />):(
           <UserRound
           size={30}
           color={"#ffffff"}/>
         )}  
+
+        {children}
            
       <Text className='biggerText topHeadings'
       style={{
-        fontFamily:"Sans-Extrabold"
-      }}>{ headingText}</Text>  
+        fontFamily:"Sans-bold"
+      }}>{otherText?headingText:userData?.name}</Text>  
       </View>
 
-      <View className="bellIcon  hoverBorder">
-        <BellIcon size={20} color={"#ffffff"}/>
-      </View>
+      <Pressable className="bellIcon ">
+        <ThemeIcon icon={BellIcon} size={20} lightColor={"#525252"} darkColor={"#ffffff"}/>
+      </Pressable>
 
               
     </View>
