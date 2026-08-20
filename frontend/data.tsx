@@ -1,4 +1,4 @@
-import { Home, BadgePlus, UserRound, Banknote, ChartNoAxesCombinedIcon, Utensils ,Fuel, Hamburger, GlobeCheck, CarTaxiFrontIcon, Landmark, BanknoteIcon, Wallet, CreditCard, Toolbox, Clapperboard, Hospital, GitGraphIcon, User, SunIcon, Speaker, Languages, LucideGitGraph} from 'lucide-react-native'
+import { Home, BadgePlus, UserRound, Banknote, ChartNoAxesCombinedIcon, Utensils ,Fuel, Hamburger, GlobeCheck, CarTaxiFrontIcon, Landmark, BanknoteIcon, Wallet, CreditCard, Toolbox, Clapperboard, Hospital, GitGraphIcon, User, SunIcon, Speaker, Languages, LucideGitGraph, Settings,SunMoonIcon, SunDimIcon, Moon, Currency, IndianRupee, DollarSign, LucidePoundSterling, EuroIcon, JapaneseYen, CircleDollarSignIcon, AlignVerticalJustifyStart, LucideDollarSign, NewspaperIcon, ReplyIcon, UserRoundPenIcon, PackageOpenIcon, ArrowRightSquareIcon, BoxIcon} from 'lucide-react-native'
 import React from 'react'
 import { Href } from 'expo-router'
 
@@ -61,10 +61,10 @@ export const bottomTabData:bottomTabDataProps[] = [
   },
     {
     id: 5,
-    name: "profile",
-    text: "Profile",
+    name: "Settings",
+    text: "Setting",
     icon: (focused,size,color) => (
-      <UserRound
+      <Settings
         size={size ?? 20}
         color={color ??(focused ? "#0a0a0a" : "#a3a3a3")}
         strokeWidth={focused ? 1.6 : 1}
@@ -273,111 +273,127 @@ export const monthData=[
 
 export const countryCurrencyData = [
   {
+    id:1,
     country: "India",
     code: "IN",
     currency: "Indian Rupee",
     currencyCode: "INR",
-    symbol: "₹",
+    symbol:IndianRupee
   },
   {
+    id:2,
     country: "United States",
     code: "US",
     currency: "US Dollar",
     currencyCode: "USD",
-    symbol: "$",
-  },
+    symbol: DollarSign
+  }
+  ,
   {
+    id:3,
     country: "United Kingdom",
     code: "GB",
     currency: "British Pound",
     currencyCode: "GBP",
-    symbol: "£",
+    symbol: LucidePoundSterling
   },
   {
+    id:4,
     country: "European Union",
     code: "EU",
     currency: "Euro",
     currencyCode: "EUR",
-    symbol: "€",
+    symbol: EuroIcon
   },
   {
+    id:5,
     country: "Japan",
     code: "JP",
     currency: "Japanese Yen",
     currencyCode: "JPY",
-    symbol: "¥",
+    symbol:JapaneseYen
   },
   {
+    id:6,
     country: "China",
     code: "CN",
     currency: "Chinese Yuan",
     currencyCode: "CNY",
-    symbol: "¥",
+    symbol: JapaneseYen
   },
   {
+    id:7,
     country: "Canada",
     code: "CA",
     currency: "Canadian Dollar",
     currencyCode: "CAD",
-    symbol: "C$",
+    symbol: CircleDollarSignIcon
   },
   {
+    id:8,
     country: "Australia",
     code: "AU",
     currency: "Australian Dollar",
     currencyCode: "AUD",
-    symbol: "A$",
+    symbol:AlignVerticalJustifyStart
   },
   {
+    id:9,
     country: "Singapore",
     code: "SG",
     currency: "Singapore Dollar",
     currencyCode: "SGD",
-    symbol: "S$",
+    symbol:LucideDollarSign
   },
   {
+    id:10,
     country: "United Arab Emirates",
     code: "AE",
     currency: "UAE Dirham",
     currencyCode: "AED",
-    symbol: "د.إ",
+    symbol: BoxIcon
   },
   {
+    id:11,
     country: "Saudi Arabia",
     code: "SA",
     currency: "Saudi Riyal",
     currencyCode: "SAR",
-    symbol: "﷼",
+    symbol: ArrowRightSquareIcon
   },
   {
+    id:12,
     country: "Pakistan",
     code: "PK",
     currency: "Pakistani Rupee",
     currencyCode: "PKR",
-    symbol: "₨",
+    symbol: PackageOpenIcon
   },
   {
+    id:13,
     country: "Bangladesh",
     code: "BD",
     currency: "Bangladeshi Taka",
     currencyCode: "BDT",
-    symbol: "৳",
+    symbol: UserRoundPenIcon
   },
   {
+    id:14,
     country: "Sri Lanka",
     code: "LK",
     currency: "Sri Lankan Rupee",
     currencyCode: "LKR",
-    symbol: "Rs",
+    symbol: ReplyIcon
   },
   {
+    id:15,
     country: "Nepal",
     code: "NP",
     currency: "Nepalese Rupee",
     currencyCode: "NPR",
-    symbol: "रू",
+    symbol: NewspaperIcon,
   },
-];
+]
 
 export const PERIODS: { key: Period; label: string }[] = [
   { key: 'day', label: 'Today' },
@@ -386,37 +402,29 @@ export const PERIODS: { key: Period; label: string }[] = [
   { key: 'year', label: 'Year' },
 ];
 
-export const settingsItem:{
-  id:number,
-  key:string,
-  items:{
-    name:string,
-    href:Href,
-    symbol:any
-  }[]
-}[]=[
+  export const settingsItem=[
   {
     id:1,
     key:'General',
     items:[
       {
         'name':'Profile',
-        'href':"/(usertab)/ProfilePage/UserProfile",
+        'href':"/(usertab)/ProfilePage/UserProfile" as const,
         'symbol':User
       },
       {
         'name':'Theme settings',
-        'href':"/(usertab)/ProfilePage/ThemeSettings",
+        'href':"/(usertab)/ProfilePage/ThemeSettings" as const,
         'symbol':SunIcon
       },
       {
-        'name':'Language Selection',
-        'href':"/(usertab)/ProfilePage/Language",
-        'symbol':Languages
+        'name':'Currency Selection',
+        'href':"/(usertab)/ProfilePage/Currency" as const,
+        'symbol':Currency
       },
       {
         'name':'Notification settings',
-        'href':"/(usertab)/ProfilePage/Notification",
+        'href':"/(usertab)/ProfilePage/Notification" as const,
         'symbol':Speaker
       },
     ]
@@ -427,9 +435,30 @@ export const settingsItem:{
     items:[
       {
         'name':'Insight Schedule',
-        'href':"/(usertab)/ProfilePage/InsightSchedule",
+        'href':"/(usertab)/ProfilePage/InsightSchedule" as const,
         'symbol':LucideGitGraph
       }
   ]
+  }
+]
+
+export const ThemeData=[
+  {
+    id:1,
+    text:"Follow System",
+    symbol:SunMoonIcon,
+    scheme:"system"
+  },
+  {
+    id:2,
+    text:"Light mode",
+    symbol:SunDimIcon,
+    scheme:"light"
+  },
+  {
+    id:3,
+    text:"Dark mode",
+    symbol:Moon,
+    scheme:"dark"
   }
 ]
