@@ -6,6 +6,7 @@ import{ useState } from 'react'
 import { useAuthHook } from '@/hooks/useAuthHook'
 import * as Linking from 'expo-linking'
 import { setAuthToken } from '@/services/setAuthToken'
+import {useGuest} from '@/hooks/useGuest'
 
 WebBrowser.maybeCompleteAuthSession()
 
@@ -14,9 +15,11 @@ const Login = () => {
   const [loading,setLoading]=useState(false)
   const {getToken}=useAuth()
   const {startSSOFlow}=useSSO()
-  const {syncBackendHook}=useAuthHook()
+  const {syncBackendHook,setBackendUser}=useAuthHook()
 
-  
+  const {enterGuestMode}=useGuest()
+
+
   const redirectUrl=Linking.createURL("sso-callback")
 
   const handleLogin=async()=>{
@@ -39,8 +42,16 @@ const Login = () => {
       }
 
       await setAuthToken(token)
+      console.log("token in the setAuthtoken")
 
-      await syncUserToBackend(token)
+      const syncedUser=await syncBackendHook(token)
+      if(!syncedUser){
+        throw new Error("Backend user synced failed")
+      }
+      console.log("What is the created user synced:", syncedUser)
+      setBackendUser(syncedUser)
+    
+      console.log("now routing to home page")
 
       router.replace("/(tabs)/home")
     }catch(err:any){
@@ -51,12 +62,16 @@ const Login = () => {
     }
   }
 
-  const syncUserToBackend = async (token: string) => {
-    const user = await syncBackendHook(token)
 
-    console.log('User synced to Prisma:',user);
-    
-  };
+ const handleGuest = async () => {
+  console.log("Guest button clicked");
+
+  await enterGuestMode();
+
+  console.log("navigating home now");
+
+  router.replace("/(tabs)/home");
+};
 
   return (
     <View
@@ -78,7 +93,8 @@ const Login = () => {
         Welcome to FinSon
       </Text>
 
-      <Text
+      <View>
+        <Text
         style={{
           fontSize: 15,
           color: "#64748B",
@@ -86,36 +102,60 @@ const Login = () => {
         }}
       >
         Sign in to manage your finances.
-      </Text>
+        </Text>
 
-      <Pressable
-        disabled={ loading}
-        onPress={handleLogin}
+        <Pressable
+          disabled={ loading}
+          onPress={handleLogin}
+          style={{
+            height: 54,
+            borderRadius: 10,
+            borderWidth: 1,
+            borderColor: "#D9E2EF",
+            backgroundColor: "#FFFFFF",
+            justifyContent: "center",
+            alignItems: "center",
+            opacity:  loading ? 0.6 : 1,
+            }}>
+              
+            {loading ? (
+              <ActivityIndicator color="#208AEF" />
+              ) : (
+              <Text
+                style={{
+                  fontSize: 15,
+                  fontWeight: "600",
+                  color: "#334155",
+                }}>
+                Continue with Google
+              </Text>
+              )}
+        </Pressable>
+      </View>
+
+      <View>
+        <Pressable 
         style={{
-          height: 54,
-          borderRadius: 10,
-          borderWidth: 1,
-          borderColor: "#D9E2EF",
-          backgroundColor: "#FFFFFF",
-          justifyContent: "center",
-          alignItems: "center",
-          opacity:  loading ? 0.6 : 1,
-        }}
-      >
-        {loading ? (
-          <ActivityIndicator color="#208AEF" />
-        ) : (
-          <Text
-            style={{
-              fontSize: 15,
-              fontWeight: "600",
-              color: "#334155",
+            height: 54,
+            borderRadius: 10,
+            borderWidth: 1,
+            borderColor: "#D9E2EF",
+            backgroundColor: "#FFFFFF",
+            justifyContent: "center",
+            alignItems: "center",
+            opacity:  loading ? 0.6 : 1,
             }}
-          >
-            Continue with Google
-          </Text>
-        )}
-      </Pressable>
+        onPress={handleGuest}>
+        <Text
+        style={{
+                  fontSize: 15,
+                  fontWeight: "600",
+                  color: "#334155",
+                }}> Check guest mode</Text>
+        </Pressable>
+      </View>
+
+
     </View>
   )
 }

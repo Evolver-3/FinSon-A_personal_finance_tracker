@@ -12,14 +12,18 @@ const SSOCallback = () => {
   useEffect(() => {
     const finishLogin = async () => {
       try {
+
+        console.log("I am in SsoCallbacke:...")
         if (!isLoaded) return;
+        console.log("am i here:...")
 
         if (!isSignedIn) {
           router.replace("/(auth)/Login");
           return;
         }
-
+        
         const token = await getToken();
+        console.log("Token is found??", token)
 
         if (!token) {
           throw new Error("No Clerk token found");
