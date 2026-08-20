@@ -4,21 +4,26 @@ import { router } from 'expo-router'
 import { useAuthHook } from '@/hooks/useAuthHook'
 import { useClerk } from '@clerk/clerk-expo'
 import { useTheme } from '@/hooks/useTheme'
+import { useGuest } from '@/hooks/useGuest'
 
 const LogoutPage = () => {
 
   const [loading,setLoading]=useState(false)
   const { signOut}=useClerk()
   const {setBackendUser}=useAuthHook()
+  const {clearGuestData,isGuest}=useGuest()
   const {isDark}=useTheme()
 
   const handleLogout=async()=>{
 
     setLoading(true)
     try{
+      if(isGuest){
+        clearGuestData()
+      }
       await signOut()
-   setBackendUser(null)
-   router.replace("/(auth)/Login")
+      setBackendUser(null)
+      router.replace("/(auth)/Login")
     }finally{
       setLoading(false)
     }
