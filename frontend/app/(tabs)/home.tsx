@@ -19,7 +19,7 @@ import ThemeIcon from '@/components/Theme/ThemeIcon'
 
 const index = () => {
 
-  const {user}=useUser()
+  const {backendUser}=useUser()
    const {fetchAllAccounts,accounts,loading}=useAccount()
    const {budgets,spendingBudget}=useBudget()
    const {getByYear,transactionsYearly}=useTransaction()
@@ -61,7 +61,6 @@ const index = () => {
       if(!total) return 0;
       return (remain/total)*100;
     }
-
     const isInitiallyLoading=loading && transactionFilteredData.length===0
 
   return (
@@ -69,12 +68,8 @@ const index = () => {
       
       <View className='boxInnerSize flex-1'>
       <TopUserComp
+      otherText={false}
       >
-        <Text className="biggerText text-xl"
-        style={{
-                fontFamily:"Sans-Semibold"
-              }}
-        >{user?.name}</Text>
       </TopUserComp>
     
 
@@ -130,14 +125,14 @@ const index = () => {
                        className='p-2 items-center rounded-lg '
                        style={{
                          elevation:5,
-                         backgroundColor:acc.color.darkColor
+                         backgroundColor:acc?.color?.darkColor
                        }}>
-                         {getAccountIconByName(acc.icon,false,isDark?"#000000":"#ffffff",24)}
+                         {getAccountIconByName(acc.icon || null,false,isDark?"#000000":"#ffffff",24)}
                      </View>
 
                      <Text className=' biggerText'
                      style={{
-                      color:acc.color.btncolor,
+                      color:acc?.color?.btncolor,
                       fontFamily:"Sans-Bold"
                      }}>{acc.type}</Text>
                    </View>
@@ -155,7 +150,7 @@ const index = () => {
                      style={{
                     fontFamily:"Sans-Bold"
                     }}
-                    >{formatAmount(acc.balance)}</Text>
+                    >{formatAmount(acc.balance || 0)}</Text>
                       </View>
                      
                    </View>
@@ -231,7 +226,7 @@ const index = () => {
                     <BudgetSpentBar
                       spent={Number(budget.spent??0)}
                       total={budget.amount}
-                      color={budget.category?.color.darkColor}/>
+                      color={budget?.category?.color?.darkColor}/>
 
                   </View>
                 ))}
@@ -307,7 +302,7 @@ const index = () => {
               className='p-2 items-center rounded-lg'
               style={{ 
                       elevation:5,
-                      backgroundColor:item.category?.color.darkColor
+                      backgroundColor:item?.category?.color?.darkColor
                     }}>
                 {getIconByName(item.category?.icon ?? null,false,isDark?"#000000":"#ffffff",24)}
               </View>
