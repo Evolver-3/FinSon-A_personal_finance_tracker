@@ -60,7 +60,7 @@ declare global{
     amount:string
     type:"INCOME" | "EXPENSE"
     note?:string 
-    date?:Date
+    date?:string
     accountId?:string
     categoryId?:string
 
@@ -83,7 +83,7 @@ declare global{
     amount?:string
     type?:"INCOME" | "EXPENSE" 
     note?:string 
-    date?:Date
+    date?:string
     accountId?:string
     categoryId?:string
   }
@@ -169,12 +169,12 @@ type BudgetContextType = {
   type Category={
     id:string
     name:string 
-    color:{
+    color?:{
       btncolor:string 
       colors:string 
       darkColor:string
     }
-    icon:string | null
+    icon?:string | null
     type:"INCOME" | "EXPENSE"
     createdAt?:string 
     updatedAt?:string
@@ -186,8 +186,8 @@ type BudgetContextType = {
     title:string 
     amount:string 
     type:"INCOME" | "EXPENSE"
-    note:string 
-    date:string
+    note?:string 
+    date?:string
     account?:Account  
     category?:Category  
     accountId?:string 
@@ -209,19 +209,21 @@ type BudgetContextType = {
     spent?:Number 
     remaining?:Number
 
-
   }
 
   type AuthContextType={
-    user:User|null
+    backendUser:User|null
     loading:boolean 
-    setUser:React.Dispatch<React.SetStateAction<User|null>>
+    error:string | null
+    setBackendUser:React.Dispatch<React.SetStateAction<User|null>>
+    loadBackendUser:()=>Promise<void>
+    syncBackendHook:(token:string)=>Promise<User>
+    refreshAuthToken:(token:string)=>Promise<void>
+    logoutEverywhere:()=>Promise<void>
   }
 
   //type of icon state
   type IconFn=(focused:boolean,color?:string,size?:number)=>React.JSX.Element
-
-
   
 type CategoryColor = {
   btncolor: string
@@ -455,6 +457,7 @@ type dataProps={
 
 
 type headingTextProps={
+  otherText?:boolean
   headingText?:string 
   children?:React.ReactNode
 }
@@ -687,12 +690,25 @@ type GuestContextProps={
   categories:Category[]
   transactions:Transaction[]
   preferences:preferenceType
+  budgets:Budget[]
   isGuest:boolean
+  userInfo:User
+  error:string | null
+  setIsGuest:React.Dispatch<React.SetStateAction<boolean>>
   addAccount:(data:Account)=>void
   addCategory:(data:Category)=>void
   addTransaction:(data:Transaction)=>void
   updatedAccount: (id: string, data: Partial<Account>) => void
   removeAccount: (id: string) => void
+  removeCategory:(id:string)=>void
+  updatedCategory:(id:string,data:Partial<Category>)=>void
+  removeTransaction:(id:string)=>void
+  updatedTransaction:(id:string,data:Partial<Transaction>)=>void
+  enterGuestMode:()=>Promise<void>
+  addBudget:(data:Budget)=>void
+  removeBudget:(id:string)=>void
+  updatedBudget:(id:string,data:Partial<Budget>)=>void
+  clearGuestData:()=>Promise<void>
 }
 
 }
