@@ -1,19 +1,20 @@
-import { useAuthContext } from "@/context/AuthContext";
+import { useAuthHook } from "./useAuthHook";
 import { profileUpdate, changeAvatar} from "@/services/userServices"
-import { useState } from "react";
+import { useCallback, useState } from "react";
 
 export const useUser=()=>{
-  const {user,setUser}=useAuthContext()
 
+  const {backendUser,setBackendUser,loadBackendUser}=useAuthHook()
   const [loading,setLoading]=useState(false)
   const [error,setError]=useState<string | null>(null)
 
-  const fetchUserProfile=async()=>{
+  const fetchUserProfile=useCallback(async()=>{
      try{
       setLoading(true)
       setError(null)
       
-     const res=await setUser
+     const res=await loadBackendUser()
+     console.log("useUser user:",res)
      return res
      
 
@@ -26,7 +27,7 @@ export const useUser=()=>{
       setLoading(false)
 
     }
-  }
+  },[])
 
   const updatingProfile=async(name:string)=>{
     try{
@@ -34,7 +35,8 @@ export const useUser=()=>{
       setError(null)
       
       const res=await profileUpdate({name})
-      setUser(res.data)
+      setBackendUser(res.data)
+      console.log("hooks update useUser:",res.data)
 
       return res.data
     }catch(error:any){
@@ -54,7 +56,7 @@ export const useUser=()=>{
       setError(null)
 
       await changeAvatar(avatar)
-     const res=await setUser
+     const res=await setBackendUser
      return res
       
     }catch(error:any){
@@ -69,6 +71,6 @@ export const useUser=()=>{
   }
 
   return {
-    user,loading,error,updatingProfile,addingAvatar,fetchUserProfile
+    backendUser,loading,error,updatingProfile,addingAvatar,fetchUserProfile
   }
 }
