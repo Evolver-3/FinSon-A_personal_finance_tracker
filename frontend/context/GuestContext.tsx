@@ -6,20 +6,26 @@ export const GuestContext=createContext<GuestContextProps | null>(null)
 export const GuestProvider=({children}:{children:React.ReactNode})=>{
 
   const [isGuest,setIsGuest]=useState(false)
+  const [userInfo,setUserInfo]=useState<User>({
+    id:'373u8hfuehr823rhfh',
+    name:"Guest",
+    email:"guest@gmail.com",
+    avatar:''
+  })
   const [accounts,setAccounts]=useState<Account[]>([])
   const [categories,setCategories]=useState<Category[]>([])
   const [transactions,setTransactions]=useState<Transaction[]>([])
   const [budgets,setBudgets]=useState<Budget[]>([])
   const [preferences,setPreferences]=useState({
     currencyCode:'USD',
-    currencySymbol:'$',
+    currencySymbol:'USD',
     theme:'system'
   })
+
   const [error,setError]=useState<string| null>(null)
 
   const handleError=(error:any)=>{
   const message=error?.response?.data?.message || error?.message || "Something went wrong"
-  
   setError(message)
   throw error
   }
@@ -27,11 +33,11 @@ export const GuestProvider=({children}:{children:React.ReactNode})=>{
   useEffect(()=>{
     const loadGuest=async()=>{
 
-      try{
+    try{
       const stored=await AsyncStorage.getItem('@guest_data')
       if(stored){
         const parsed=JSON.parse(stored)
-
+        setUserInfo(parsed.userInfo || {})
         setAccounts(parsed.accounts ||[])
         setCategories(parsed.categories || [])
         setTransactions(parsed.transactions || [])
@@ -43,7 +49,7 @@ export const GuestProvider=({children}:{children:React.ReactNode})=>{
       handleError(err)
       return null
     }
-    }
+  }
     if(isGuest){
       loadGuest()
     }
@@ -56,14 +62,16 @@ export const GuestProvider=({children}:{children:React.ReactNode})=>{
 
     const saveGuestData=async()=>{
     try{
-      AsyncStorage.setItem('@guest_data',JSON.stringify({
-      accounts,
-      categories,
-      transactions,
-      budgets,
-      preferences
-    }))
-
+      AsyncStorage.setItem('@guest_data',JSON.stringify(
+        {
+          userInfo,
+          accounts,
+          categories,
+          transactions,
+          budgets,
+          preferences
+        }
+      ))
     }catch(err:any){
       console.log("error in saving data in asyncStorage:",err)
       handleError(err)
@@ -73,7 +81,7 @@ export const GuestProvider=({children}:{children:React.ReactNode})=>{
 
   saveGuestData()
     
-  },[accounts,categories,transactions,preferences,isGuest])
+  },[userInfo,accounts,categories,transactions,preferences,isGuest])
 
   const clearGuestData=async()=>{
     await AsyncStorage.removeItem('@guest_data')
@@ -84,16 +92,11 @@ export const GuestProvider=({children}:{children:React.ReactNode})=>{
     setIsGuest(false)
   }
 
-const enterGuestMode = async () => {
-  console.log("Are we here:");
+  const enterGuestMode = async () => {
 
-  await AsyncStorage.setItem("@app_mode", "guest");
-
-  const storedMode = await AsyncStorage.getItem("@app_mode");
-  console.log("stored mode:", storedMode); // should be "guest"
-
-  setIsGuest(true);
-};
+    await AsyncStorage.setItem("@app_mode", "guest");
+    setIsGuest(true);
+  }
 
   useEffect(()=>{
     const loadMode=async()=>{
@@ -193,9 +196,9 @@ const enterGuestMode = async () => {
   }
 
   return(
-    <GuestContext.Provider value={{accounts,categories,transactions,budgets,preferences,isGuest,setIsGuest,
+    <GuestContext.Provider value={{userInfo,accounts,categories,transactions,budgets,preferences,isGuest,setIsGuest,
       addAccount,addCategory,addTransaction,
-      removeAccount,updatedAccount,removeCategory,updatedCategory,removeTransaction,updatedTransaction,enterGuestMode,addBudget,removeBudget,updatedBudget
+      removeAccount,updatedAccount,removeCategory,updatedCategory,removeTransaction,updatedTransaction,enterGuestMode,addBudget,removeBudget,updatedBudget,error,clearGuestData
       
     }}>
       {children}
