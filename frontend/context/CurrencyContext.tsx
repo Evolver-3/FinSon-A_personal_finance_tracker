@@ -15,7 +15,7 @@ export const CurrencyProvider=({children}:{children:React.ReactNode})=>{
     value={{
       countryName,
       setCountryName,
-      symbol:currency?.symbol ?? "₹",
+      symbol:currency?.symbol,
       currencyCode:currency?.currencyCode ?? "INR"
     }}>
       {children}

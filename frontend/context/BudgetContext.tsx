@@ -1,11 +1,18 @@
 import { createContext,ReactNode,useState,useEffect ,useContext} from "react";
 import { createBudget, updateBudget, deleteBudget, checkSpending } from "@/services/budgetServices";
+import {useAuth as useClerkAuth} from '@clerk/clerk-expo'
+import { useGuest } from "@/hooks/useGuest";
 
 export const BudgetContext=createContext<BudgetContextType | null>(null)
 
 export const BudgetProvider=({children}:{children:ReactNode})=>{
 
-    const [budgets,setbudgets]=useState<Budget[]>([])
+  const {isSignedIn}=useClerkAuth()
+  const guest=useGuest()
+
+  const isGuest=!isSignedIn
+
+    const [budgets,setbudgets]=useState<Budget[]>(isGuest?guest.budgets:[])
   
     const [loading,setLoading]=useState(false)
     const [error,setError]=useState<string|null>(null)
@@ -15,13 +22,28 @@ export const BudgetProvider=({children}:{children:ReactNode})=>{
   
       setError(message)
       throw error
-  
     }
+
+    useEffect(()=>{
+      if(isGuest){
+        setbudgets(guest.budgets)
+          }
+        },[guest.budgets,isGuest])
+    
   
     const creatingNewBudget=async(data:createBudgetProps)=>{
-      try{
-        setLoading(true)
+       setLoading(true)
         setError(null)
+      try{
+        const newBudget:Budget={
+          id:Date.now().toString(),
+          ...data,
+          createdAt:new Date().toISOString()
+        }
+        if(isGuest){
+          guest.addBudget(newBudget)
+        }
+       
   
         await createBudget(data)
   

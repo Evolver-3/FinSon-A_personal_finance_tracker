@@ -1,14 +1,19 @@
-import { handleError } from "@/lib/handleError";
 import { createContext,ReactNode } from "react";
 import { createTransaction, getTransaction, updateTransaction, deleteTransaction, getTransactionByYear } from "@/services/transactionServices";
 import {useState,useEffect} from 'react'
+import {useAuth as useClerkAuth} from '@clerk/clerk-expo'
+import { useGuest } from "@/hooks/useGuest";
 
 export const TransactionContext=createContext<TransactionContextType| null>(null)
 
 export const TransactionProvider=({children}:{children:ReactNode})=>{
 
-  
-    const [transactions,setTransactions]=useState<Transaction[]>([])
+  const {isSignedIn}=useClerkAuth()
+  const guest=useGuest()
+
+  const isGuest=!isSignedIn
+
+    const [transactions,setTransactions]=useState<Transaction[]>(isGuest?guest.transactions:[])
     
     const [transactionsYearly,setTransactionsYearly]=useState<TransactionsYearlyProps>(
       {
@@ -21,12 +26,40 @@ export const TransactionProvider=({children}:{children:ReactNode})=>{
   
     const [loading,setLoading]=useState(false)
     const [error,setError]=useState<string|null>(null)
+
+    useEffect(()=>{
+      if(isGuest){
+        setTransactions(guest.transactions)
+      }
+    },[guest.transactions,isGuest])
+
+    useEffect(()=>{
+      if(!isGuest){
+        getByYear(new Date().getFullYear())
+      }
+    },[isGuest])
+  
+    const handleError=(error:any)=>{
+    const message=error?.response?.data?.message || error?.message || "Something went wrong"
+    
+    setError(message)
+    throw error
+    }
   
     const creatingNewTransaction=async(data:createTransactionProps)=>{
-      try{
         setLoading(true)
         setError(null)
-  
+      try{
+        const newTransaction:Transaction={
+          id:Date.now().toString(),
+          ...data,
+          createdAt:new Date().toISOString()
+        }
+
+        if(isGuest){
+          guest.addTransaction(newTransaction)
+        }
+
         const res=await createTransaction(data)
   
         setTransactions((prev)=>[res.data, ...prev])
@@ -43,6 +76,12 @@ export const TransactionProvider=({children}:{children:ReactNode})=>{
 
   
     const fetchTransaction=async(id:string)=>{
+
+      if(isGuest){
+        const found=guest.transactions.find((t)=>t.id===id) || null
+        setSingleTransaction(found)
+        return found
+      }
       try{
         setLoading(true)
         setError(null)
@@ -60,9 +99,11 @@ export const TransactionProvider=({children}:{children:ReactNode})=>{
     }
 
     const getByYear=async(year:number)=>{
-      try{
+      if(isGuest)return guest.transactions
         setLoading(true)
         setError(null)
+      try{
+
         const res=await getTransactionByYear(year)
 
         const transactionsdetail=(res.data)?res.data:[]
@@ -80,9 +121,18 @@ export const TransactionProvider=({children}:{children:ReactNode})=>{
     }
   
     const editTransaction=async(id:string,data:updateTransactionProps)=>{
+      setLoading(true)
+      setError(null)
       try{
-        setLoading(true)
-        setError(null)
+        if(isGuest){
+          guest.updatedTransaction(id,data)
+
+          setTransactions((prev)=>prev.map((trx)=>trx.id===id?{...trx,...data}:trx))
+          setSingleTransaction((prev)=>prev?.id===id?{...prev,...data}:prev)
+
+          return {...singleTransaction,...data} as Transaction
+        }
+        
         const res=await updateTransaction(id,data)
   
         setTransactions((prev)=>
@@ -104,9 +154,14 @@ export const TransactionProvider=({children}:{children:ReactNode})=>{
     }
   
     const removeTransaction=async(id:string)=>{
-      try{
         setLoading(true)
         setError(null)
+      try{
+        if(isGuest){
+          guest.removeTransaction(id)
+          setSingleTransaction((prev)=>(prev?.id===id?null:prev))
+        }
+
         await deleteTransaction(id)
   
         setTransactions((prev)=>prev.filter((transaction)=>transaction.id !==id))

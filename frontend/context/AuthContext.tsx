@@ -5,12 +5,11 @@ import { getMe, logoutAllDevice, refreshToken, syncbackend } from '@/services/au
 export const AuthContext =createContext<AuthContextType | null> (null) 
 
 export const AuthProvider=({children}:{children:React.ReactNode})=>{
-
+  const {isLoaded,isSignedIn,getToken}=useAuth()
   const [backendUser,setBackendUser]=useState<User|null>(null)
   const [loading,setLoading]=useState(true)
   const [error,setError]=useState<string|null>(null)
 
-  const {isLoaded,isSignedIn,getToken}=useAuth()
 
   //error handling
   const handleError=(error:any)=>{
@@ -52,7 +51,6 @@ export const AuthProvider=({children}:{children:React.ReactNode})=>{
   useEffect(()=>{
     loadBackendUser()
   },[isLoaded,isSignedIn])
-
   const syncBackendHook=async(token:string)=>{
     setLoading(true)
     setError(null)
