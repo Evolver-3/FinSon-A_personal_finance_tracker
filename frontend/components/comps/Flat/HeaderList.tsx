@@ -1,5 +1,4 @@
 import { View, Pressable} from 'react-native'
-import React from 'react'
 import TopUserComp from '../TopUserComp'
 import { Plus} from 'lucide-react-native'
 import ThemeIcon from '@/components/Theme/ThemeIcon'
@@ -10,7 +9,8 @@ const HeaderList = ({headingText,onPress,inlineText,setQuery,pressableNeeded}:He
 
   return (
     <View className=' px-4 gap-y-4 pt-4'>
-      <TopUserComp  
+      <TopUserComp 
+      otherText={true} 
         headingText={headingText}/>
         
         <View className='flex-row items-center gap-x-2'>
