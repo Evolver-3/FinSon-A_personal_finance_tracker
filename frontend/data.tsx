@@ -1,4 +1,4 @@
-import { Home, BadgePlus, UserRound, Banknote, ChartNoAxesCombinedIcon, Utensils ,Fuel, Hamburger, GlobeCheck, CarTaxiFrontIcon, Landmark, BanknoteIcon, Wallet, CreditCard, Toolbox, Clapperboard, Hospital, GitGraphIcon, User, SunIcon, Speaker, Languages, LucideGitGraph, Settings,SunMoonIcon, SunDimIcon, Moon, Currency, IndianRupee, DollarSign, LucidePoundSterling, EuroIcon, JapaneseYen, CircleDollarSignIcon, AlignVerticalJustifyStart, LucideDollarSign, NewspaperIcon, ReplyIcon, UserRoundPenIcon, PackageOpenIcon, ArrowRightSquareIcon, BoxIcon} from 'lucide-react-native'
+import { Home, BadgePlus, UserRound, Banknote, ChartNoAxesCombinedIcon, Utensils ,Fuel, Hamburger, GlobeCheck, CarTaxiFrontIcon, Landmark, BanknoteIcon, Wallet, CreditCard, Toolbox, Clapperboard, Hospital, GitGraphIcon, User, SunIcon, Speaker, Languages, LucideGitGraph, Settings,SunMoonIcon, SunDimIcon, Moon, Currency, IndianRupee, DollarSign, LucidePoundSterling, EuroIcon, JapaneseYen, CircleDollarSignIcon, AlignVerticalJustifyStart, LucideDollarSign, NewspaperIcon, ReplyIcon, UserRoundPenIcon, PackageOpenIcon, ArrowRightSquareIcon, BoxIcon, FileBoxIcon, LucideBanknoteX} from 'lucide-react-native'
 import React from 'react'
 import { Href } from 'expo-router'
 
@@ -437,6 +437,16 @@ export const PERIODS: { key: Period; label: string }[] = [
         'name':'Insight Schedule',
         'href':"/(usertab)/ProfilePage/InsightSchedule" as const,
         'symbol':LucideGitGraph
+      },
+      {
+        'name':'Category',
+        'href':'/(usertab)/ProfilePage/CategoryPage' as const,
+        'symbol':FileBoxIcon
+      },
+      {
+        'name':"Accounts",
+        'href':"/(usertab)/ProfilePage/AccountPage" as const,
+        'symbol':LucideBanknoteX
       }
   ]
   }
