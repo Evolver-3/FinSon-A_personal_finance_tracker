@@ -45,7 +45,7 @@ const AccountItem = ({item,editAccount,removeAccount}:AccountItemProps) => {
       <View
       className='rounded-xl py-6 px-4 mainbg mainborder flex-col gap-y-4'
       style={{
-        backgroundColor:isDark?"#212121":item.color.colors,
+        backgroundColor:isDark?"#212121":item?.color?.colors,
         elevation:2
       }}>
         <View className='flex-grow flex-row gap-x-5 items-center'>
@@ -53,9 +53,9 @@ const AccountItem = ({item,editAccount,removeAccount}:AccountItemProps) => {
           className='p-2 items-center rounded-lg '
           style={{
             elevation:5,
-            backgroundColor:item.color.darkColor
+            backgroundColor:item?.color?.darkColor
           }}>
-            {getAccountIconByName(item.icon,false,isDark?"#000000":"#ffffff",24)}
+            {getAccountIconByName(item?.icon || null,false,isDark?"#000000":"#ffffff",24)}
           </View>
 
           <View>
@@ -67,12 +67,12 @@ const AccountItem = ({item,editAccount,removeAccount}:AccountItemProps) => {
               {item.name}
           </Text>
 
-          <View>
-          <ThemeIcon icon={symbol} size={20}/>
+          <View className='flex-row gap-y-3 items-center'>
+          <ThemeIcon icon={symbol} size={14}/>
 
           <Text 
             className="text-green-400 text-md">
-              {formatAmount(item.balance)}
+              {formatAmount(item?.balance ||0)}
           </Text>
           </View>
           </View>
@@ -150,7 +150,7 @@ const AccountItem = ({item,editAccount,removeAccount}:AccountItemProps) => {
         name:item.name,
         balance:item.balance,
         type:item.type,
-        color:item?.color.btncolor,
+        color:item?.color?.btncolor,
         icon:item.icon
       }}
       submitText={"Edit your account"}

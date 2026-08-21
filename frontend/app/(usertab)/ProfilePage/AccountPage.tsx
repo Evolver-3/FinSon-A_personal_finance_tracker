@@ -16,7 +16,7 @@ const AccountPage = () => {
   const {isDark}=useTheme()
 
   const [pageLoad,setPageLoad]=useState(false)
-  const [pageError,setPageError]=useState("")
+  const [pageError,setPageError]=useState<string | null>("")
   const [query,setQuery]=useState("")
 
   const filteredData=accounts.filter(item=>{
@@ -26,12 +26,12 @@ const AccountPage = () => {
 
   const isInitiallyLoading=loading && accounts.length===0
 
-
+  const newError=pageError || error
   return (
     <Wrapper loading={false}>
       
       <CreateAccount
-      pageError={pageError}
+      pageError={newError}
       pageLoad={pageLoad}
       creatingAccount={creatingAccount}
       openModal={openCreate}

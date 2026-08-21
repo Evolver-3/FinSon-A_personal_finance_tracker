@@ -26,7 +26,7 @@ const CreateAccount = ({creatingAccount,pageError,pageLoad,openModal,setOpenModa
             ...values
           })
         }catch(err:any){
-           const message=err?.response?.data?.message || err?.message || "Failed to Create new Budget"
+           const message=err?.response?.data?.message || err?.message || "Failed to Create new Account"
 
           setPageError(message)
         }finally{
