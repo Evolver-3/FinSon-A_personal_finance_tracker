@@ -17,24 +17,20 @@ export const useAccount=()=>{
   const [error,setError]=useState<string|null>(null)
 
   useEffect(()=>{
-    if(isGuest){
-      setAccounts(guest.accounts)
-    }
-  },[guest.accounts,isGuest])
-
-  useEffect(()=>{
     if(!isGuest){
       fetchAllAccounts()
+    }else{
+      setAccounts(guest.accounts)
     }
-  },[isGuest])
+  },[isGuest,guest.accounts])
 
   const handleError=(error:any)=>{
 
-    console.log("=== FULL ERROR ===")
-    console.log(error)
-    console.log("error.response:", error?.response)
-    console.log("error.response?.data:", error?.response?.data)
-    const message=error?.message?.data?.message || error?.message || "Something went wrong"
+    // console.log("=== FULL ERROR ===")
+    // console.log(error)
+    // console.log("error.response:", error?.response)
+    // console.log("error.response?.data:", error?.response?.data)
+    const message=isGuest?'Failed to save locally. Storage may be full.':error?.message?.data?.message || error?.message || "Something went wrong"
 
     setError(message)
     throw error 
@@ -50,6 +46,7 @@ export const useAccount=()=>{
         ...data,
         createdAt:new Date().toISOString()
       }
+      console.log("newAccount for guest use:",newAccount)
 
       if(isGuest){
         guest.addAccount(newAccount)
@@ -61,7 +58,7 @@ export const useAccount=()=>{
       return res.data
 
     }catch(error:any){
-
+      
      handleError(error)
 
     }finally{
@@ -75,12 +72,9 @@ export const useAccount=()=>{
       setError(null)
 
     try{
- 
       const res=await getAllAccounts()
       setAccounts(res.data)
       return res.data
-
-
     }catch(error:any){
       
       handleError(error)
@@ -106,14 +100,12 @@ export const useAccount=()=>{
       setSelectedAccount(res.data)
       return res.data
 
-
     }catch(error:any){
       handleError(error)
     }finally{
       setLoading(false)
     }
   }
-
 
     const editAccount=async(id:string,data:updateAccountProps)=>{
       setLoading(true)
@@ -130,10 +122,7 @@ export const useAccount=()=>{
         return{...selectedAccount,...data} as Account
       }
 
-
       const res=await updateAccount(id,data)
-
-
       setAccounts((prev)=>
       prev.map((acc)=>(acc.id === id ? res.data:acc)))
 
