@@ -29,7 +29,7 @@ declare global{
     name:string 
     type:"CASH" | "BANK" | "CARD" | "WALLET" 
     balance?:string
-    icon?:string 
+    icon:string  | null
     color?:CategoryColor
   }
 
@@ -37,7 +37,7 @@ declare global{
     name?:string 
     type?:"CASH" | "BANK" | "CARD" | "WALLET" 
     balance?:string
-    icon?:string
+    icon:string | null
     color?:CategoryColor
   }
 
@@ -246,8 +246,8 @@ type AccountItemProps={
 
 type createAccountsProps={
   creatingAccount:(values:createAccountProps)=>Promise<void>
-  pageError:string
-  setPageError:React.Dispatch<React.SetStateAction<string>>
+  pageError:string | null
+  setPageError:React.Dispatch<React.SetStateAction<string | null>>
   pageLoad:boolean
   setPageLoad:React.Dispatch<React.SetStateAction<boolean>>
   openModal:boolean
@@ -563,11 +563,14 @@ type CurrencyContextType={
 }
 
 type InitialAccountValueProps={
+  id?:string
   name?:string 
   balance?:string 
   type?:"CASH" | "BANK" | "CARD" | "WALLET"
-  color?:string 
-  icon?:string
+  color?:any
+  icon:string | null
+  amount?:string
+  month?:string
 }
 
 type AccountDataProps={
