@@ -6,11 +6,11 @@ import { ButtonNeed } from '../comps/ButtonNeed'
 import ModalComp, { SelectAccountIcon, SelectColors, SelectType } from '../comps/Mode/ModalComp'
 import ErrorPopUp from '../comps/ErrorPopUp'
 
-const AccountData = ({initialValues,error,loading,onSubmit,submitText,openModal,setOpenModal,viewFlex,pressableFlex}:AccountDataProps) => {
+const AccountData = ({initialValues,error,setError,loading,onSubmit,submitText,openModal,setOpenModal,viewFlex,pressableFlex}:AccountDataProps) => {
 
     const [name,setName]=useState(initialValues?.amount?.toString()?? "")
     const [balance,setBalance]=useState(initialValues?.month?.toString() ?? "")
-    const [color,setColor]=useState<CategoryColor>(initialValues?.color ??categorydynamicColors[0])
+    const [color,setColor]=useState<string>(initialValues?.color ??categorydynamicColors[0].btncolor)
     const [icon,setIcon]=useState<string | null>(initialValues?.icon ??null)
     const [type,setType]=useState <"CASH" | "BANK" | "CARD" | "WALLET">(initialValues?.type ??"CASH")
 
@@ -21,9 +21,9 @@ const AccountData = ({initialValues,error,loading,onSubmit,submitText,openModal,
         setBalance(initialValues?.balance ?? "")
         setIcon(initialValues?.icon ?? null)
         setType(initialValues?.type ?? "CASH")
-        setColor(initialValues?.color ?? categorydynamicColors[0])
+        setColor(initialValues?.color ?? categorydynamicColors[0]?.btncolor )
       }
-    },[initialValues?.id])
+    },[initialValues])
   
     const handleBalanceChange=(text:string)=>{
           const amountNeeded=text.replace(/[^0-9.]/g, "")
@@ -34,6 +34,10 @@ const AccountData = ({initialValues,error,loading,onSubmit,submitText,openModal,
         }
   
     const handleSubmit=async()=>{
+      if(!name ||!balance||!type ||!icon|| !color){
+        setError("All entries are not filled")
+        return        
+      }
       await onSubmit({
         name,balance,type,icon,color
       })
@@ -42,10 +46,18 @@ const AccountData = ({initialValues,error,loading,onSubmit,submitText,openModal,
       setName("")
       setType("CASH")
       setIcon(null)
-      setColor(categorydynamicColors[0])
+      setColor(categorydynamicColors[0].btncolor)
   
       setOpenModal(false)
     }
+
+    useEffect(()=>{
+      const timer=setTimeout(()=>{
+        setError(null)
+      },3000)
+      return()=>clearTimeout(timer)
+    },[])
+
   return (
     <ModalComp
    visible={openModal}
@@ -54,11 +66,9 @@ const AccountData = ({initialValues,error,loading,onSubmit,submitText,openModal,
    pressableFlex={pressableFlex}
     viewFlex={viewFlex}>
   
-  <View className='flex-col gap-y-5 mt-10 relative'>
-
+  <View className='flex-col gap-y-5 mt-5 relative'>
     <ErrorPopUp
-      errorMessage={error }/>
-  
+      errorMessage={error}/>
 
     <TextData
     keyboardType="default"
@@ -122,8 +132,8 @@ const AccountData = ({initialValues,error,loading,onSubmit,submitText,openModal,
                 style={{
                   backgroundColor:col.btncolor
                 }}
-                focused={color.btncolor===col.btncolor}
-                onPress={()=>setColor(col)}/>
+                focused={color===col.btncolor}
+                onPress={()=>setColor(color)}/>
             </View>))}
         </ScrollView>
       </View>

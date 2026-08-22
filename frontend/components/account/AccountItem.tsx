@@ -8,32 +8,27 @@ import { useCurrency } from '@/context/CurrencyContext'
 import AccountData from './AccountData'
 import ThemeIcon from '@/components/Theme/ThemeIcon'
 
-
 const AccountItem = ({item,editAccount,removeAccount}:AccountItemProps) => {
   const [openEdit,setOpenEdit]=useState(false)
-  const [selectedAccount,setSelectedAccount]=useState<Account| null>(null)
-
   const {symbol}=useCurrency()
   
   const [editLoad,setEditLoad]=useState(false)
   const [ deleteLoad,setDeleteLoad]=useState(false)
-  const [pageError,setPageError]=useState("")
+  const [pageError,setPageError]=useState<string| null>("")
 
   const {isDark}=useTheme()
 
   const handledeleteAccount=async()=>{
 
     setDeleteLoad(true)
-    setPageError("")
     try{
         if(!item?.id)return
-
+        console.log(item?.id)
         await removeAccount(item?.id)
           
         }catch(err:any){
-         const message=err?.response?.data?.message || err?.message || "Failed to sign in"
+         const message=err?.response?.data?.message || err?.message || "Failed to delete"
 
-        setPageError(message)
         }finally{
           setDeleteLoad(false)
         }
@@ -141,8 +136,6 @@ const AccountItem = ({item,editAccount,removeAccount}:AccountItemProps) => {
 
         </View>
 
-      
-    
       </View>
    
       <AccountData
@@ -150,7 +143,7 @@ const AccountItem = ({item,editAccount,removeAccount}:AccountItemProps) => {
         name:item.name,
         balance:item.balance,
         type:item.type,
-        color:item?.color?.btncolor,
+        color:item?.color?.btncolor ,
         icon:item.icon
       }}
       submitText={"Edit your account"}
@@ -158,6 +151,7 @@ const AccountItem = ({item,editAccount,removeAccount}:AccountItemProps) => {
       setOpenModal={setOpenEdit}
       loading={editLoad}
       error={pageError}
+      setError={setPageError}
       pressableFlex={2}
       viewFlex={4}
       

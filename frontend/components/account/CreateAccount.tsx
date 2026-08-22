@@ -1,21 +1,17 @@
-import { View} from 'react-native'
-import React from 'react'
 import AccountData from './AccountData'
-
 
 const CreateAccount = ({creatingAccount,pageError,pageLoad,openModal,setOpenModal,setPageLoad,setPageError}:createAccountsProps) => {
   
   return (
-
-    <View>
       <AccountData 
       error={pageError}
+      setError={setPageError}
       loading={pageLoad}
       submitText={"Add new account"}
       openModal={openModal}
       setOpenModal={setOpenModal}
       pressableFlex={3}
-      viewFlex={4}
+      viewFlex={7}
       
       onSubmit={async(values)=>{
         setPageLoad(true)
@@ -26,14 +22,13 @@ const CreateAccount = ({creatingAccount,pageError,pageLoad,openModal,setOpenModa
             ...values
           })
         }catch(err:any){
-           const message=err?.response?.data?.message || err?.message || "Failed to Create new Account"
-
+          const message="Failed to Create new Account"
           setPageError(message)
+          throw err
         }finally{
           setPageLoad(false)
         }
       }}/>
-    </View>
   )
 }
 
