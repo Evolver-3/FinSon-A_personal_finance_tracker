@@ -56,7 +56,7 @@ const AccountData = ({initialValues,error,setError,loading,onSubmit,submitText,o
         setError(null)
       },3000)
       return()=>clearTimeout(timer)
-    },[])
+    },[error])
 
   return (
     <ModalComp
