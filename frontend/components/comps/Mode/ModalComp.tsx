@@ -1,58 +1,63 @@
-import { View, Text, Modal, Pressable, ScrollView, ViewStyle, RegisteredStyle} from 'react-native'
-import React from 'react'
+import { View, Text, Modal, Pressable,Dimensions,ScrollView} from 'react-native'
 import { AccountIcons, CategoryIcons } from '@/data'
+import { useTheme } from '@/hooks/useTheme'
 
-type ModalCompProps={
-  visible:boolean 
-  onRequestClose:()=>void 
-  textblock:string 
-  children:React.ReactNode
-  pressableFlex?:number 
-  viewFlex?:number
+const { height: SCREEN_HEIGHT } = Dimensions.get('window');
 
-}
-const ModalComp = ({visible,onRequestClose,textblock,children,pressableFlex,viewFlex}:ModalCompProps) => {
+const ModalComp = ({ visible, onRequestClose, textblock, children }: ModalCompProps) => {
   return (
-     <Modal
-        visible={visible}
-        transparent={true}
-        animationType='slide'
-        onRequestClose={onRequestClose}>
-       
-          <View className=" flex-1">
-       
-            <Pressable
-            style={{
-              backgroundColor: 'rgba(0,0,0,0.5)',
-              flex:pressableFlex,
-            }}
-            onPress={onRequestClose}/>
-              <View className='bg-neutral-300 dark:bg-neutral-800 rounded-t-3xl pt-4 px-7 flex-col gap-y-4 '
-              style={{flex:viewFlex}}
-              onStartShouldSetResponder={() => true}>
-                <Text className='biggerText text-lg font-semibold '>
-                 {textblock}
-                </Text>
-                
-                {children}
-              </View>
-        
-            </View>
-        </Modal>
-  )
-}
+    <Modal
+      visible={visible}
+      transparent
+      animationType="slide"
+      onRequestClose={onRequestClose}
+    >
+      <View style={{ flex: 1, justifyContent: 'flex-end' }}>
+        {/* Backdrop */}
+        <Pressable
+          style={{
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            backgroundColor: 'rgba(0,0,0,0.5)',
+          }}
+          onPress={onRequestClose}
+        />
+
+        {/* Content: grows with children, scrolls if too tall */}
+        <View
+          className="bg-neutral-300 dark:bg-neutral-800 rounded-t-3xl pt-4 px-7"
+          style={{
+            maxHeight: SCREEN_HEIGHT * 0.75, // cap at 75% of screen
+          }}
+        >
+          {/* Handle bar */}
+          <View className="w-12 h-1 bg-gray-400 rounded-full self-center mb-4" />
+
+          <Text className="text-lg font-semibold text-black dark:text-white mb-4">
+            {textblock}
+          </Text>
+
+          {/* ScrollView wraps children — handles both short and long content */}
+          <ScrollView
+            showsVerticalScrollIndicator={false}
+            contentContainerStyle={{ paddingBottom: 24 }}
+          >
+            {children}
+          </ScrollView>
+        </View>
+      </View>
+    </Modal>
+  );
+};
 
 export default ModalComp
 
 
-type SelectTypeProps={
-  text:string 
-  onPress:()=>void
-  focused:boolean
-
-}
-
 export const SelectType=({text,onPress,focused}:SelectTypeProps)=>{
+  const {isDark}=useTheme()
   return (
     <Pressable
     style={{
@@ -61,7 +66,7 @@ export const SelectType=({text,onPress,focused}:SelectTypeProps)=>{
       paddingVertical:8,
       borderRadius:8,
       alignItems:'center',
-      backgroundColor:focused?"#262626":"transparent"
+      backgroundColor:focused?"#2F2B2B":"transparent"
     }}
     onPress={onPress}>
       <Text 
@@ -69,18 +74,12 @@ export const SelectType=({text,onPress,focused}:SelectTypeProps)=>{
         fontSize:14,
         fontWeight:"400",
         textAlign:"center",
-        color:focused?"#60a5fa":"#000000"
+        color:focused?"#60a5fa":isDark?"#ffffff":"#000000"
       }}>{text}</Text>
     </Pressable>
   )
 }
 
-type SelectColorProps={
-  onPress:()=>void
-  focused:boolean
-  style:ViewStyle  
-
-}
 
 export const SelectColors=({onPress,focused,style}:SelectColorProps)=>{
   return (
@@ -92,17 +91,7 @@ export const SelectColors=({onPress,focused,style}:SelectColorProps)=>{
   )
 }
 
-type TabIconProps={
-  icon: string | null
-  onPress:()=>void
-  focused:boolean
-  name:string
-  style:ViewStyle
-}
-
-
-
-export const SelectIcon=({icon,onPress,focused,name,style}:TabIconProps)=>{
+export const SelectIcon=({icon,onPress,focused,name,style}:TabIconsProps)=>{
   return (
     <Pressable 
     style={{
@@ -122,7 +111,7 @@ export const SelectIcon=({icon,onPress,focused,name,style}:TabIconProps)=>{
 }
 
 
-export const SelectAccountIcon=({icon,onPress,focused,name}:TabIconProps)=>{
+export const SelectAccountIcon=({icon,onPress,focused,name}:TabIconsProps)=>{
   return (
     <Pressable 
     style={{
@@ -153,10 +142,10 @@ export const getIconByName=(name:string | null, focused:boolean,
   return found?found.symbol(focused,color,size):null
 }
 
-export const getAccountIconByName=(name:string | null,focused:boolean)=>{
+export const getAccountIconByName=(name:string | null,focused:boolean,color?:string,size?:number)=>{
   if(!name) return null 
 
   const found=AccountIcons.find(c=>c.name===name)
 
-  return found?found.symbol(focused):null
+  return found?found.symbol(focused,color,size):null
 }
