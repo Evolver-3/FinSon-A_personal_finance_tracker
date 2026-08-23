@@ -1,28 +1,21 @@
 import { View, FlatList} from 'react-native'
-import React,{useState} from 'react'
+import {useState} from 'react'
 import Wrapper from '@/components/mainUi/WrapperPage'
 import { useCategory } from '@/hooks/useCategory'
 import CreateCategory from '@/components/category/CreateCategory'
 import RenderCategory from '@/components/category/RenderCategory'
-import { categorydynamicColors } from '@/data'
 import HeaderList from '@/components/comps/Flat/HeaderList'
 import { FakeLoad } from '@/components/comps/Animate/FakeLoad'
 import { useTheme } from '@/hooks/useTheme'
 
 const CategoryPage = () => {
 
-  const { selectedCategory,editCategory,fetchCategory,categories,loading,creatingCategory,removeCategory,error}=useCategory()
+  const { selectedCategory,editCategory,categories,loading,creatingCategory,removeCategory}=useCategory()
 
   const [visible,setVisible]=useState(false)
-
-  const [name,setName]=useState("")
-  const [color,setColor]=useState<CategoryColor>(categorydynamicColors[0])
-  const [icon,setIcon]=useState<string | null>(null)
-  const [type,setType]=useState<"INCOME" | "EXPENSE">("EXPENSE")
-
   const [renderPageLoading,setRenderPageLoading]=useState(false)
 
-  const [createError,setCreateError]=useState<string | null>(null)
+  const [pageError,setPageError]=useState<string | null>("")
 
   const [query,setQuery]=useState("")
   const {isDark}=useTheme()
@@ -33,29 +26,6 @@ const CategoryPage = () => {
   })
 
   const isInitiallyLoading=loading && categories.length===0
-
-
-  const handleSubmit=async()=>{
-  
-   try{
-    setRenderPageLoading(true)
-    setCreateError(null)
-
-    await creatingCategory({name,type,color,icon})
-    console.log("category rem0ved:",name,type,color,icon)
-    setName("")
-    setColor(categorydynamicColors[0])
-    setVisible(false)
-   }catch(err:any){
-    setCreateError(err?.response?.data?.message || err?.message || error || "Error occurred while creatin category")
-
-   }finally{
-    setRenderPageLoading(false)
-   }
-
-  }
-
-  
   return (
     <Wrapper
     loading={false}>
@@ -63,16 +33,12 @@ const CategoryPage = () => {
        <CreateCategory
         visible={visible}
         setVisible={setVisible}
-        name={name}
-        setName={setName}
-        type={type} 
-        setType={setType} 
-        color={color}
-        setColor={setColor}
-        icon={icon}
-        setIcon={setIcon}
-        handleSubmit={handleSubmit}
-        loading={renderPageLoading} 
+        loading={renderPageLoading}
+        setloading={setRenderPageLoading}
+        pageError={pageError}
+        setPageError={setPageError}
+        creatingCategory={creatingCategory}
+
         />
         
         <FlatList
@@ -111,12 +77,10 @@ const CategoryPage = () => {
         renderItem={({item})=>(
           <RenderCategory
           item={item}
-        loading={renderPageLoading}
-        selectedCategory={selectedCategory}
-        editCategory={editCategory}
-        fetchCategory={fetchCategory}
-        removeCategory={removeCategory}
-        />
+          selectedCategory={selectedCategory}
+          editCategory={editCategory}
+          removeCategory={removeCategory}
+          />
         )}
         />
 
