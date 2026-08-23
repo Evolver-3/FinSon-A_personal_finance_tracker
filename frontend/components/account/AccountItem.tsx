@@ -1,4 +1,4 @@
-import { View, Text, Pressable, ActivityIndicator } from 'react-native'
+import { View, Text, ActivityIndicator } from 'react-native'
 import React, { useState } from 'react'
 import { getAccountIconByName } from '../comps/Mode/ModalComp'
 import { useTheme } from '@/hooks/useTheme'
@@ -143,7 +143,7 @@ const AccountItem = ({item,editAccount,removeAccount}:AccountItemProps) => {
         name:item.name,
         balance:item.balance,
         type:item.type,
-        color:item?.color?.btncolor ,
+        color:item?.color ,
         icon:item.icon
       }}
       submitText={"Edit your account"}

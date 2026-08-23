@@ -10,7 +10,7 @@ const AccountData = ({initialValues,error,setError,loading,onSubmit,submitText,o
 
     const [name,setName]=useState(initialValues?.amount?.toString()?? "")
     const [balance,setBalance]=useState(initialValues?.month?.toString() ?? "")
-    const [color,setColor]=useState<string>(initialValues?.color ??categorydynamicColors[0].btncolor)
+    const [color,setColor]=useState<CategoryColor>(initialValues?.color ??categorydynamicColors[0])
     const [icon,setIcon]=useState<string | null>(initialValues?.icon ??null)
     const [type,setType]=useState <"CASH" | "BANK" | "CARD" | "WALLET">(initialValues?.type ??"CASH")
 
@@ -21,7 +21,7 @@ const AccountData = ({initialValues,error,setError,loading,onSubmit,submitText,o
         setBalance(initialValues?.balance ?? "")
         setIcon(initialValues?.icon ?? null)
         setType(initialValues?.type ?? "CASH")
-        setColor(initialValues?.color ?? categorydynamicColors[0]?.btncolor )
+        setColor(initialValues?.color ?? categorydynamicColors[0] )
       }
     },[initialValues])
   
@@ -46,7 +46,7 @@ const AccountData = ({initialValues,error,setError,loading,onSubmit,submitText,o
       setName("")
       setType("CASH")
       setIcon(null)
-      setColor(categorydynamicColors[0].btncolor)
+      setColor(categorydynamicColors[0])
   
       setOpenModal(false)
     }
@@ -132,8 +132,8 @@ const AccountData = ({initialValues,error,setError,loading,onSubmit,submitText,o
                 style={{
                   backgroundColor:col.btncolor
                 }}
-                focused={color===col.btncolor}
-                onPress={()=>setColor(color)}/>
+                focused={color?.btncolor===col.btncolor}
+                onPress={()=>setColor(col)}/>
             </View>))}
         </ScrollView>
       </View>

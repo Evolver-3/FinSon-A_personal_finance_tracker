@@ -1,5 +1,5 @@
 import { View, Text, FlatList} from 'react-native'
-import React, { useState } from 'react'
+import { useState} from 'react'
 import Wrapper from '@/components/mainUi/WrapperPage'
 import { useAccount } from '@/hooks/useAccount'
 import CreateAccount from '@/components/account/CreateAccount'
@@ -9,12 +9,10 @@ import { FakeLoad } from '@/components/comps/Animate/FakeLoad'
 import { useTheme } from '@/hooks/useTheme'
 
 const AccountPage = () => {
-  const {loading,error,creatingAccount,accounts,editAccount,removeAccount,  selectedAccount}=useAccount()
+  const {loading,creatingAccount,accounts,editAccount,removeAccount,selectedAccount}=useAccount()
   
   const [openCreate,setOpenCreate]=useState(false)
-
   const {isDark}=useTheme()
-
   const [pageLoad,setPageLoad]=useState(false)
   const [pageError,setPageError]=useState<string | null>("")
   const [query,setQuery]=useState("")
@@ -26,12 +24,11 @@ const AccountPage = () => {
 
   const isInitiallyLoading=loading && accounts.length===0
 
-  const newError=pageError || error
   return (
     <Wrapper loading={false}>
       
       <CreateAccount
-      pageError={newError}
+      pageError={pageError}
       pageLoad={pageLoad}
       creatingAccount={creatingAccount}
       openModal={openCreate}
