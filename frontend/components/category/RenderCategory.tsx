@@ -1,41 +1,31 @@
-import { View, Text, FlatList,Pressable, ActivityIndicator, Modal} from 'react-native'
-import { Pencil } from 'lucide-react-native'
+import { View, Text, ActivityIndicator} from 'react-native'
 import React,{useState} from 'react'
 import UpdateCategory from './UpdateCategory'
 import { getIconByName } from '../comps/Mode/ModalComp'
 import { useTheme } from '@/hooks/useTheme'
 import PressedAnimate from '../comps/Animate/PressedAnimate'
 
-type RenderCategoryProps={
-  item:Category
-  loading:boolean
-  selectedCategory:Category |null
-  editCategory:(id:string,data:updateCategoryProps)=>Promise<void>
-  fetchCategory:(id:string)=>Promise<Category>
-  removeCategory:(id:string)=>Promise<void>
-  
-}
+const RenderCategory = ({editCategory,removeCategory,item,selectedCategory}:RenderCategoryProps) => {
 
-const RenderCategory = ({loading,editCategory,removeCategory,item}:RenderCategoryProps) => {
-
-  const [openEdit,setOpenEdit]=useState(false)
-  const [selectedCategory,setSelectedCategory]=useState<Category|null>(null)
-  const [removePageLoading,setRemovePageLoading]=useState(false)
+  const [openModal,setOpenModal]=useState(false)
+  const [deleteLoad,setDeleteLoad]=useState(false)
+  const [editLoad,setEditLoad]=useState(false)
+  const [pageError,setPageError]=useState<string | null>("")
   
   const {isDark}=useTheme()
 
    const handleDeleteCategory=async()=>{
+      setDeleteLoad(true)
     try{
-      setRemovePageLoading(true)
 
-      if(!selectedCategory?.id)return 
+      if(!item?.id)return 
+    console.log("selected category::",item?.id)
 
-      await removeCategory(selectedCategory?.id)
-      setOpenEdit(false)
+      await removeCategory(item?.id)
     }catch(error){
       console.log(error)
     }finally{
-      setRemovePageLoading(false)
+      setDeleteLoad(false)
 
     }
     }
@@ -46,7 +36,7 @@ const RenderCategory = ({loading,editCategory,removeCategory,item}:RenderCategor
       <View
         className='rounded-xl py-6 px-4 mainbg mainborder flex-col gap-y-4'
         style={{
-          backgroundColor:isDark?"#212121":item.color.colors,
+          backgroundColor:isDark?"#212121":item?.color?.colors,
           elevation:2
         }}>
           <View
@@ -55,9 +45,9 @@ const RenderCategory = ({loading,editCategory,removeCategory,item}:RenderCategor
               className='p-2 items-center rounded-lg'
               style={{
                 elevation:5,
-                backgroundColor:item.color.darkColor
+                backgroundColor:item?.color?.darkColor
               }}>
-              {getIconByName(item.icon,false,isDark?"#000000":"#ffffff",24)}
+              {getIconByName(item?.icon || null,false,isDark?"#000000":"#ffffff",24)}
             </View>
              
             <View 
@@ -90,7 +80,7 @@ const RenderCategory = ({loading,editCategory,removeCategory,item}:RenderCategor
               className='flex-row gap-x-5 justify-end flex-grow'>
               
               <PressedAnimate
-                onPress={()=>setOpenEdit(true)}
+                onPress={()=>setOpenModal(true)}
                 originalColor={isDark?"#518151":"#ADF7B3"}
                 pressedColor={isDark?"#49B649":"#CEE9D0"}
                 style={{
@@ -122,7 +112,7 @@ const RenderCategory = ({loading,editCategory,removeCategory,item}:RenderCategor
                   justifyContent:"center",
                   elevation:6}}>
                   
-                    {removePageLoading ?
+                    {deleteLoad ?
                     (<ActivityIndicator color={"#ffffff"} size={10}/>):
                     <Text 
                       className="smallText text-xs"
@@ -138,11 +128,33 @@ const RenderCategory = ({loading,editCategory,removeCategory,item}:RenderCategor
       </View>
 
       <UpdateCategory
-      openEdit={openEdit}
-      setOpenEdit={setOpenEdit}
-      selectedCategory={selectedCategory}
-      editCategory={editCategory}
-      loading={loading}/>
+      initialValues={{
+        name:item.name,
+        color:item?.color,
+        type:item.type,
+        icon:item.icon
+      }}
+      submitText={"Edit categories"}
+      openModal={openModal}
+      setOpenModal={setOpenModal}
+      loading={editLoad}
+      error={pageError}
+      setError={setPageError}
+      
+      onSubmit={async(values)=>{
+        setEditLoad(true)
+        setPageError("")
+        try{
+          console.log('btn clicked--edit')
+          await editCategory(item.id,{...values})
+        }catch(err:any){
+          const message=err?.response?.data?.message || err?.message || "Failed to sign in"
+          setPageError("server error")
+        setPageError(message)
+        }finally{
+          setEditLoad(false)
+        }
+      }}/>
               
     </View>
   )
