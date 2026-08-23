@@ -155,12 +155,8 @@ type BudgetContextType = {
     id:string
     name:string 
     type:"CASH" | "BANK" | "CARD" | "WALLET" 
-    color?:{
-      btncolor:string 
-      colors:string 
-      darkColor:string
-    }
-    icon?:string
+    color?:CategoryColor
+    icon:string | null
     balance?:string
     createdAt?:string 
     updatedAt?:string
@@ -169,11 +165,7 @@ type BudgetContextType = {
   type Category={
     id:string
     name:string 
-    color?:{
-      btncolor:string 
-      colors:string 
-      darkColor:string
-    }
+    color?:CategoryColor
     icon?:string | null
     type:"INCOME" | "EXPENSE"
     createdAt?:string 
@@ -307,34 +299,30 @@ type createBudgetPageProps={
 type createCateProps={
   visible:boolean 
   setVisible:React.Dispatch<React.SetStateAction<boolean>>
-  name:string 
-  setName:React.Dispatch<React.SetStateAction<string>>
-  type:string
-  setType:React.Dispatch<React.SetStateAction<"INCOME"|"EXPENSE">>
-  color:CategoryColor
-  setColor:React.Dispatch<React.SetStateAction<CategoryColor>>
-  handleSubmit:()=>void
   loading:boolean
-  icon:string|null
-  setIcon:React.Dispatch<React.SetStateAction<string| null>>
+  setloading:React.Dispatch<React.SetStateAction<boolean>>
+  pageError:string | null
+  setPageError:React.Dispatch<React.SetStateAction<string| null>>
+  creatingCategory:(data:createCategoryProps)=>Promise<void>
 }
 
 type RenderCategoryProps={
   item:Category
-  loading:boolean
   selectedCategory:Category |null
   editCategory:(id:string,data:updateCategoryProps)=>Promise<void>
-  fetchCategory:(id:string)=>Promise<Category>
   removeCategory:(id:string)=>Promise<void>
   
 }
 
 type updateProps={
-  openEdit:boolean
-  setOpenEdit:React.Dispatch<React.SetStateAction<boolean>>
-  selectedCategory:Category  | null
-  editCategory:(id:string,data:updateCategoryProps)=>Promise<void>
+  initialValues?:Partial<InitialCategory>
+  error:string | null
+  setError:React.Dispatch<React.SetStateAction<string | null>>
   loading:boolean
+  onSubmit:(values:createCategoryProps)=>Promise<void>
+  submitText:string
+  openModal:boolean
+  setOpenModal:React.Dispatch<React.SetStateAction<boolean>>
 }
 
 
@@ -567,7 +555,7 @@ type InitialAccountValueProps={
   name?:string 
   balance?:string 
   type?:"CASH" | "BANK" | "CARD" | "WALLET"
-  color?:any
+  color?:CategoryColor
   icon:string | null
   amount?:string
   month?:string
@@ -576,6 +564,7 @@ type InitialAccountValueProps={
 type AccountDataProps={
   initialValues?:Partial<InitialAccountValueProps>
   error:string | null
+  setError:React.Dispatch<React.SetStateAction<string | null>>
   loading:boolean
   onSubmit:(values:createAccountProps)=>Promise<void>
   submitText:string
