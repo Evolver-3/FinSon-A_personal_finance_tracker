@@ -13,39 +13,68 @@ export const BudgetProvider=({children}:{children:ReactNode})=>{
   const isGuest=!isSignedIn
 
     const [budgets,setbudgets]=useState<Budget[]>(isGuest?guest.budgets:[])
+    const [transactions, setTransactions]=useState<Transaction[]>(guest.transactions)
   
     const [loading,setLoading]=useState(false)
     const [error,setError]=useState<string|null>(null)
   
+    useEffect(()=>{
+    if(!isGuest){
+      const now=new Date()
+      spendingBudget(now.getMonth()+1,now.getFullYear())
+      }else{
+        setbudgets(guest.budgets)
+      }
+    },[guest.budgets,isGuest])
+
+      useEffect(() => {
+      setbudgets(prev => prev.map(budget => {
+      const spent = transactions
+        .filter(t => 
+        t.categoryId === budget.categoryId &&
+        t.type === 'EXPENSE'
+        )
+        .reduce((sum, t) => sum + Number(t.amount), 0);
+
+      return { ...budget, spent };
+      }));
+    }, [transactions])
+
     const handleError=(error:any)=>{
-      const message=error?.response?.data?.message || error?.message || "Something went wrong"
+      const message=isGuest?'Failed to save locally. Storage may be full.':error?.message?.data?.message || error?.message || "Something went wrong"
   
       setError(message)
       throw error
     }
 
-    useEffect(()=>{
-      if(isGuest){
-        setbudgets(guest.budgets)
-          }
-        },[guest.budgets,isGuest])
     
-  
     const creatingNewBudget=async(data:createBudgetProps)=>{
        setLoading(true)
         setError(null)
       try{
-        const newBudget:Budget={
+
+        if(isGuest){
+          const category=guest.categories.find(c=>c.id===data.categoryId)
+          
+          const now=new Date()
+
+          const spent=guest.transactions.filter(t=>t.categoryId===data.categoryId &&
+            t.type==="EXPENSE"
+          ).reduce((sum,t)=>sum+Number(t.amount),0)
+
+          const newBudget:Budget={
           id:Date.now().toString(),
           ...data,
+          spent:spent,
+          category:category,
           createdAt:new Date().toISOString()
         }
-        if(isGuest){
+        console.log("created balue",newBudget)
           guest.addBudget(newBudget)
         }
        
-  
-        await createBudget(data)
+        const res=await createBudget(data)
+        setbudgets((prev)=>[res.data,...prev])
   
         const now=new Date()
         await spendingBudget(now.getMonth()+1,now.getFullYear())
@@ -58,11 +87,16 @@ export const BudgetProvider=({children}:{children:ReactNode})=>{
     }
   
       const editBudget=async(id:string,data:updateBudgetProps)=>{
-      try{
         setLoading(true)
         setError(null)
+      try{
+        if(isGuest){
+          guest.updatedBudget(id,data)
+        }
+         setbudgets((prev)=>
+          prev.map((bud)=>(bud.id===id?{...bud,...data}:bud)))
+
         await updateBudget(id,data)
-  
         const now=new Date()
         await spendingBudget(now.getMonth()+1,now.getFullYear())
   
@@ -76,18 +110,16 @@ export const BudgetProvider=({children}:{children:ReactNode})=>{
     }
   
       const removeBudget=async(id:string)=>{
-      try{
         setLoading(true)
         setError(null)
-        console.log("hooks::", id)
+      try{
+        if(isGuest){
+          guest.removeBudget(id)
+        }
         await deleteBudget(id)
-        console.log("deleted successfully...")
-  
   
         const now=new Date()
-        console.log("fetching spending...")
         await spendingBudget(now.getMonth()+1,now.getFullYear())
-        console.log("spending fetching ...")
       }catch(error:any){
    
         handleError(error)
@@ -112,11 +144,6 @@ export const BudgetProvider=({children}:{children:ReactNode})=>{
         setLoading(false)
       }
     }
-  
-    useEffect(()=>{
-      const now=new Date()
-      spendingBudget(now.getMonth()+1,now.getFullYear())
-    },[])
 
     return (
       <BudgetContext.Provider 
