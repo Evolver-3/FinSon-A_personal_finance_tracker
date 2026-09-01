@@ -1,15 +1,14 @@
-import { View, Text , FlatList, SectionList} from 'react-native'
-import React, { useCallback, useEffect, useState ,useMemo} from 'react'
+import { View, Text , SectionList} from 'react-native'
+import React, { useCallback, useState ,useMemo, useEffect} from 'react'
 import Wrapper from '@/components/mainUi/WrapperPage'
 import { useTransaction } from '@/hooks/useTransaction'
 import { useAccount } from '@/hooks/useAccount'
 import { useCategory } from '@/hooks/useCategory'
 import HeaderList from '@/components/comps/Flat/HeaderList'
 import RenderTransaction from '@/components/transactionPage/RenderTransaction'
-import { FakeLoad } from '../(usertab)/AccountPage'
+import { FakeLoad } from '@/components/comps/Animate/FakeLoad'
 import { useTheme } from '@/hooks/useTheme'
 import { useFocusEffect } from 'expo-router'
-import { formatMonth } from '@/components/comps/DateFormat'
 
 const Transactions = () => {
   const {transactionsYearly,editTransaction,removeTransaction,fetchTransaction,loading,getByYear}=useTransaction()
@@ -20,17 +19,17 @@ const Transactions = () => {
    useFocusEffect(
     useCallback(()=>{
         getByYear(year)
-      },[year])
+      },[])
     )
 
+    useEffect(()=>{
+      console.log("transactionYearly:",transactionsYearly)
+    },[transactionsYearly])
 
   const {accounts}=useAccount()
   const {categories}=useCategory()
   const [query,setQuery]=useState('')
 
-  const currentMonth=useMemo(()=>{
-    return transactionsYearly.months.find(m=>m.month === month)
-  },[transactionsYearly.months, month])
 
   const sections=useMemo(()=>{
     return transactionsYearly.months.filter(m=>m.count>0).map(m=>({
@@ -55,7 +54,7 @@ const Transactions = () => {
         <SectionList
         sections={isInitiallyLoading?[]:sections}
         keyExtractor={(item)=>item.transactions.id}
-        contentContainerStyle={{paddingHorizontal:4,paddingTop:6,gap:10,paddingBottom:64}}
+        contentContainerStyle={{paddingHorizontal:0,paddingTop:6,gap:10,paddingBottom:64}}
         stickySectionHeadersEnabled={true}
         ListHeaderComponent={
           <HeaderList
@@ -65,21 +64,21 @@ const Transactions = () => {
           inlineText={"Search transactions..."}/>}
         renderSectionHeader={({section:{title}})=>(
           <View 
-            className='px-2 py-2 mb-1 mx-4'
+            className='px-6 py-3 '
             style={{
               backgroundColor: isDark ? '#1a1a1a' : '#f3f4f6',
-              borderRadius: 8
             }}>
             <Text 
               className='text-base font-bold'
               style={{ fontFamily: 'Sans-Semibold' }}>
                 {title}
             </Text>
+            <Text>You have spent {} in this month</Text>
           </View>)}
         ListEmptyComponent={
           <FakeLoad
           loading={isInitiallyLoading}
-          hasAccounts={transactionsYearly.months.some(m=>m.count>0)}
+          hasData={transactionsYearly.months.some(m=>m.count>0)}
           query={query}
           unmatchText='No matching transaction found'
           defaultText='Add an transaction'>
