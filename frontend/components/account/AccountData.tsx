@@ -6,7 +6,7 @@ import { ButtonNeed } from '../comps/ButtonNeed'
 import ModalComp, { SelectAccountIcon, SelectColors, SelectType } from '../comps/Mode/ModalComp'
 import ErrorPopUp from '../comps/ErrorPopUp'
 
-const AccountData = ({initialValues,error,setError,loading,onSubmit,submitText,openModal,setOpenModal,viewFlex,pressableFlex}:AccountDataProps) => {
+const AccountData = ({initialValues,error,setError,loading,onSubmit,submitText,openModal,setOpenModal}:AccountDataProps) => {
 
     const [name,setName]=useState(initialValues?.amount?.toString()?? "")
     const [balance,setBalance]=useState(initialValues?.month?.toString() ?? "")
@@ -62,11 +62,12 @@ const AccountData = ({initialValues,error,setError,loading,onSubmit,submitText,o
     <ModalComp
    visible={openModal}
    onRequestClose={()=>setOpenModal(false)}
-   textblock={'Create Account'}
-   pressableFlex={pressableFlex}
-    viewFlex={viewFlex}>
+   textblock={'Create Account'}>
   
   <View className='flex-col gap-y-5 mt-5 relative'>
+    <Text className="text-xl font-semibold text-black dark:text-white">
+      Create Account
+    </Text>
     <ErrorPopUp
       errorMessage={error}/>
 

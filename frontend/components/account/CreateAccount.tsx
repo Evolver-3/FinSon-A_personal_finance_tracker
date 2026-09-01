@@ -10,8 +10,6 @@ const CreateAccount = ({creatingAccount,pageError,pageLoad,openModal,setOpenModa
       submitText={"Add new account"}
       openModal={openModal}
       setOpenModal={setOpenModal}
-      pressableFlex={3}
-      viewFlex={7}
       
       onSubmit={async(values)=>{
         setPageLoad(true)

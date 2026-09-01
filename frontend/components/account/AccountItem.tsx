@@ -152,8 +152,6 @@ const AccountItem = ({item,editAccount,removeAccount}:AccountItemProps) => {
       loading={editLoad}
       error={pageError}
       setError={setPageError}
-      pressableFlex={2}
-      viewFlex={4}
       
       onSubmit={async(values)=>{
         setEditLoad(true)
