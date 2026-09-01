@@ -39,7 +39,7 @@ const index = () => {
     useFocusEffect(
       useCallback(()=>{
         const now=new Date()
-        spendingBudget(now.getMonth()+1, now.getFullYear())
+        spendingBudget(now.getMonth()+1, now.getFullYear(),'')
       },[])
     )
 
@@ -118,7 +118,7 @@ const index = () => {
                   pressedColor={isDark?"#393939":"#EBF2F2"}
                   onPress={()=>{
                     router.push({
-                        pathname:"/(usertab)/AccountPage",
+                        pathname:"/(usertab)/ProfilePage/AccountPage",
                       })}}>
                      <View className="flex-row justify-between gap-x-4 items-center">
                     <View
@@ -312,7 +312,7 @@ const index = () => {
                 <Text className='text-xs minText'
                 style={{
                   fontFamily:"Sans-ExtraBold"
-                }}>{formatDate(item.date)}</Text>
+                }}>{formatDate(String(item.date))}</Text>
               </View>
             </View>
 

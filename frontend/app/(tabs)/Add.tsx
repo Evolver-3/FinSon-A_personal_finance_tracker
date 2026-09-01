@@ -1,21 +1,20 @@
 import { View, Text } from 'react-native'
 import  { useCallback, useState } from 'react'
-import Wrapper from '@/components/WrapperPage'
+import Wrapper from '@/components/mainUi/WrapperPage'
 import { useFocusEffect, useRouter } from 'expo-router'
 import { useTransaction } from '@/hooks/useTransaction'
 import { useAccount } from '@/hooks/useAccount'
 import { useCategory } from '@/hooks/useCategory'
-import React from 'react'
 import TransactionForm from '@/components/transactionPage/TransactionForm'
 
 const Add = () => {
-const {creatingNewTransaction,fetchAllTransactions}=useTransaction()
+const {creatingNewTransaction,getByYear}=useTransaction()
 
   const router=useRouter()
 
    useFocusEffect(
         useCallback(()=>{
-          fetchAllTransactions()
+          getByYear(new Date().getFullYear())
         },[])
       )
 
