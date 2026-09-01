@@ -60,7 +60,7 @@ declare global{
     amount:string
     type:"INCOME" | "EXPENSE"
     note?:string 
-    date?:string
+    date?:Date
     accountId?:string
     categoryId?:string
 
@@ -83,7 +83,7 @@ declare global{
     amount?:string
     type?:"INCOME" | "EXPENSE" 
     note?:string 
-    date?:string
+    date?:Date
     accountId?:string
     categoryId?:string
   }
@@ -137,7 +137,7 @@ type BudgetContextType = {
   budgets: Budget[]
   loading: boolean
   error: string | null
-  spendingBudget: (month: number, year: number) => Promise<Budget[] | undefined>
+  spendingBudget: (month: number, year: number, categoryId:string) => Promise<Budget[] | undefined>
   creatingNewBudget: (data: createBudgetProps) => Promise<void>
   editBudget: (id: string, data: updateBudgetProps) => Promise<void>
   removeBudget: (id: string) => Promise<void>
@@ -179,7 +179,7 @@ type BudgetContextType = {
     amount:string 
     type:"INCOME" | "EXPENSE"
     note?:string 
-    date?:string
+    date?:Date
     account?:Account  
     category?:Category  
     accountId?:string 
@@ -265,16 +265,15 @@ type onSubmitBudget={
 type budgetModalProps={
   initialValues?:Partial<createBudgetProps>
   error:string | null
+  setError:React.Dispatch<React.SetStateAction<string | null>>
   loading:boolean
   categories:Category[]
   onSubmit:(values:onSubmitBudget)=>Promise<void>
   submitText:string
   openModal:boolean 
   setOpenModal:React.Dispatch<React.SetStateAction<boolean>>
-  viewFlex:number 
-  pressableFlex:number
+  headerText:string
 }
-
 
 type budgetValues={
   amount:number
@@ -288,12 +287,10 @@ type createBudgetPageProps={
   categories:Category[]
   pageLoad:boolean 
   setPageLoad:React.Dispatch<React.SetStateAction<boolean>>
-  setPageError:React.Dispatch<React.SetStateAction<string>>
-  pageError:string
+  setPageError:React.Dispatch<React.SetStateAction<string | null>>
+  pageError:string | null
   openModal:boolean
   setOpenModal:React.Dispatch<React.SetStateAction<boolean>>
-  viewFlex:number 
-  pressableFlex:number
 }
 
 type createCateProps={
@@ -362,8 +359,6 @@ type ModalCompProps={
   onRequestClose:()=>void 
   textblock:string 
   children:React.ReactNode
-  pressableFlex?:number 
-  viewFlex?:number
 }
 
 type SelectTypeProps={
@@ -405,6 +400,7 @@ type buttonNeedProps={
 
 type ErrorPopUpProps={
   errorMessage:string | null
+  style?:ViewStyle
 }
 
 
@@ -490,7 +486,7 @@ type initialValuesTransactionProps={
   amount?:string 
   type?:"INCOME"|"EXPENSE" 
   note?:string 
-  date?:Date
+  date:Date
   accountId?:string 
   categoryId?:string
 }
@@ -505,8 +501,6 @@ type TransactionCompProps={
   loading:boolean
   openCreate:boolean
   setOpenCreate:React.Dispatch<React.SetStateAction<boolean>>
-  pressableFlex:number 
-  viewFlex:number
   error:string | null
   textBlock:string
 }
@@ -514,12 +508,12 @@ type TransactionCompProps={
 
 type TransactionFormProps={
   initialValues?:Partial<initialValuesTransactionProps>
-    accounts:Account[]
-    categories:Category[]
-    onSubmit:(values:createTransactionProps)=>Promise<void>
-    submitText:string 
-    loading:boolean
-    error:string | null
+  accounts:Account[]
+  categories:Category[]
+  onSubmit:(values:createTransactionProps)=>Promise<void>
+  submitText:string 
+  loading:boolean
+  error:string | null
 }
 
 type fakeLoadProps={
@@ -570,8 +564,6 @@ type AccountDataProps={
   submitText:string
   openModal:boolean
   setOpenModal:React.Dispatch<React.SetStateAction<boolean>>
-  viewFlex:number
-  pressableFlex:number
 }
 
 type createLoginPageHookProps={
