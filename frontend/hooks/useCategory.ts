@@ -16,19 +16,15 @@ export const useCategory=()=>{
   const [error,setError]=useState<string|null>(null)
 
   useEffect(()=>{
-    if(isGuest){
+    if(!isGuest){
+      fetchAllCategory() 
+    }else{
       setCategories(guest.categories)
     }
   },[guest.categories,isGuest])
 
-  useEffect(()=>{
-    if(!isGuest){
-      fetchAllCategory()
-    }
-  },[isGuest])
-
   const handleError=(error:any)=>{
-    const message=error?.message?.data?.message || error?.message || "Something went wrong"
+    const message=isGuest?"Failed to save. Storage may be full":error?.message?.data?.message || error?.message || "Something went wrong"
 
     setError(message)
     throw error 
@@ -49,7 +45,7 @@ export const useCategory=()=>{
       }
 
       const res=await createCategory(data)
-      console.log("category created:",res.data)
+      console.log("res data:",res)
 
       setCategories((prev)=>[res.data, ...prev])
 
@@ -72,9 +68,7 @@ export const useCategory=()=>{
 
       const res=await getCategories()
       setCategories(res.data)
-
       return res.data
-
 
     }catch(error:any){
      
@@ -96,13 +90,7 @@ export const useCategory=()=>{
       setError(null)
 
       const res=await getCategory(id)
-
-      console.log("fetchSingle--res.data",res.data)
-
-      console.log("fetchSingle--res.data.data",res.data.data)
-
       setSelectedCategory(res.data)
-
       return res.data
 
 
@@ -130,7 +118,6 @@ export const useCategory=()=>{
       }
 
       const res=await updateCategory(id,data)
-      console.log("edit category:",res)
 
       setCategories((prev)=>
       prev.map((category)=>(category.id === id ? res.data:category)))
@@ -174,10 +161,6 @@ export const useCategory=()=>{
       setLoading(false)
     }
   }
-
-  useEffect(()=>{
-    fetchAllCategory()
-  },[])
 
   return {
     loading,

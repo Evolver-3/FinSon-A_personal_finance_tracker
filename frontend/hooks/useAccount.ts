@@ -46,7 +46,6 @@ export const useAccount=()=>{
         ...data,
         createdAt:new Date().toISOString()
       }
-      console.log("newAccount for guest use:",newAccount)
 
       if(isGuest){
         guest.addAccount(newAccount)
@@ -54,7 +53,6 @@ export const useAccount=()=>{
 
       const res=await createAccount(data)
       setAccounts((prev)=>[res.data, ...prev])
-      console.log("hooks res:",res.data)
       return res.data
 
     }catch(error:any){
@@ -107,7 +105,7 @@ export const useAccount=()=>{
     }
   }
 
-    const editAccount=async(id:string,data:updateAccountProps)=>{
+  const editAccount=async(id:string,data:updateAccountProps)=>{
       setLoading(true)
       setError(null)
     try{
@@ -156,6 +154,7 @@ export const useAccount=()=>{
       setAccounts((prev)=>prev.filter((acc)=>acc.id !==id))
 
       setSelectedAccount((prev)=>prev?.id ===id? null :prev)
+      console.log("deleted....")
 
 
     }catch(error:any){
@@ -166,10 +165,6 @@ export const useAccount=()=>{
       setLoading(false)
     }
   }
-
-  useEffect(()=>{
-    fetchAllAccounts()
-  },[])
 
   return {
     accounts,
