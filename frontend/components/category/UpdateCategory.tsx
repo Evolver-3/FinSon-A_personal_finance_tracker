@@ -61,10 +61,11 @@ const UpdateCategory = ({initialValues,
     visible={openModal}
     onRequestClose={()=>setOpenModal(false)}
     textblock={"Update Category"}
-    pressableFlex={3}
-    viewFlex={3}
     >
       <View className="flex-col gap-y-5 mt-5 relative">
+        <Text className="text-xl font-semibold text-black dark:text-white">
+          Update Category
+        </Text>
         <ErrorPopUp
         errorMessage={error}/>
 
