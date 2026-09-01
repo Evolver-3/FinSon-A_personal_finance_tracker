@@ -1,5 +1,5 @@
 import { View, Text ,FlatList} from 'react-native'
-import React, { useCallback, useState } from 'react'
+import { useCallback, useState } from 'react'
 import Wrapper from '@/components/mainUi/WrapperPage'
 import { useBudget } from '@/hooks/useBudget'
 import CreateBudget from '@/components/budget/CreateBudget'
@@ -14,26 +14,25 @@ import { useCurrency } from '@/context/CurrencyContext'
 import { formatAmount } from '@/components/comps/DateFormat'
 import ThemeIcon from '@/components/Theme/ThemeIcon'
 
-
 const Budget = () => {
 
   const {creatingNewBudget,loading,budgets,spendingBudget}=useBudget()
   const {categories}=useCategory()
-  const [pageError,setPageError]=useState("")
+  const [pageError,setPageError]=useState<string | null>(null)
   const [pageLoad,setPageLoad]=useState(false)
   const [query,setQuery]=useState('')
   const [openModal,setOpenModal]=useState(false)
 
   const {isDark}=useTheme()
   const {symbol}=useCurrency()
- useFocusEffect(
-       useCallback(()=>{
-         const now=new Date()
-         spendingBudget(now.getMonth()+1, now.getFullYear())
-       },[])
-     )
- 
 
+  useFocusEffect(
+      useCallback(()=>{
+         const now=new Date()
+         spendingBudget(now.getMonth()+1, now.getFullYear(),'')
+      },[])
+  )
+ 
   const isInitiallyLoading=loading && budgets.length===0
 
   const monthlyBudget=(monthNumber:number)=>{
@@ -60,6 +59,7 @@ const Budget = () => {
     return (
     <Wrapper loading={false}>
   
+      {/* passed props in the model */}
       <CreateBudget
       creatingNewBudget={creatingNewBudget}
       loading={loading}
@@ -68,11 +68,10 @@ const Budget = () => {
       setPageLoad={setPageLoad}
       setPageError={setPageError}
       pageError={pageError}
-      pressableFlex={2}
-      viewFlex={6}
       openModal={openModal}
       setOpenModal={setOpenModal}/>
 
+      {/* Rendered all budget Data Created */}
       <FlatList
       data={filteredData}
       keyExtractor={(item)=>item.id}
@@ -81,8 +80,11 @@ const Budget = () => {
         paddingTop:6,
         gap:10
       }}
+
       ListHeaderComponent={
         <View className='flex-col gap-y-4'>
+
+          {/* Header which include a searchbar and create btn */}
           <HeaderList 
           pressableNeeded
           setQuery={setQuery}
@@ -90,28 +92,33 @@ const Budget = () => {
           inlineText={"Search Budgets..."}
           onPress={()=>setOpenModal(true)}/>
           
+          {/* Monthly total budget card */}
           <View className="px-4 mb-4">
             <View className="boxBlock mainborder"
           style={{
             gap:6,
             elevation:2
           }}>
-            <Text className='smallText text-md'
+            <Text className='smallText text-xl'
               style={{
                 fontFamily:"Sans-Semibold"
               }}>Monthly{"  "}Budget{"  "}Remains</Text>
 
-            <View className='flex-row gap-x-2 items-end'>
-              <ThemeIcon icon={symbol} size={20}/>
+            <View className='flex-col'>
+              <View className='flex-row items-center'>
+                <ThemeIcon icon={symbol} size={20}/>
               <Text className=' text-3xl text-green-500'
               style={{
                 fontFamily:"Sans-Bold"
               }}>{formatAmount(getRemainingPerMonth)}</Text> 
-              <View className=' smallText text-xs '
+              </View>
+              <View className=' smallText text-xs flex-row gap-x-2'
               >
-                <Text>remains of</Text>
-                <ThemeIcon icon={symbol} size={20}/>
-                <Text>{formatAmount(getTotalPerMonth)}</Text> 
+                <Text className="text-white">remains of</Text>
+                <View className="flex-row items-center gap-x-px">
+                <ThemeIcon icon={symbol} size={14}/>
+                <Text className="smallText">{formatAmount(getTotalPerMonth)}</Text> 
+                </View>
               </View>
             </View>
           </View>
@@ -119,6 +126,8 @@ const Budget = () => {
         </View>
         }
       ListEmptyComponent={
+
+        // Loading Ui when the data is fetched
         <FakeLoad 
           loading={isInitiallyLoading}
           hasData={budgets.length>0}
@@ -136,6 +145,8 @@ const Budget = () => {
         </FakeLoad>
         }
       renderItem={({item})=>(
+      
+        // Rendered full list of budget 
         <RenderBudget
         item={item}
         symbol={symbol}/>

@@ -1,32 +1,51 @@
-import { View, Text,Pressable } from 'react-native'
-import React, { useState ,useEffect} from 'react'
+import { View, Text } from 'react-native'
 import { getIconByName } from '../comps/Mode/ModalComp'
-import BudgetSpentBar from '../comps/Animate/BudgetSpentBar'
-import { ChevronLeft ,ChevronRight} from 'lucide-react-native'
+import { ChevronRight} from 'lucide-react-native'
 import ThemeIcon from '../Theme/ThemeIcon'
 import { useRouter } from 'expo-router'
 import PressedAnimate from '../comps/Animate/PressedAnimate'
 import { useTheme } from '@/hooks/useTheme'
-import { formatAmount } from '@/app/(tabs)/home'
+import { formatAmount } from '@/components/comps/DateFormat'
+import {useAuth as useClerkAuth} from '@clerk/clerk-expo'
 
-
-const RenderBudget = ({item}:{item:Budget}) => {
+const RenderBudget = ({item,symbol}:{item:Budget,symbol:any}) => {
   const {isDark}=useTheme()
   const router=useRouter()
+  const {isSignedIn}=useClerkAuth()
+  const isGuest=!isSignedIn
 
   const spentAmount=Number(item.spent)
-  const remainingAmount=Number(item.remaining)
+  const remainingAmount=isGuest?Number(item.amount-spentAmount):Number(item.remaining)
 
   const totalAmount=spentAmount+remainingAmount
-
-
   const perLeft=(remainingAmount/totalAmount *100).toPrecision(4)
+
+
+  const handlePress=()=>{
+    try{
+      router.push({
+        pathname:"/(usertab)/BudgetData",
+        params:{
+          categoryId:item.categoryId,
+          month:String(item.month),
+          year:String(item.year),
+          budgetId:item.id,
+          symbol:item.category?.icon
+        }
+      })
+      // console.log("router.push called successfully")
+
+    }catch(error:any){
+      console.log("router push error:", error)
+
+    }
+  }
 
   return (
     <View className='px-4'>
       <View className="rounded-xl py-6 px-4 mainbg mainborder flex-col gap-y-4"
       style={{
-        backgroundColor:isDark?"#212121":item.category?.color.colors,
+        backgroundColor:isDark?"#212121":item?.category?.color?.colors,
         elevation:2
       }}>
 
@@ -34,7 +53,7 @@ const RenderBudget = ({item}:{item:Budget}) => {
           <View className="flex-row gap-x-5 items-center">
             <View className='rounded-lg p-2'
             style={{
-              backgroundColor:item.category?.color.darkColor,
+              backgroundColor:item.category?.color?.darkColor,
               elevation:5
             }}>
               {getIconByName(item.category?.icon ?? null,false,isDark?"#000000":"#ffffff",24)}
@@ -60,7 +79,10 @@ const RenderBudget = ({item}:{item:Budget}) => {
               style={{
                 fontFamily:"Sans-Extrabold"
               }}>Remaining</Text>
+              <View>
+              <ThemeIcon icon={symbol} size={20}/>
               <Text className="text-green-400 text-md">{formatAmount(remainingAmount)}</Text>
+              </View>
           </View>
 
           <PressedAnimate
@@ -73,17 +95,7 @@ const RenderBudget = ({item}:{item:Budget}) => {
             }}
             originalColor={"transparent"}
             pressedColor={"rgba(99, 102, 241, 0.16)"}
-            onPress={()=>{
-              router.push({
-                pathname:"/(usertab)/BudgetData",
-                params:{
-                  categoryId:item.categoryId,
-                  month:String(item.month),
-                  year:String(item.year),
-                  budgetId:item.id
-                }
-              })
-            }}>
+            onPress={handlePress}>
               <ThemeIcon
             icon={ChevronRight}
             size={16}/>

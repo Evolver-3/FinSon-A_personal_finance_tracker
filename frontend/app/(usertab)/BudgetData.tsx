@@ -1,32 +1,39 @@
-import { View, Text, FlatList, ActivityIndicator } from 'react-native'
-import React,{useCallback, useState} from 'react'
-import { useTransaction } from '@/hooks/useTransaction'
-import Wrapper from '@/components/WrapperPage'
-import { useRouter, useLocalSearchParams, useFocusEffect } from 'expo-router'
-import { getIconByName } from '@/components/comps/Mode/ModalComp'
-import { useBudget } from '@/hooks/useBudget'
-import PressedAnimate from '@/components/comps/Animate/PressedAnimate'
-import { useTheme } from '@/hooks/useTheme'
-import BudgetModel from '@/components/budget/BudgetModel'
-import { useCategory } from '@/hooks/useCategory'
-import BudgetSpentBar from '@/components/comps/Animate/BudgetSpentBar'
-import { FakeLoad } from './AccountPage'
-import { formatAmount } from '../(tabs)/home'
-import { formatDate } from '@/components/comps/DateFormat'
-import Animateddrop from '@/components/comps/Animate/Animateddrop'
+import BudgetModel from "@/components/budget/BudgetModel"
+import Animateddrop from "@/components/comps/Animate/Animateddrop"
+import BudgetSpentBar from "@/components/comps/Animate/BudgetSpentBar"
+import { FakeLoad } from "@/components/comps/Animate/FakeLoad"
+import PressedAnimate from "@/components/comps/Animate/PressedAnimate"
+import { formatAmount, formatDate } from "@/components/comps/DateFormat"
+import { getIconByName } from "@/components/comps/Mode/ModalComp"
+import Wrapper from "@/components/mainUi/WrapperPage"
+import ThemeIcon from "@/components/Theme/ThemeIcon"
+import { useBudget } from "@/hooks/useBudget"
+import { useCategory } from "@/hooks/useCategory"
+import { useTheme } from "@/hooks/useTheme"
+import { useTransaction } from "@/hooks/useTransaction"
+import { useAuth } from "@clerk/clerk-expo"
+import { useFocusEffect } from "expo-router"
+import { useLocalSearchParams, useRouter } from "expo-router"
+import { useCallback, useMemo, useState } from "react"
+import { ActivityIndicator, FlatList, Text, View } from "react-native"
+
 
 const BudgetData = () => {
 
-  const {categoryId,month,year,budgetId}=useLocalSearchParams<{ 
+  const {categoryId,month,year,budgetId,symbol}=useLocalSearchParams<{ 
     categoryId:string 
     month:string
     year:string
     budgetId:string
+    symbol:any
   }>()
+
+  const {isSignedIn}=useAuth()
+  const isGuest=!isSignedIn
 
   const router=useRouter()
 
-  const {editBudget,removeBudget,budgets,error,spendingBudget}=useBudget()
+  const {editBudget,removeBudget,budgets,spendingBudget}=useBudget()
   const {transactions,loading}=useTransaction()
   const {categories}=useCategory()
   const [openEdit,setOpenEdit]=useState(false)
@@ -37,19 +44,23 @@ const BudgetData = () => {
   const [pageError,setPageError]=useState<string | null>("")
   const [editLoad,setEditLoad]=useState(false)
 
-    useFocusEffect(
-        useCallback(()=>{
-          const now=new Date()
-          spendingBudget(now.getMonth()+1, now.getFullYear())
-        },[])
+  useFocusEffect(
+    useCallback(()=>{
+      const now=new Date()
+      spendingBudget(now.getMonth()+1, now.getFullYear(),'')
+
+      if(isGuest){
+        spendingBudget(Number(month),Number(year),categoryId)
+        }
+    },[isGuest,month,year,categoryId])
+  )
+
+  const budgetTransactions=useMemo(()=>{
+    return transactions.filter(t=>
+      t.categoryId===categoryId &&
+      t.type==="EXPENSE"
       )
-  
-  const budgetTransactions=transactions.filter(transaction=>{
-    const date=new Date(transaction.date)
-    return (
-      transaction.category?.id=== categoryId && date.getMonth()+1 === Number(month) && date.getFullYear()===Number(year)
-    )
-  })
+    },[transactions,categoryId])
 
   const isInitiallyLoading=loading && budgetTransactions.length===0
 
@@ -67,13 +78,11 @@ const BudgetData = () => {
     setDeleteLoad(true)
     setPageError(null)
     try{
-    console.log(budgetId)
     await removeBudget(budgetId)
-    console.log("remove success")
     router.back()
 
     }catch(err:any){
-     const message=err?.response?.data?.message || err?.message || error||"Failed to delete new Budget"
+     const message="Failed to delete new Budget"
      setPageError(message)
 
     }finally{
@@ -81,8 +90,6 @@ const BudgetData = () => {
     }
 
   }
-
-
 
   return (
     <Wrapper loading={false}>
@@ -95,13 +102,13 @@ const BudgetData = () => {
         categoryId:budget?.categoryId
       }}
         error={pageError}
+        setError={setPageError}
         loading={editLoad}
         categories={categories}
         submitText={"Update budget"}
         openModal={openEdit}
         setOpenModal={setOpenEdit}
-        pressableFlex={1}
-        viewFlex={1}
+        headerText='Update Budget'
         onSubmit={
         async(values)=>{
         setEditLoad(true)
@@ -109,9 +116,8 @@ const BudgetData = () => {
           try{
               await editBudget(budgetId,
               {...values})
-              console.log("edit does it even work..")
             }catch(err:any){
-              const message=err?.response?.data?.message || err?.message|| error || "Failed to edit Budget"
+              const message= "Some error happen while updating edit Budget"
               setPageError(message)
             }finally{
               setEditLoad(false)
@@ -144,11 +150,16 @@ const BudgetData = () => {
 
             <View className="flex-col gap-y-6">
               <View className="flex-row justify-between items-end">
+
+            <ThemeIcon icon={symbol} size={20}/>
             <Text className='text-md smallText'
             style={{
               fontFamily:"Sans-Semibold"
             }}>
-                {formatAmount(spentAmount)} spent of {formatAmount(totalAmount)}
+              {formatAmount(spentAmount)} spent of </Text>
+                <ThemeIcon icon={symbol} size={20}/>
+            <Text>
+              {formatAmount(totalAmount)}
             </Text>
             <Text className='text-xs text-green-600 dark:text-green-500'
               style={{
@@ -200,8 +211,8 @@ const BudgetData = () => {
                   fontFamily:"Sans-Semibold"
                 }}>Remove</Text>}
               </PressedAnimate>
-            </View>
-            </View>
+            </View> 
+          </View>
             
         </View>
 
@@ -214,9 +225,9 @@ const BudgetData = () => {
         }
 
       ListEmptyComponent={
-        <FakeLoad 
+        <FakeLoad
             loading={isInitiallyLoading}
-            hasAccounts={budgetTransactions.length>0}
+            hasData={budgetTransactions.length>0}
                 unmatchText='No matching transaction found'
                 defaultText='No transactions exist'
                 >
@@ -238,7 +249,7 @@ const BudgetData = () => {
         <View className='px-4'>
           <Animateddrop 
             viewstyle={{
-              backgroundColor:isDark?"#212121":item.account?.color.colors,
+              backgroundColor:isDark?"#212121":item.account?.color?.colors,
               elevation:2
           }}
           firstChild={
@@ -249,9 +260,9 @@ const BudgetData = () => {
                 <View  className='p-2 items-center rounded-lg '
                        style={{
                          elevation:5,
-                         backgroundColor:item.category?.color.darkColor
+                         backgroundColor:item.category?.color?.darkColor
                        }}>
-                    {getIconByName(item.category?.icon?? null,false,isDark?"#000000":"#ffffff",24)}
+                    {getIconByName(item.account?.icon?? null,false,isDark?"#000000":"#ffffff",24)}
                 </View>
 
                 <View className=" gap-y-2">
@@ -268,27 +279,37 @@ const BudgetData = () => {
                     style={{
                       fontFamily:"Sans-ExtraBold"
                     }}>
-                      {formatDate(item.date)}
+                      {formatDate(String(item.date))}
                   </Text>
                 </View>
               </View>
 
               {item.type==="EXPENSE" ? (
+                <View>
                 <Text
                 className=" text-md biggerText  text-red-400 dark:text-red-400 "
                 style={{
                   fontFamily:"Sans-Semibold"
                 }}>
-                  -{formatAmount(item.amount)}
+                  -{" "} </Text>
+                  <ThemeIcon icon={symbol} size={20}/>
+                  <Text>{formatAmount(item.amount)}
                 </Text>
+                </View>
                 ):(
-                <Text
-                className=" text-md biggerText  text-green-400 px-2 py-1 rounded-lg bg-green-100  dark:bg-gray-600"
+                <View>
+                    <Text
+                  className=" text-md biggerText  text-green-400 px-2 py-1 rounded-lg bg-green-100  dark:bg-gray-600"
                 style={{
                   fontFamily:"Sans-Semibold"
                 }}>
-                  +{formatAmount(item.amount)}
+                  +{" "}
+                  </Text>
+                  <ThemeIcon icon={symbol} size={20}/>
+                  <Text>{formatAmount(item.amount)}
                 </Text>
+                </View>
+                
               )}
               </View>
 
@@ -331,7 +352,7 @@ const BudgetData = () => {
                 <Text
                 className='text-sm'
                 style={{
-                  color:isDark?item.account?.color.btncolor:item.account?.color.darkColor
+                  color:isDark?item.account?.color?.btncolor:item.account?.color?.darkColor
                 }}> {item.account?.name}</Text>
             
               </View>
@@ -341,7 +362,7 @@ const BudgetData = () => {
                 paddingVertical:5,
                 paddingHorizontal:6,
                 elevation:2,
-                backgroundColor:isDark?item.account?.color.darkColor:item.account?.color.btncolor
+                backgroundColor:isDark?item.account?.color?.darkColor:item.account?.color?.btncolor
               }}>
                 <Text className='text-xs oppText'
                 style={{
@@ -354,12 +375,8 @@ const BudgetData = () => {
 
             </View>
           }/>
-
-        
-        
         </View>
-      )}
-      />
+      )}/>
     </Wrapper>
   )
 }

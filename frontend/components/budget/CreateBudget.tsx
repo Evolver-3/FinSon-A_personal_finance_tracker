@@ -1,39 +1,35 @@
 import { View } from 'react-native'
-import React from 'react'
 import BudgetModel from './BudgetModel'
+import { useAuth } from '@clerk/clerk-expo'
+import { useGuest } from '@/hooks/useGuest'
 
-type budgetValues={
-  amount:number
-  month:number
-  year:number
-  categoryId:string
-}
-type createBudgetPageProps={
-  creatingNewBudget:(values:budgetValues)=>Promise<void>
-  loading:boolean
-  categories:Category[]
-  pageLoad:boolean 
-  setPageLoad:React.Dispatch<React.SetStateAction<boolean>>
-  setPageError:React.Dispatch<React.SetStateAction<string>>
-  pageError:string
-  openModal:boolean
-  setOpenModal:React.Dispatch<React.SetStateAction<boolean>>
-  viewFlex:number 
-  pressableFlex:number
-}
-const CreateBudget = ({creatingNewBudget,categories,setPageLoad,pageLoad,setPageError,pageError,openModal,setOpenModal,viewFlex,pressableFlex}:createBudgetPageProps) => {
+const CreateBudget = (
+  {
+    creatingNewBudget,
+    categories,
+    setPageLoad,
+    pageLoad,
+    setPageError,
+    pageError,
+    openModal,
+    setOpenModal
+  }:createBudgetPageProps) => {
+
+  const {isSignedIn}=useAuth()
+  const guest=useGuest()
+  const isGuest=!isSignedIn
+
   return (
     <View>
       <BudgetModel
       error={pageError}
+      setError={setPageError}
       loading={pageLoad}
       categories={categories}
       submitText={"Add new budget"}
       openModal={openModal}
       setOpenModal={setOpenModal}
-      viewFlex={viewFlex}
-      pressableFlex={pressableFlex}
-
+      headerText='Create Your Budget'
       
       onSubmit={async(values)=>{
         setPageLoad(true)
@@ -45,7 +41,7 @@ const CreateBudget = ({creatingNewBudget,categories,setPageLoad,pageLoad,setPage
           })
 
         }catch(err:any){
-           const message=err?.response?.data?.message || err?.message || "Failed to Create new Budget"
+           const message=isGuest?"Failed to Create new Budget": err?.response?.data?.message || err?.message  
 
           setPageError(message)
         }finally{
