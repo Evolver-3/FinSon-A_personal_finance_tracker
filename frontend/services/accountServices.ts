@@ -18,6 +18,7 @@ export const getSingleAccount=async(accountId:string)=>{
 
 export const updateAccount=async(accountId:string,data:updateAccountProps)=>{
   const res=await api.patch(`/account/${accountId}`,data)
+  console.log("updateAccount sevice:", res.data)
   return res.data
 }
 

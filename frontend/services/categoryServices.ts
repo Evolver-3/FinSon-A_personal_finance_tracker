@@ -2,6 +2,7 @@ import {api} from './api'
 
 export const createCategory=async(data: createCategoryProps)=>{
   const res=await api.post("/category",data)
+  console.log("category service created:", res.data)
   return res.data
 }
 

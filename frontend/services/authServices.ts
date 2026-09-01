@@ -7,22 +7,15 @@ export const syncbackend=async(token:string)=>{
     Authorization:`Bearer ${token}`
   }})
 
-
-  console.log("syncBackend services:")
-  console.log("response:", res)
+  console.log("syncBackend services response:", res)
 
   return res.data.data || res.data
 }
 
-export const getMe=async(token:string)=>{
-  const res=await api.get("/auth/user",{
-    headers:{
-      Authorization:`Bearer ${token}`
-    }
-  })
+export const getMe=async()=>{
+  const res=await api.get("/auth/user")
 
-  console.log("getMe service:....")
-  console.log("response:", res)
+  console.log("getMe service response:", res)
 
   return res.data.data || res.data
 }
