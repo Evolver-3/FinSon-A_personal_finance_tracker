@@ -6,7 +6,7 @@ import CreateCategory from '@/components/category/CreateCategory'
 import RenderCategory from '@/components/category/RenderCategory'
 import { categorydynamicColors } from '@/data'
 import HeaderList from '@/components/comps/Flat/HeaderList'
-import { FakeLoad } from './AccountPage'
+import { FakeLoad } from '@/components/comps/Animate/FakeLoad'
 import { useTheme } from '@/hooks/useTheme'
 
 const CategoryPage = () => {
